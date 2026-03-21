@@ -902,23 +902,6 @@ input[type=date]{color-scheme:dark}
 
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   StudyLog Pro v7 — JavaScript
-   Cloud sync via GitHub Gist. Works on phone, tablet, desktop,
-   api.drv.tw — anywhere. No Azure. No OAuth popup.
-
-   HOW TO CONNECT (2 minutes):
-   1. Go to https://github.com/settings/tokens
-   2. "Generate new token (classic)"
-   3. Note: "StudyLog Pro"
-   4. Check only: ✅  gist
-   5. Click "Generate token" → copy it
-   6. Open the app → Setup → paste the token → done
-
-   That token syncs your data to a private GitHub Gist.
-   Paste the same token on any other device to access the same data.
-   Token is stored in localStorage — you only enter it once per device.
-═══════════════════════════════════════════════════════════════ */
 'use strict';
 
 /* ─── SEMESTER FOLDER HELPER ─── */
@@ -1003,7 +986,7 @@ const DEFAULT_ROUTINE = {
 ═══════════════════════════════════ */
 const GIST_FILENAME = 'studylog_data.json';
 const ROUTINE_FILENAME = 'studylog_routine.json';
-const GIST_DESC = 'StudyLog Pro — Academic Journal Data';
+const GIST_DESC = 'StudyLog Pro – Academic Journal Data';
 let ghToken = localStorage.getItem('slp_gh_token') || '';
 let gistId   = localStorage.getItem('slp_gist_id')  || '';
 let ghSyncing = false;
@@ -1171,7 +1154,7 @@ function updateSyncUI() {
 async function connectGitHub(token) {
   setSyncStatus('syncing', 'Verifying token…');
   const user = await validateToken(token);
-  if (!user) { setSyncStatus('ok', 'Saved'); toast('Invalid token — check and try again', 'err'); return false; }
+  if (!user) { setSyncStatus('ok', 'Saved'); toast('Invalid token – check and try again', 'err'); return false; }
   ghToken = token;
   localStorage.setItem('slp_gh_token', token);
   localStorage.setItem('slp_gh_user', user.login);
@@ -1187,7 +1170,7 @@ async function connectGitHub(token) {
     entries = applyTombstones(merged).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
     lsSave({ version: 7, entries });
   } else {
-    // No cloud data yet — upload local data
+    // No cloud data yet – upload local data
     await saveToGist({ version: 7, entries, saved: new Date().toISOString() });
   }
   setSyncStatus('ok', 'Synced ✓');
@@ -1232,7 +1215,7 @@ async function loadData() {
   if (ghToken) {
     const gistData = await loadFromGist();
     if (gistData && gistData.entries) {
-      // Merge tombstones first — union of local + cloud deleted IDs
+      // Merge tombstones first – union of local + cloud deleted IDs
       if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
       const localMap = Object.fromEntries((data?.entries || []).map(e => [e.id, e]));
       const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
@@ -1242,7 +1225,7 @@ async function loadData() {
         if (l && c) merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
         else merged[id] = l || c;
       }
-      // Apply combined tombstones — any entry deleted on any device is removed everywhere
+      // Apply combined tombstones – any entry deleted on any device is removed everywhere
       data = { version: 7, entries: applyTombstones(Object.values(merged)) };
       lsSave(data);
     }
@@ -1268,7 +1251,7 @@ function applyRoutine(r, silent = false) {
   localStorage.setItem('slp_semester_folder', semesterFolder);
   const tb = document.getElementById('tbName');
   if (tb) tb.innerHTML = `StudyLog Pro<small>${META.branch} · ${META.section} · ${META.academicYear}</small>`;
-  document.title = `StudyLog Pro — ${META.routineName}`;
+  document.title = `StudyLog Pro – ${META.routineName}`;
   buildSubjList();
   if (!silent) toast(`Routine: ${META.routineName}`, 'ok');
 }
@@ -1318,7 +1301,7 @@ function renderSuStep() {
       <div class="su-progress">${dots(0)}</div>
       <div class="su-step">Step 1 of 2</div>
       <div class="su-title">Connect GitHub Sync</div>
-      <div class="su-sub">Sync your journal across <strong>all devices</strong> — phone, tablet, computer — for free using a GitHub Personal Access Token.<br><br>Takes 2 minutes to set up. No Azure. No OAuth popup.</div>
+      <div class="su-sub">Sync your journal across <strong>all devices</strong> – phone, tablet, computer – for free using a GitHub Personal Access Token.<br><br>Takes 2 minutes to set up. No Azure. No OAuth popup.</div>
       <div style="background:var(--panel2);border:1px solid var(--border2);border-radius:var(--rs);padding:13px;text-align:left;margin-bottom:14px;font-size:12.5px;color:var(--text2);line-height:1.75">
         <strong style="color:var(--text);display:block;margin-bottom:5px">How to get your token:</strong>
         1. Go to <a href="https://github.com/settings/tokens" target="_blank" rel="noopener" style="color:var(--accent)">github.com/settings/tokens</a><br>
@@ -1330,7 +1313,7 @@ function renderSuStep() {
         <input class="finp" id="suTokenInp" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;font-family:var(--mono);font-size:12px">
         <button class="su-btn" style="width:auto;padding:8px 16px;margin:0" onclick="suConnectGH()">Connect</button>
       </div>
-      <button class="su-btn-sec" onclick="skipToLocal()">Skip — use this device only</button>
+      <button class="su-btn-sec" onclick="skipToLocal()">Skip – use this device only</button>
       <div class="su-note">🔒 Token stored locally. Data in a private GitHub Gist. GitHub is free for this use.</div>`;
     // Allow Enter key in token input
     setTimeout(() => {
@@ -1347,7 +1330,7 @@ function renderSuStep() {
         <code style="font-family:var(--mono);font-size:12px;background:var(--panel3);padding:2px 6px;border-radius:3px">routine_y2s1.json</code> → 3rd Semester</div>
       <button class="su-btn" onclick="suLoadRoutine()">⚙ Load routine JSON</button>
       <button class="su-btn-sec" onclick="finishSetup()">Use default (Y1 Semester 2)</button>
-      <div class="su-note">📋 Once loaded, the routine syncs to GitHub — all devices get it automatically.</div>`;
+      <div class="su-note">📋 Once loaded, the routine syncs to GitHub – all devices get it automatically.</div>`;
   }
 }
 
@@ -1388,7 +1371,7 @@ async function skipToLocal() {
   await loadData();
   document.getElementById('setupOverlay')?.classList.add('hidden');
   render(); buildSubjList(); updateSideTagCloud();
-  toast('Running offline — data on this device only', 'info');
+  toast('Running offline – data on this device only', 'info');
 }
 
 async function finishSetup() {
@@ -1817,10 +1800,10 @@ function renderSchedPicker(dateStr,batch){
   const wrap=document.getElementById('schedPicker');
   if(!dateStr){wrap.innerHTML='<div class="sch-empty">Select a date</div>';return;}
   const d=new Date(dateStr+'T00:00:00'),dow=d.getDay();
-  if(dow===0||dow===6){wrap.innerHTML=`<div class="sch-holiday"><strong>🏖 ${DAYSFULL[dow]} — Weekend</strong>No classes.</div>`;selSubj='OTHER';selTime='';document.getElementById('modalSubjHint').textContent='Other';return;}
+  if(dow===0||dow===6){wrap.innerHTML=`<div class="sch-holiday"><strong>🏖 ${DAYSFULL[dow]} – Weekend</strong>No classes.</div>`;selSubj='OTHER';selTime='';document.getElementById('modalSubjHint').textContent='Other';return;}
   const all=(SCHEDULE[String(dow)]||[]),slots=all.filter(s=>s.batch==='both'||s.batch===batch||batch==='both');
   if(!slots.length){wrap.innerHTML=`<div class="sch-empty">No classes for ${DAYSFULL[dow]}</div>`;return;}
-  wrap.innerHTML=`<div class="sch-day-title">Schedule — <span class="sch-day-pill">${DAYSFULL[dow]}</span></div><div class="sch-grid">${slots.map((sl,i)=>{const sub=SUBJECTS.find(x=>x.id===sl.subj)||{color:'#8b92a8',id:sl.subj};return`<div class="sch-card" id="sch_${i}" onclick="selectSch(${i},'${sl.subj}','${sl.time}')"><div class="sch-time-col"><div class="sch-t-main">${sl.time.split('–')[0]}</div><div class="sch-t-end">–${sl.time.split('–')[1]||''}</div></div><div class="sch-info"><div class="sch-subj-id" style="color:${sub.color}">${sl.subj}</div><div class="sch-subj-name">${sl.note}</div>${sl.room?`<div class="sch-room">${sl.room}</div>`:''}</div><div class="sch-side">${sl.batch!=='both'?`<span class="sch-batch">${sl.batch}</span>`:''}<span class="sch-sel-ico">✓</span></div></div>`;}).join('')}</div>`;
+  wrap.innerHTML=`<div class="sch-day-title">Schedule – <span class="sch-day-pill">${DAYSFULL[dow]}</span></div><div class="sch-grid">${slots.map((sl,i)=>{const sub=SUBJECTS.find(x=>x.id===sl.subj)||{color:'#8b92a8',id:sl.subj};return`<div class="sch-card" id="sch_${i}" onclick="selectSch(${i},'${sl.subj}','${sl.time}')"><div class="sch-time-col"><div class="sch-t-main">${sl.time.split('–')[0]}</div><div class="sch-t-end">–${sl.time.split('–')[1]||''}</div></div><div class="sch-info"><div class="sch-subj-id" style="color:${sub.color}">${sl.subj}</div><div class="sch-subj-name">${sl.note}</div>${sl.room?`<div class="sch-room">${sl.room}</div>`:''}</div><div class="sch-side">${sl.batch!=='both'?`<span class="sch-batch">${sl.batch}</span>`:''}<span class="sch-sel-ico">✓</span></div></div>`;}).join('')}</div>`;
   if(slots.length)selectSch(0,slots[0].subj,slots[0].time);
 }
 function selectSch(idx,subj,time){selSubj=subj;selTime=time;document.getElementById('fSubj').value=subj;document.getElementById('fTime').value=time;document.querySelectorAll('.sch-card').forEach((el,i)=>el.classList.toggle('selected',i===idx));const sub=SUBJECTS.find(x=>x.id===subj)||{label:subj};document.getElementById('modalSubjHint').textContent=sub.label+(time?' · '+time:'');}
@@ -1864,7 +1847,7 @@ function expSel(){expEntries(entries.filter(e=>selIds.has(e.id)),'studylog_selec
 /* ── EXPORT/IMPORT ── */
 function exportAll(){expEntries(entries,'studylog_all');}
 function expEntries(list,fname){
-  const md=list.map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{label:e.subject};const d=new Date(e.date+'T00:00:00');let o=`# ${e.date} — ${s.label}${e.time?' ('+e.time+')':''}\n\n**Date:** ${d.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;if(e.mood)o+=`**Mood:** ${moodEmo(e.mood)}\n`;if(e.rating)o+=`**Rating:** ${e.rating}/10\n`;o+='\n';if((e.titles||[]).length){o+='## Topics\n\n';e.titles.forEach(t=>{o+=t.url?`- [${t.text}](${t.url})\n`:`- ${t.text}\n`;});o+='\n';}if(e.notes)o+=`## Notes\n\n${e.notes}\n\n`;if((e.todos||[]).length){o+='## Tasks\n\n';e.todos.forEach(t=>{o+=`- [${t.done?'x':' '}] ${t.text}${t.due?' (due '+t.due+')':''}\n`;});o+='\n';}if((e.tags||[]).length)o+=`**Tags:** ${e.tags.map(t=>'#'+t).join(' ')}\n\n`;if((e.youtubes||[]).length){o+='## Videos\n\n';e.youtubes.forEach(y=>o+=`- https://youtube.com/watch?v=${y}\n`);}return o+'---\n';}).join('\n');
+  const md=list.map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{label:e.subject};const d=new Date(e.date+'T00:00:00');let o=`# ${e.date} – ${s.label}${e.time?' ('+e.time+')':''}\n\n**Date:** ${d.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;if(e.mood)o+=`**Mood:** ${moodEmo(e.mood)}\n`;if(e.rating)o+=`**Rating:** ${e.rating}/10\n`;o+='\n';if((e.titles||[]).length){o+='## Topics\n\n';e.titles.forEach(t=>{o+=t.url?`- [${t.text}](${t.url})\n`:`- ${t.text}\n`;});o+='\n';}if(e.notes)o+=`## Notes\n\n${e.notes}\n\n`;if((e.todos||[]).length){o+='## Tasks\n\n';e.todos.forEach(t=>{o+=`- [${t.done?'x':' '}] ${t.text}${t.due?' (due '+t.due+')':''}\n`;});o+='\n';}if((e.tags||[]).length)o+=`**Tags:** ${e.tags.map(t=>'#'+t).join(' ')}\n\n`;if((e.youtubes||[]).length){o+='## Videos\n\n';e.youtubes.forEach(y=>o+=`- https://youtube.com/watch?v=${y}\n`);}return o+'---\n';}).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download=fname+'.md';a.click();toast('Exported ✓','ok');
 }
 function importData(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!d.entries)throw new Error('Invalid format');entries=[...entries,...d.entries.filter(n=>!entries.find(x=>x.id===n.id))];await saveData();render();buildSubjList();updateSideTagCloud();toast(`Imported ${d.entries.length} entries ✓`,'ok');}catch(err){toast('Import failed','err');}};inp.click();}
