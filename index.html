@@ -359,7 +359,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .sb-flex{flex:1;min-width:6px}
 
 /* ▀▄▀▄ OVERLAY/MODAL ▀▄▀▄ */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;min-width: 500px;width: 100%;}
 .overlay.open{opacity:1;visibility:visible}
 [data-theme="light"] .overlay{background:rgba(0,0,0,.45)}
 .modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--rl);width:100%;max-width:750px;box-shadow:var(--shadow);transform:translateY(-8px) scale(.99);transition:transform .2s,background .25s;margin:auto}
