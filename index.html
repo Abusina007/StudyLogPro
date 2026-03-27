@@ -545,8 +545,8 @@ kbd{background:var(--panel2);border:1px solid var(--border2);color:var(--text);p
 [data-theme="light"] #toast.ok{background:#f0fdf4;color:var(--green)}
 [data-theme="light"] #toast.err{background:#fff1f2;color:var(--red)}
 [data-theme="light"] #toast.info{background:#eff6ff;color:var(--accent)}
-#undoBar{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:9px 16px;border-radius:var(--rs);font-size:12.5px;z-index:1000;opacity:0;transition:all .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm)}
-#undoBar.show{transform:translateX(-50%);opacity:1}
+#undoBar{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:9px 16px;border-radius:var(--rs);font-size:12.5px;z-index:1000;opacity:0;transition:all .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm);pointer-events: none; transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);}
+#undoBar.show{transform:translateX(-50%);opacity:1;pointer-events: auto;}
 #undoBar button{background:var(--accent);border:none;color:#fff;padding:4px 12px;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font)}
 #undoBar button:hover{background:var(--accent-h)}
 .sel-bar{padding:8px 14px;background:var(--accent-dim2);border-bottom:1px solid rgba(79,142,247,.18);display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);flex-shrink:0}
@@ -903,7 +903,20 @@ input[type=date]{color-scheme:dark}
   <div id="fvContent"></div>
 </div>
 
-<div id="undoBar">🗑 Deleted. <button onclick="undoDelete()">Undo (Ctrl+Z)</button></div>
+<div id="undoBar">
+  <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg fill="#dc2626" version="1.1" id="Layer_1" xmlns:x="&amp;ns_extend;" xmlns:i="&amp;ns_ai;" xmlns:graph="&amp;ns_graphs;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve" stroke="#dc2626" stroke-width="0.00024000000000000003">
+
+<g id="SVGRepo_bgCarrier" stroke-width="0"/>
+
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.4800000000000001"> <metadata> <sfw> <slices> </slices> <slicesourcebounds width="505" height="984" bottomleftorigin="true" x="0" y="-552"> </slicesourcebounds> </sfw> </metadata> <g> <g> <g> <path d="M23,23H1c-0.4,0-0.7-0.2-0.9-0.5c-0.2-0.3-0.2-0.7,0-1l11-20c0.4-0.6,1.4-0.6,1.8,0l11,20c0.2,0.3,0.2,0.7,0,1 C23.7,22.8,23.4,23,23,23z M2.7,21h18.6L12,4.1L2.7,21z"/> </g> </g> <g> <g> <path d="M12,16c-0.6,0-1-0.4-1-1v-5c0-0.6,0.4-1,1-1s1,0.4,1,1v5C13,15.6,12.6,16,12,16z"/> </g> </g> <g> <g> <circle cx="12" cy="18" r="1"/> </g> <g> <path d="M12,19.5c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5S12.8,19.5,12,19.5z M12,17.5c-0.3,0-0.5,0.2-0.5,0.5 s0.2,0.5,0.5,0.5s0.5-0.2,0.5-0.5S12.3,17.5,12,17.5z"/> </g> </g> </g> </g>
+
+<g id="SVGRepo_iconCarrier"> <metadata> <sfw> <slices> </slices> <slicesourcebounds width="505" height="984" bottomleftorigin="true" x="0" y="-552"> </slicesourcebounds> </sfw> </metadata> <g> <g> <g> <path d="M23,23H1c-0.4,0-0.7-0.2-0.9-0.5c-0.2-0.3-0.2-0.7,0-1l11-20c0.4-0.6,1.4-0.6,1.8,0l11,20c0.2,0.3,0.2,0.7,0,1 C23.7,22.8,23.4,23,23,23z M2.7,21h18.6L12,4.1L2.7,21z"/> </g> </g> <g> <g> <path d="M12,16c-0.6,0-1-0.4-1-1v-5c0-0.6,0.4-1,1-1s1,0.4,1,1v5C13,15.6,12.6,16,12,16z"/> </g> </g> <g> <g> <circle cx="12" cy="18" r="1"/> </g> <g> <path d="M12,19.5c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5S12.8,19.5,12,19.5z M12,17.5c-0.3,0-0.5,0.2-0.5,0.5 s0.2,0.5,0.5,0.5s0.5-0.2,0.5-0.5S12.3,17.5,12,17.5z"/> </g> </g> </g> </g>
+
+</svg>
+  Deleted.<button onclick="undoDelete()">Undo (Ctrl+Z)</button></div>
 <div id="toast"></div>
 
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
@@ -1705,7 +1718,9 @@ function buildCard(e){
     <div class="date-col"><div class="dc-d">${d.getDate()}</div><div class="dc-m">${MSHORT[d.getMonth()]}</div><div class="dc-w">${DAYS[d.getDay()]}</div></div>
     <div class="card-info"><span class="card-subj-badge" style="background:${s.bg};color:${s.color}">${s.label}${e.time?`<span class="card-subj-time">· ${esc(e.time)}</span>`:''}</span><div class="card-title-list">${titlesH||'<div class="card-t" style="color:var(--text3);font-style:italic;font-size:13px">Untitled session</div>'}</div>${tagsH}</div>
     <div class="card-ctrl"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end">${overdue?'<span class="overdue-badge">📅 Review</span>':''}${e.mood?`<span style="font-size:12px">${moodEmo(e.mood)}</span>`:''}${e.rating?`<span style="font-size:10.5px;color:var(--accent);font-family:var(--mono);font-weight:700">${e.rating}/10</span>`:''}<span class="pin-ind">📌</span></div>
-    <div class="card-btns"><button class="c-btn" onclick="editEntry('${e.id}')">✎ Edit</button><button class="c-btn" onclick="togglePin('${e.id}')">📌</button><button class="c-btn danger" onclick="deleteEntry('${e.id}')">✕</button></div></div>
+    <div class="card-btns"><button class="c-btn" onclick="editEntry('${e.id}')">✎ Edit</button><button class="c-btn" onclick="togglePin('${e.id}')"><svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/20/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M6.5 5C6.5 4.44772 6.94772 4 7.5 4H9H15H16.5C17.0523 4 17.5 4.44772 17.5 5C17.5 5.55228 17.0523 6 16.5 6H16.095L16.9132 15H19C19.5523 15 20 15.4477 20 16C20 16.5523 19.5523 17 19 17H16H13V22C13 22.5523 12.5523 23 12 23C11.4477 23 11 22.5523 11 22V17H8H5C4.44772 17 4 16.5523 4 16C4 15.4477 4.44772 15 5 15H7.08679L7.90497 6H7.5C6.94772 6 6.5 5.55228 6.5 5ZM9.91321 6L9.09503 15H12H14.905L14.0868 6H9.91321Z" fill="currentColor"></path>
+</svg></button><button class="c-btn danger" onclick="deleteEntry('${e.id}')">✕</button></div></div>
   </div>
   <div class="card-body">${notesH}${wc?`<div class="wc-badge">📝 ${wc}w · ~${Math.max(1,Math.ceil(wc/200))}min</div>`:''}${todosH}${ytH}${filesH}</div>
 </div>`;
@@ -1864,7 +1879,20 @@ async function pinSel(){entries.forEach(e=>{if(selIds.has(e.id))e.pinned=true;})
 function expSel(){expEntries(entries.filter(e=>selIds.has(e.id)),'studylog_selected');}
 
 /* ── EXPORT/IMPORT ── */
-function exportAll(){expEntries(entries,'studylog_all');}
+function exportAll() {
+  const data = {
+    version: 7,
+    entries: entries,
+    exported: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `studylog_export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Exported JSON ✓', 'ok');
+}
 function expEntries(list,fname){
   const md=list.map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{label:e.subject};const d=new Date(e.date+'T00:00:00');let o=`# ${e.date} – ${s.label}${e.time?' ('+e.time+')':''}\n\n**Date:** ${d.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;if(e.mood)o+=`**Mood:** ${moodEmo(e.mood)}\n`;if(e.rating)o+=`**Rating:** ${e.rating}/10\n`;o+='\n';if((e.titles||[]).length){o+='## Topics\n\n';e.titles.forEach(t=>{o+=t.url?`- [${t.text}](${t.url})\n`:`- ${t.text}\n`;});o+='\n';}if(e.notes)o+=`## Notes\n\n${e.notes}\n\n`;if((e.todos||[]).length){o+='## Tasks\n\n';e.todos.forEach(t=>{o+=`- [${t.done?'x':' '}] ${t.text}${t.due?' (due '+t.due+')':''}\n`;});o+='\n';}if((e.tags||[]).length)o+=`**Tags:** ${e.tags.map(t=>'#'+t).join(' ')}\n\n`;if((e.youtubes||[]).length){o+='## Videos\n\n';e.youtubes.forEach(y=>o+=`- https://youtube.com/watch?v=${y}\n`);}return o+'---\n';}).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download=fname+'.md';a.click();toast('Exported ✓','ok');
