@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>StudyLog Pro</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
 :root{
   --r:8px;--rs:6px;--rl:12px;
   --sidebar:264px;--toolbar:48px;--status:26px;
-  --font:'Inter',system-ui,sans-serif;--mono:'Roboto Mono',monospace;
+  --font: 'DM Sans', system-ui, sans-serif;--mono:'Roboto Mono',monospace;
   --tr:.15s cubic-bezier(.4,0,.2,1);--tr-fast:.08s ease;
 ::view-transition-new(root) {
   clip-path: circle(0px at var(--tx) var(--ty));
@@ -121,8 +121,8 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 @media(max-width:800px){.mpxx{display:none};}
 @media(max-width:700px){.tb-ws{max-width:95px}.tb-btn:not(.primary){padding:6px 7px}}
 @media(max-width:600px){.focus-btn{display: none;}}
-@media(max-width:540px){.tb-hamburger{display:flex}.tb-sep:not(:first-of-type){display:none}.tb-ws{display:none}.focus-btn{display:none}.for-small{width:25px}.newbtn{width:35px;display:flex;align-items:center;justify-content:center}.nnewbt{display:none}.plusbtn{font-size:16px}}
-
+@media(max-width:540px){.tb-hamburger{display:flex}.tb-sep:not(:first-of-type){display:none}.tb-ws{display:none}.focus-btn{display:none}.for-small{width:25px}.newbtn{width:35px;display:flex;align-items:center;justify-content:center}.nnewbt{display:none}.plusbtn{font-size:16px};}
+@media (min-width: 768px){.forpc{display: none;}}
 /* ▀▄▀▄ LAYOUT ▀▄▀▄ */
 #body{display:flex;flex:1;overflow:hidden;position:relative;}
 #sideOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:490;backdrop-filter:blur(2px)}
@@ -131,10 +131,86 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 /* ▀▄▀▄ SIDEBAR ▀▄▀▄ */
 #sidebar{width:var(--sidebar);background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;flex-shrink:0;transition:width var(--tr),transform var(--tr),background .25s;scrollbar-width:thin;scrollbar-color:var(--panel4) transparent}
 #sidebar.collapsed{width:0;overflow:hidden}
-.sb-sec{padding:10px 13px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-sec{padding:10px 13px;border-bottom: 1.2px solid color-mix(in srgb, var(--border) 80%, transparent);flex-shrink:0}
+.sb-sec-sub .subj-list-container {
+  max-height: auto;      /* adjust as needed */
+  transition: max-height 0.2s ease-out;
+}
+.sb-sec-sub .subj-list-container.collapsed {
+  max-height: 0;
+}
+.toggle-icon {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text3);
+  transition: transform 0.2s ease;
+}
+.toggle-icon.rotated {
+  transform: rotate(-90deg);
+}
 .sb-lbl{font-size:9px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--text4);margin-bottom:7px;padding:0 2px;display:flex;align-items:center;justify-content:space-between}
 .sb-lbl-a{font-weight:400;font-size:10px;cursor:pointer;letter-spacing:0;text-transform:none;color:var(--text3);transition:color var(--tr)}
 .sb-lbl-a:hover{color:var(--accent)}
+/* Toolbar expandable search */
+.tb-search-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;   /* pushes it to the right */
+}
+.tb-search-icon {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--tr);
+  flex-shrink: 0;
+}
+.tb-search-icon:hover {
+  background: var(--panel2);
+  border-color: var(--border2);
+  color: var(--text);
+}
+.tb-search-expand {
+  overflow: hidden;
+  transition: width 0.2s ease, margin 0.2s ease;
+  width: 0;
+  margin-left: 0;
+  visibility: hidden;
+}
+.tb-search-expand.open {
+  width: auto;
+  margin-left: 6px;
+  visibility: visible;
+}
+.tb-search-input {
+  width: 100%;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 6px 10px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: all var(--tr);
+  transition: .2s ease-out;
+}
+.tb-search-input:focus {
+  border-color: var(--accent);
+  background: var(--panel);
+  box-shadow: 0 0 0 2px var(--accent-dim2);
+  transition: .2s ease-in;
+}
+.tb-search-input::placeholder {
+  color: var(--text3);
+}
 .sb-search-wrap{position:relative}
 .sb-search-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:13px}
 .sb-search{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px 8px 29px;color:var(--text);font-size:13px;outline:none;transition:all var(--tr)}
@@ -173,9 +249,9 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .sb-stat{background:var(--panel2);border-radius:var(--rs);padding:8px 10px}
 .sb-stat-n{font-size:20px;font-weight:700;color:var(--accent);line-height:1;font-family:var(--mono)}
 .sb-stat-l{font-size:9px;color:var(--text3);margin-top:2px}
-.ws-info{background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px}
+.ws-info{background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;}
 .ws-pl{font-size:9px;color:var(--text4);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
-.ws-path{font-size:10.5px;font-family:var(--mono);color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px}
+.ws-path{font-size:10.5px;font-family:var(--mono);color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;margin-top: 10px;}
 .ws-btns{display:flex;gap:5px;flex-wrap:wrap}
 .ws-ab{flex:1;min-width:50px;background:none;border:1px solid var(--border);border-radius:var(--rs);padding:5px 4px;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all var(--tr);font-family:var(--font);text-align:center;white-space:nowrap}
 .ws-ab:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim2)}
@@ -184,8 +260,8 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 
 /* ▀▄▀▄ MOBILE SIDEBAR ▀▄▀▄ */
 @media(max-width:768px){
-  #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);width:min(var(--sidebar),85vw)!important;box-shadow:var(--shadow)}
-  #sidebar.mobile-open{transform:translateX(0)}
+  #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);width:min(var(--sidebar),85vw)!important;box-shadow:var(--shadow);transition: .2s ease}
+  #sidebar.mobile-open{transform:translateX(0);transition: .2s ease-in}
   #sidebar.collapsed{transform:translateX(-100%);width:var(--sidebar)!important}
 }
 
@@ -588,7 +664,7 @@ input[type=date]{color-scheme:dark}
   </button>
   <div class="tb-brand for-small">
     <div class="tb-logo">SL</div>
-    <div class="tb-name focus-btn mpxx" id="tbName">StudyLog Pro<small id="tbSub">AIML · 1A · 2026-27</small></div>
+    <div class="tb-name focus-btn mpxx" id="tbName">StudyLog Pro<small id="tbSub">AIML · 1A</small></div>
   </div>
   <div class="tb-sep"></div>
   <div class="tb-ws" id="wsChip" onclick="changeWorkspace()">
@@ -610,14 +686,18 @@ input[type=date]{color-scheme:dark}
     <button class="tb-v" id="vStats" onclick="switchView('stats')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="10" width="3" height="5" rx="1"/><rect x="6.5" y="6" width="3" height="9" rx="1"/><rect x="12" y="2" width="3" height="13" rx="1"/></svg><span class="tb-v-lbl">Stats</span>
     </button>
+    
   </div>
+<div class="tb-search-container" id="tbSearchContainer">
+  <button class="tb-search-icon" id="tbSearchIcon" title="Search (Ctrl+F)">⌕</button>
+  <div class="tb-search-expand" id="tbSearchExpand">
+    <input class="tb-search-input" id="searchInp" placeholder="Search…" autocomplete="off" oninput="applyFilters()">
+  </div>
+</div>
   <div class="tb-spacer"></div>
+
   <div class="tb-actions">
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alt+T">🌙</button>
-    <div class="tb-sep"></div>
     <button class="tb-btn focus-btn mpxx" onclick="toggleFocus()" title="F10"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 5V2h3M12 2h3v3M1 11v3h3M12 14h3v-3"/></svg></button>
-    <button class="tb-btn" onclick="exportAll()" title="Ctrl+E"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg></button>
-    <button class="tb-btn" onclick="importData()" title="Import"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v4h10v-4M8 12V4M5 7L8 4l3 3"/></svg></button>
     <div class="tb-sep"></div>
     <button class="tb-btn focus-btn mpxx" onclick="openHelp()" title="F1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M6 6c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2v1.5"/><circle cx="8" cy="12" r=".8" fill="currentColor" stroke="none"/></svg></button>
     <button class="tb-btn primary newbtn" onclick="openModal()"><span class="plusbtn">+</span><span class="mpx nnewbt"> New </span><span class="focus-btn mpx" style="font-size:9.5px;opacity:.55;font-family:var(--mono);margin-left:2px">Alt+N</span></button>
@@ -628,13 +708,18 @@ input[type=date]{color-scheme:dark}
 <div id="body">
   <div id="sideOverlay" onclick="closeMobileSidebar()"></div>
   <aside id="sidebar">
-    <div class="sb-sec">
-      <div class="sb-search-wrap">
-        <span class="sb-search-ico">⌕</span>
-        <input class="sb-search" id="searchInp" placeholder="Search… (Ctrl+F)" oninput="applyFilters()" autocomplete="off">
+    <div class="sb-sec tb-actions acc-btn">
+      <div class="tb-brand forpc">
+      <div class="tb-logo">SL</div>
+      <div class="tb-name" id="tbName">StudyLog Pro</div>
       </div>
-      <div class="sh-hint" style="margin-top:5px">Try: <span>mon</span> <span>DSA</span> <span>2026-03</span> <span>#exam</span></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alt+T">🌙</button>
+    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+    <button class="tb-btn" onclick="exportAll()" title="Ctrl+E"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg></button>
+    <button class="tb-btn" onclick="importData()" title="Import"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v4h10v-4M8 12V4M5 7L8 4l3 3"/></svg></button>
     </div>
+
+</div>
     <div class="sb-sec">
       <div class="sb-lbl">Navigate</div>
       <div class="nav-item active" id="nav-all" onclick="setNav('all')">
@@ -652,10 +737,22 @@ input[type=date]{color-scheme:dark}
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><polyline points="8,4 8,8 11,10"/></svg>This Week<span class="nav-badge" id="navWeekCnt">0</span>
       </div>
     </div>
-    <div class="sb-sec" style="flex-shrink:0">
-      <div class="sb-lbl">Subjects <span class="sb-lbl-a" onclick="clearSubjFilter()">Clear</span></div>
-      <div class="subj-list" id="subjList"></div>
+
+<div class="sb-sec sb-sec-sub" style="flex-shrink:0">
+  <div class="sb-lbl" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="subjToggle">
+    <span>Subjects</span>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <span class="sb-lbl-a" onclick="clearSubjFilter(); event.stopPropagation();">Clear</span>
+      <span class="toggle-icon" id="subjIcon">
+        <svg height="48" viewBox="0 0 9 48" width="4" xmlns="http://www.w3.org/2000/svg"><path d="m1.5618 24.0621 6.5581-6.4238c.2368-.2319.2407-.6118.0088-.8486-.2324-.2373-.6123-.2407-.8486-.0088l-7 6.8569c-.1157.1138-.1807.2695-.1802.4316.001.1621.0674.3174.1846.4297l7 6.7241c.1162.1118.2661.1675.4155.1675.1577 0 .3149-.062.4326-.1846.2295-.2388.2222-.6187-.0171-.8481z"></path></svg>
+      </span>
     </div>
+  </div>
+  <div class="subj-list-container" id="subjListContainer" style="overflow: hidden; transition: max-height 0.2s ease-out;">
+    <div class="subj-list" id="subjList"></div>
+  </div>
+</div>
+      <div class="subj-list" id="subjList"></div>
     <div class="sb-sec">
       <div class="sb-lbl">Date Range <span class="sb-lbl-a" onclick="clearDates()">Clear</span></div>
       <div class="date-row"><label>From</label><input class="date-inp" type="date" id="dateFrom" onchange="applyFilters()"></div>
@@ -678,7 +775,11 @@ input[type=date]{color-scheme:dark}
 <div class="sb-sec">
   <div class="sb-lbl">Workspace</div>
   <div class="ws-info">
-    <div class="ws-pl">Storage path</div>
+    <div style="display: grid;grid-template-columns: 1.8fr 1.2fr;">
+      <div class="ws-pl">Storage path</div>
+      <button class="ws-ab" onclick="syncNow()">🔄 Sync now</button>
+  </div>
+    
     <div class="ws-path" id="wsPathFull">Browser (localStorage)</div>
     <div id="ghUser" style="display:none;font-size:11px;color:var(--text2);padding:5px 0;border-top:1px solid var(--border);margin-top:6px"></div>
     <div class="ws-btns" style="margin-top:7px">
@@ -708,6 +809,7 @@ input[type=date]{color-scheme:dark}
       <div id="statsCont" style="display:none"></div>
     </div>
   </main>
+
 </div>
 
 <!-- ▀▄▀▄ STATUS BAR ▀▄▀▄ -->
@@ -1098,12 +1200,17 @@ async function saveToGist(data, routineData) {
   ghSyncing = true;
   try {
     if (!gistId) await findOrCreateGist();
-    if (!gistId) return false;
+    if (!gistId) throw new Error('No gist ID');
     const payload = { ...data, deletedIds };
     const files = { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } };
     if (routineData) files[ROUTINE_FILENAME] = { content: JSON.stringify(routineData, null, 2) };
     const res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
-    return !!res;
+    if (!res) throw new Error('GitHub API error');
+    return true;
+  } catch (err) {
+    console.error('GitHub sync failed:', err);
+    toast('Sync to GitHub failed: ' + err.message, 'err');
+    return false;
   } finally { ghSyncing = false; }
 }
 
@@ -1221,9 +1328,37 @@ async function saveData() {
   if (ghToken) {
     const ok = await saveToGist(data);
     setSyncStatus('ok', ok ? 'Synced ✓' : 'Saved locally');
+    if (ok) toast('Changes synced to GitHub', 'ok');
+    else toast('Sync failed – data saved locally only', 'err');
   } else {
     setSyncStatus('ok', 'Saved');
   }
+}
+
+async function syncNow() {
+  if (!ghToken) {
+    toast('Connect GitHub first', 'err');
+    return;
+  }
+  setSyncStatus('syncing', 'Fetching from GitHub…');
+  const gistData = await loadFromGist();
+  if (gistData && gistData.entries) {
+    if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+    const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
+    const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
+    const merged = {};
+    for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
+      const l = localMap[id], c = cloudMap[id];
+      merged[id] = (l && c) ? ((c.updatedAt||0) >= (l.updatedAt||0) ? c : l) : (l || c);
+    }
+    entries = applyTombstones(Object.values(merged));
+    lsSave({ version: 7, entries });
+    render(); buildSubjList(); updateSideTagCloud();
+    toast('Synced from GitHub', 'ok');
+  } else {
+    toast('No cloud data found', 'err');
+  }
+  setSyncStatus('ok', 'Synced');
 }
 
 async function loadData() {
@@ -1548,7 +1683,24 @@ function closeMobileSidebar() {
   document.getElementById('sidebar')?.classList.remove('mobile-open');
   document.getElementById('sideOverlay')?.classList.remove('show');
 }
+const subjToggle = document.getElementById('subjToggle');
+const subjContainer = document.getElementById('subjListContainer');
+const subjIcon = document.getElementById('subjIcon');
 
+if (subjToggle && subjContainer) {
+  subjToggle.addEventListener('click', (e) => {
+    if (e.target.classList.contains('sb-lbl-a')) return;
+    subjContainer.classList.toggle('collapsed');
+    subjIcon.classList.toggle('rotated');
+    // optional: save state
+    localStorage.setItem('subjListCollapsed', subjContainer.classList.contains('collapsed'));
+  });
+}
+// restore state
+if (subjContainer && localStorage.getItem('subjListCollapsed') === 'true') {
+  subjContainer.classList.add('collapsed');
+  subjIcon.classList.add('rotated');
+}
 /* ══════════════════════════════════
    SUBJECTS / TAGS
 ══════════════════════════════════ */
@@ -1612,6 +1764,16 @@ async function toggleCardTodo(eid,tid) {
 ══════════════════════════════════ */
 function setMood(m){formMood=formMood===m?'':m;document.querySelectorAll('[data-mood]').forEach(el=>el.classList.toggle('on',el.dataset.mood===formMood));}
 document.addEventListener('DOMContentLoaded',()=>{const ri=document.getElementById('ratingInp');if(ri)ri.oninput=function(){formRating=+this.value;document.getElementById('ratingVal').textContent=this.value;};});
+// Auto‑close sidebar when tapping workspace buttons (on mobile)
+document.querySelectorAll('.ws-ab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Only collapse if sidebar is in mobile mode
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('mobile-open')) {
+      closeMobileSidebar();
+    }
+  });
+});
 function toggleRatingSlider(){formRatingOn=document.getElementById('ratingChk').checked;document.getElementById('ratingSliderWrap').classList.toggle('hidden',!formRatingOn);}
 
 /* ══════════════════════════════════
@@ -1640,7 +1802,54 @@ function parseSearchTokens(q){
   const s=SUBJECTS.find(x=>x.id.toLowerCase()===raw||x.label.toLowerCase().includes(raw));
   return[s?{type:'subject',val:s.id}:{type:'text',val:raw}];
 }
+// Expandable search in toolbar
+const searchIcon = document.getElementById('tbSearchIcon');
+const searchExpand = document.getElementById('tbSearchExpand');
+const searchInput = document.getElementById('searchInp');
 
+if (searchIcon && searchExpand) {
+  // Function to expand and focus
+  const expandAndFocus = () => {
+    const wasOpen = searchExpand.classList.contains('open');
+    if (!wasOpen) {
+      searchExpand.classList.add('open');
+      // Wait a tiny bit for the element to become visible before focusing
+      setTimeout(() => {
+        searchInput.focus();
+        // For mobile, some browsers need a slight extra nudge
+        searchInput.click(); // ensures keyboard on some devices
+      }, 50);
+    } else {
+      searchInput.focus();
+    }
+  };
+
+  // On icon click (works for both mouse and touch)
+  searchIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    expandAndFocus();
+  });
+
+  // Also handle touchstart for better mobile responsiveness
+  searchIcon.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // prevents double-trigger with click
+    expandAndFocus();
+  });
+
+  // Close if clicking outside the search container
+  document.addEventListener('click', (e) => {
+    const container = document.getElementById('tbSearchContainer');
+    if (!container.contains(e.target)) {
+      searchExpand.classList.remove('open');
+      searchInput.blur();
+    }
+  });
+
+  // Keep open while input has focus
+  searchInput.addEventListener('focus', () => {
+    searchExpand.classList.add('open');
+  });
+}
 /* ══════════════════════════════════
    FILTERS / VIEWS
 ══════════════════════════════════ */
@@ -1996,7 +2205,16 @@ document.addEventListener('keydown',e=>{
   if(modOpen){if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();saveEntry();}return;}
   if(cmdOpen)return;
   if(e.altKey&&(e.key==='n'||e.key==='N')){e.preventDefault();openModal();return;}
-  if((e.ctrlKey||e.metaKey)&&e.key==='f'){e.preventDefault();document.getElementById('searchInp').focus();return;}
+if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+  e.preventDefault();
+  const expand = document.getElementById('tbSearchExpand');
+  const inp = document.getElementById('searchInp');
+  if (expand && !expand.classList.contains('open')) {
+    expand.classList.add('open');
+  }
+  if (inp) inp.focus();
+  return;
+}
   if((e.ctrlKey||e.metaKey)&&e.key==='e'){e.preventDefault();exportAll();return;}
   if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();toggleMobileSidebar();return;}
   if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undoDelete();return;}
