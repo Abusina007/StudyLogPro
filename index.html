@@ -435,10 +435,10 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .sb-flex{flex:1;min-width:6px}
 
 /* ▀▄▀▄ OVERLAY/MODAL ▀▄▀▄ */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:810;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;}
 .overlay.open{opacity:1;visibility:visible}
 [data-theme="light"] .overlay{background:rgba(0,0,0,.45)}
-.modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--rl);width:100%;max-width:750px;box-shadow:var(--shadow);transform:translateY(-8px) scale(.99);transition:transform .2s,background .25s;margin:auto}
+.modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--rl);width:100%;max-width:750px;box-shadow:var(--shadow);transform:translateY(-8px) scale(.99);transition:transform .2s,background .25s;margin:auto;z-index: 1500;}
 .overlay.open .modal{transform:none}
 .m-head{display:flex;align-items:center;gap:10px;padding:17px 20px 13px;border-bottom:1px solid var(--border)}
 .m-head h2{font-size: clamp(0.625rem, 0.493rem + 0.556vw, 0.875rem);font-weight:600;letter-spacing:-.3px;flex:1}
@@ -714,7 +714,7 @@ input[type=date]{color-scheme:dark}
 .dp-day-title{flex:1;font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px}
 .dp-add-btn{background:var(--accent);color:#fff;border:none;padding:7px 15px;border-radius:var(--rs);font-size:12.5px;font-weight:600;cursor:pointer;transition:background var(--tr)}
 .dp-add-btn:hover{background:var(--accent-h)}
-.dp-day-body{flex:1;overflow-y:auto;padding:16px}
+.dp-day-body{flex:1;overflow-y:auto;padding:16px;}
 
 /* ▀▄▀▄ WEEK FOLDERS (grid) ▀▄▀▄ */
 .wf-container{display:flex;flex-direction:column;gap:7px}
@@ -1901,12 +1901,13 @@ async function init() {
         entries = applyTombstones(Object.values(merged));
         lsSave({ version: 7, entries });
         render(); buildSubjList(); updateSideTagCloud();
-      }
-      setSyncStatus('ok', 'Synced ✓');
+        setSyncStatus('ok', 'Synced ✓');
     }
-  } else {
+  }
+} else {
     showSetup();
   }
+  initDetailDrag();
 }
 
 /* ══════════════════════════════════
@@ -2169,7 +2170,7 @@ function buildEntryRow(e){
   const title=(e.titles||[]).find(t=>t.text)?.text||'Untitled session';
   const today=new Date().toISOString().split('T')[0];
   const isToday=e.date===today;
-  const preview=e.notes?e.notes.replace(/\n/g,' ').substring(0,90):(e.todos||[]).length?`${(e.todos||[]).length} task${(e.todos||[]).length!==1?'s':''} · ${(e.todos||[]).filter(t=>t.done).length} done`:'No notes';
+  const preview=e.notes?e.notes.replace(/\n/g,' ').substring(0,80):(e.todos||[]).length?`${(e.todos||[]).length} task${(e.todos||[]).length!==1?'s':''} · ${(e.todos||[]).filter(t=>t.done).length} done`:'No notes';
   let badges='';
   if(e.pinned)badges+=`<span style="font-size:11px">📌</span>`;
   if(e.mood)badges+=`<span style="font-size:11px">${moodEmo(e.mood)}</span>`;
@@ -2183,8 +2184,15 @@ function buildEntryRow(e){
     <div class="er-accent" style="background:${s.color}"></div>
     <div class="er-icon" style="background:${s.bg};color:${s.color}">${e.subject.slice(0,4)}</div>
     <div class="er-content">
-      <div class="er-top"><span class="er-title">${esc(title)}</span><span class="er-date">${dateLabel}</span></div>
-      <div class="er-bottom"><span class="er-preview">${esc(preview)}</span><div class="er-badges">${badges}</div></div>
+      <div class="er-top">
+        <span class="er-title">${esc(title)}</span>
+        <span class="er-date">${dateLabel}</span>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:${s.color};margin-bottom:2px;letter-spacing:.1px;line-height:1.3">${esc(s.label)}${e.time?` <span style="font-weight:400;color:var(--text3);font-size:10px">· ${esc(e.time)}</span>`:''}</div>
+      <div class="er-bottom">
+        <span class="er-preview">${esc(preview)}</span>
+        <div class="er-badges">${badges}</div>
+      </div>
     </div>
   </div>`;
 }
@@ -2229,7 +2237,12 @@ function openDetailPanel(id){
   document.getElementById('dpBody').innerHTML=html;
   document.getElementById('detailOverlay').classList.add('open');
 }
-function closeDetailPanel(){document.getElementById('detailOverlay').classList.remove('open');detailId=null;}
+function closeDetailPanel(){
+  const panel=document.querySelector('.detail-panel');
+  if(panel){panel.style.transform='';panel.style.maxHeight='';panel.style.borderRadius='';}
+  document.getElementById('detailOverlay').classList.remove('open');
+  detailId=null;
+}
 function dpEdit(){const id=detailId;closeDetailPanel();editEntry(id);}
 async function dpPin(){const id=detailId;await togglePin(id);if(id)openDetailPanel(id);}
 function dpDel(){const id=detailId;closeDetailPanel();deleteEntry(id);}
@@ -2750,6 +2763,60 @@ function renderCmd(q){
 function hilight(t,q){if(!q)return esc(t);return esc(t).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');}
 function runCmd(i){closeCmd();CMDS[i]?.fn();}
 function cmdKey(e){const items=document.querySelectorAll('.cmd-item');if(e.key==='ArrowDown'){e.preventDefault();cmdIdx=Math.min(cmdIdx+1,items.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();cmdIdx=Math.max(cmdIdx-1,0);}else if(e.key==='Enter'){e.preventDefault();items[cmdIdx]?.click();return;}else if(e.key==='Escape'){closeCmd();return;}items.forEach((el,i)=>el.classList.toggle('hi',i===cmdIdx));}
+
+/* ── DETAIL PANEL DRAG ── */
+function initDetailDrag(){
+  const panel = document.querySelector('.detail-panel');
+  const handle = document.querySelector('.dp-handle');
+  if(!panel||!handle) return;
+
+  let startY=0, dragY=0, dragging=false, expanded=false;
+
+  function dragStart(y){
+    startY=y; dragY=0; dragging=true;
+    panel.style.transition='none';
+  }
+  function dragMove(y){
+    if(!dragging) return;
+    const dy=y-startY;
+    // allow drag down freely, limit drag up to 80px
+    dragY = dy>0 ? dy : Math.max(-80,dy);
+    panel.style.transform=`translateY(${dragY}px)`;
+  }
+  function dragEnd(){
+    if(!dragging) return;
+    dragging=false;
+    panel.style.transition='';
+    if(dragY>110){
+      // dragged down far — close
+      closeDetailPanel();
+    } else if(dragY<-50){
+      // dragged up — expand to fill
+      panel.style.transform='';
+      panel.style.maxHeight='100vh';
+      panel.style.borderRadius='0';
+      expanded=true;
+    } else {
+      // bounce back
+      panel.style.transform='';
+      if(expanded){
+        panel.style.maxHeight='';
+        panel.style.borderRadius='';
+        expanded=false;
+      }
+    }
+  }
+
+  // touch
+  handle.addEventListener('touchstart',e=>dragStart(e.touches[0].clientY),{passive:true});
+  window.addEventListener('touchmove',e=>{if(dragging)dragMove(e.touches[0].clientY);},{passive:true});
+  window.addEventListener('touchend',dragEnd);
+
+  // mouse (desktop)
+  handle.addEventListener('mousedown',e=>{dragStart(e.clientY);e.preventDefault();});
+  window.addEventListener('mousemove',e=>{if(dragging)dragMove(e.clientY);});
+  window.addEventListener('mouseup',dragEnd);
+}
 
 /* ── MISC ── */
 function openHelp(){document.getElementById('helpModal').classList.add('open');}
