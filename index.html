@@ -886,6 +886,89 @@ input, textarea, [contenteditable] {
 .view-slide-right{animation:slideFromLeft .28s cubic-bezier(.4,0,.2,1) both}
 @keyframes slideFromRight{from{opacity:0;transform:translateX(48px)}to{opacity:1;transform:none}}
 @keyframes slideFromLeft{from{opacity:0;transform:translateX(-48px)}to{opacity:1;transform:none}}
+
+/* ▀▄▀▄ UX IMPROVEMENTS ▀▄▀▄ */
+
+/* scroll to top button */
+#scrollTopBtn{
+  position:fixed;bottom:48px;right:14px;width:40px;height:40px;
+  border-radius:50%;background:var(--accent);color:#fff;border:none;
+  font-size:18px;cursor:pointer;z-index:300;
+  box-shadow:0 4px 16px rgba(47,129,247,.45);
+  opacity:0;transform:translateY(12px) scale(.85);
+  transition:opacity .22s,transform .22s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;display:flex;align-items:center;justify-content:center;
+}
+#scrollTopBtn.show{opacity:1;transform:none;pointer-events:auto;}
+#scrollTopBtn:hover{background:var(--accent-h);transform:scale(1.08);}
+#scrollTopBtn:active{transform:scale(.94);}
+
+/* ripple on entry rows */
+.entry-row,.grid-card,.wf-entry{position:relative;overflow:hidden;}
+.ripple{
+  position:absolute;border-radius:50%;
+  background:rgba(47,129,247,.18);
+  transform:scale(0);animation:rippleAnim .5s linear;
+  pointer-events:none;z-index:0;
+}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0;}}
+
+/* long-press highlight */
+.entry-row.longpress-active{background:var(--accent-dim2)!important;
+  box-shadow:inset 0 0 0 2px var(--accent);}
+
+/* swipe-to-delete track on entry rows */
+.entry-row{touch-action:pan-y;}
+.entry-row .swd-bg{
+  position:absolute;right:0;top:0;bottom:0;width:80px;
+  background:var(--red);display:flex;align-items:center;
+  justify-content:center;color:#fff;font-size:18px;
+  border-radius:0 var(--rs) var(--rs) 0;opacity:0;
+  transition:opacity .15s;pointer-events:none;z-index:1;
+}
+
+/* draft indicator in modal */
+#draftDot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--amber);display:inline-block;
+  margin-left:6px;opacity:0;transition:opacity .3s;
+  vertical-align:middle;
+}
+#draftDot.show{opacity:1;}
+
+/* tooltip on toolbar buttons (PC) */
+.tb-btn[title]:hover::after,.theme-toggle[title]:hover::after{
+  content:attr(title);
+  position:absolute;bottom:calc(100% + 7px);left:50%;
+  transform:translateX(-50%);
+  background:var(--panel2);border:1px solid var(--border2);
+  color:var(--text);font-size:10.5px;padding:3px 8px;
+  border-radius:var(--rs);white-space:nowrap;
+  pointer-events:none;z-index:500;
+  box-shadow:var(--shadow-sm);
+}
+.tb-btn[title],.theme-toggle[title]{position:relative;}
+
+/* better focus ring for keyboard nav */
+:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+  border-radius:var(--rs);
+}
+
+/* active press scale on buttons */
+.btn-p:active,.btn-c:active,.tb-btn:active,.dp-act:active{
+  transform:scale(.96);transition:transform .08s;
+}
+
+/* skeleton shimmer for list while loading */
+.skeleton{
+  background:linear-gradient(90deg,var(--panel2) 25%,var(--panel3) 50%,var(--panel2) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;
+  border-radius:var(--rs);
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
@@ -956,7 +1039,12 @@ input, textarea, [contenteditable] {
 <!-- ▀▄▀▄ BODY ▀▄▀▄ -->
 <div id="body">
   <div id="sideOverlay" onclick="closeMobileSidebar()"></div>
-  <aside id="sidebar">
+<aside id="sidebar" class="">
+<script>
+  if(window.innerWidth>768&&localStorage.getItem('slp_sidebar_collapsed')==='1'){
+    document.getElementById('sidebar').classList.add('collapsed');
+  }
+</script>
     <div class="sb-sec tb-actions acc-btn">
       <div class="tb-brand forpc">
       <div class="tb-logo">SL</div>
@@ -992,7 +1080,7 @@ input, textarea, [contenteditable] {
     <div style="display: flex; gap: 8px; align-items: center;">
       <span class="sb-lbl-a" onclick="clearSubjFilter(); event.stopPropagation();">Clear</span>
       <span class="toggle-icon" id="subjIcon">
-        <svg height="48" viewBox="0 0 9 48" width="4" xmlns="http://www.w3.org/2000/svg"><path d="m1.5618 24.0621 6.5581-6.4238c.2368-.2319.2407-.6118.0088-.8486-.2324-.2373-.6123-.2407-.8486-.0088l-7 6.8569c-.1157.1138-.1807.2695-.1802.4316.001.1621.0674.3174.1846.4297l7 6.7241c.1162.1118.2661.1675.4155.1675.1577 0 .3149-.062.4326-.1846.2295-.2388.2222-.6187-.0171-.8481z"></path></svg>
+        <svg fill="currentColor" height="48" viewBox="0 0 9 48" width="4" xmlns="http://www.w3.org/2000/svg"><path d="m1.5618 24.0621 6.5581-6.4238c.2368-.2319.2407-.6118.0088-.8486-.2324-.2373-.6123-.2407-.8486-.0088l-7 6.8569c-.1157.1138-.1807.2695-.1802.4316.001.1621.0674.3174.1846.4297l7 6.7241c.1162.1118.2661.1675.4155.1675.1577 0 .3149-.062.4326-.1846.2295-.2388.2222-.6187-.0171-.8481z"></path></svg>
       </span>
     </div>
   </div>
@@ -1313,7 +1401,10 @@ input, textarea, [contenteditable] {
 </svg>
   Deleted.<button onclick="undoDelete()">Undo (Ctrl+Z)</button></div>
 <div id="toast"></div>
-
+<!-- scroll to top -->
+<button id="scrollTopBtn" onclick="viewArea.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<!-- draft indicator dot (injected into modal title) -->
+<span id="draftDot"></span>
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <script>
 'use strict';
@@ -1901,7 +1992,6 @@ async function finishSetup() {
   await loadData();
   document.getElementById('setupOverlay')?.classList.add('hidden');
   render(); buildSubjList(); updateSideTagCloud();
-  const lv = localStorage.getItem('slp_view'); if (lv) switchView(lv);
   const gm = localStorage.getItem('slp_group'); if (gm) groupMode = gm;
   updateSyncUI();
   toast('All set! ' + (ghToken ? 'Syncing with GitHub ✓' : 'Running offline'), 'ok');
@@ -2057,7 +2147,11 @@ function toggleMobileSidebar() {
     const opening = !sb.classList.contains('mobile-open');
     sb.classList.toggle('mobile-open', opening);
     document.getElementById('sideOverlay')?.classList.toggle('show', opening);
-  } else { sb.classList.toggle('collapsed'); }
+  } else {
+    const collapsed = !sb.classList.contains('collapsed');
+    sb.classList.toggle('collapsed', collapsed);
+    localStorage.setItem('slp_sidebar_collapsed', collapsed ? '1' : '0');
+  }
 }
 function closeMobileSidebar() {
   document.getElementById('sidebar')?.classList.remove('mobile-open');
@@ -2159,26 +2253,177 @@ function toggleRatingSlider(){formRatingOn=document.getElementById('ratingChk').
 /* ══════════════════════════════════
    SMART SEARCH
 ══════════════════════════════════ */
+function _editDist(a,b){
+  if(Math.abs(a.length-b.length)>3)return 99;
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+const _KW={
+  'pending':'pending','incomplete':'pending','undone':'pending','todo':'pending',
+  'done':'done','completed':'done','finished':'done','checked':'done',
+  'overdue':'overdue','due today':'due today','duetoday':'due today',
+  'has task':'has task','hastask':'has task','has tasks':'has task','tasks':'has task',
+  'no tasks':'no tasks','notasks':'no tasks',
+  'no notes':'no notes','nonotes':'no notes',
+  'pinned':'pinned','pin':'pinned',
+  'unpinned':'unpinned','unpin':'unpinned',
+  'has notes':'has notes','hasnotes':'has notes',
+  'has video':'has video','hasvideo':'has video','youtube':'has video','video':'has video',
+  'has file':'has file','hasfile':'has file','attachment':'has file','files':'has file',
+  'has rating':'has rating','hasrating':'has rating','rated':'has rating',
+  'unrated':'unrated',
+  'great':'great','good':'good','okay':'okay','tired':'tired','confused':'confused',
+  'has mood':'has mood','hasmood':'has mood',
+  'today':'today','yesterday':'yesterday',
+  'this week':'this week','thisweek':'this week',
+  'this month':'this month','thismonth':'this month',
+  'last month':'last month','lastmonth':'last month',
+  'review':'review','review due':'review','reviewdue':'review',
+};
+function _resolveKW(raw){
+  // 1. exact
+  if(_KW[raw])return _KW[raw];
+  const keys=Object.keys(_KW);
+  // 2. prefix (min 2 chars)
+  if(raw.length>=2){
+    for(const k of keys)if(k.startsWith(raw))return _KW[k];
+  }
+  // 3. fuzzy (min 4 chars, allow 1 edit; min 6 chars allow 2 edits)
+  if(raw.length>=4){
+    let best=null,bd=99;
+    for(const k of keys){
+      const d=_editDist(raw,k);
+      const max=raw.length>=6?2:1;
+      if(d<=max&&d<bd){bd=d;best=_KW[k];}
+    }
+    if(best)return best;
+  }
+  return null;
+}
+
 function matchesQuery(e,q){
-  if(!q)return true;const raw=q.trim().toLowerCase();
-  if(raw.startsWith('#'))return(e.tags||[]).some(t=>t.toLowerCase().includes(raw.slice(1)));
-  if(raw in DAY_ALIASES)return new Date(e.date+'T00:00:00').getDay()===DAY_ALIASES[raw];
-  for(const[a,dow]of Object.entries(DAY_ALIASES))if(raw.length>=3&&a.startsWith(raw)&&new Date(e.date+'T00:00:00').getDay()===dow)return true;
-  if(raw in MONTH_ALIASES)return new Date(e.date+'T00:00:00').getMonth()+1===MONTH_ALIASES[raw];
-  for(const[a,mn]of Object.entries(MONTH_ALIASES))if(raw.length>=3&&a.startsWith(raw)&&new Date(e.date+'T00:00:00').getMonth()+1===mn)return true;
+  if(!q)return true;
+  const raw=q.trim().toLowerCase();
+  if(!raw)return true;
+  const today=new Date().toISOString().split('T')[0];
+  const todos=e.todos||[];
+  const pending=todos.filter(t=>!t.done);
+  const done=todos.filter(t=>t.done);
+
+  /* ── structured operators ── */
+  const rM=raw.match(/^rating\s*([><=!]+)\s*(\d+)$/);
+  if(rM){const[,op,val]=rM;const v=+val,r=e.rating||0;
+    if(op==='>')return r>v;if(op==='>=')return r>=v;
+    if(op==='<')return r<v;if(op==='<=')return r<=v;
+    if(op==='='||op==='==')return r===v;if(op==='!='||op==='!==')return r!==v;}
+  const wM=raw.match(/^words?\s*([><=]+)\s*(\d+)$/);
+  if(wM){const[,op,val]=wM;const v=+val,wc=wCount(e.notes||'');
+    if(op==='>')return wc>v;if(op==='>=')return wc>=v;
+    if(op==='<')return wc<v;if(op==='<=')return wc<=v;
+    if(op==='='||op==='==')return wc===v;}
+  const bM=raw.match(/^batch\s*[:]\s*(g1|g2|both)$/);
+  if(bM)return(e.batch||'').toLowerCase()===bM[1];
+
+  /* ── tag shorthand ── */
+  if(raw.startsWith('#'))
+    return(e.tags||[]).some(t=>t.toLowerCase().includes(raw.slice(1)));
+
+  /* ── keyword resolution: exact → prefix → fuzzy ── */
+  const kw=_resolveKW(raw);
+  if(kw){
+    if(kw==='pending')    return pending.length>0;
+    if(kw==='done')       return done.length>0;
+    if(kw==='overdue')    return pending.some(t=>t.due&&t.due<today);
+    if(kw==='due today')  return pending.some(t=>t.due===today);
+    if(kw==='has task')   return todos.length>0;
+    if(kw==='no tasks')   return todos.length===0;
+    if(kw==='no notes')   return(e.notes||'').trim().length===0;
+    if(kw==='pinned')     return!!e.pinned;
+    if(kw==='unpinned')   return!e.pinned;
+    if(kw==='has notes')  return(e.notes||'').trim().length>0;
+    if(kw==='has video')  return(e.youtubes||[]).length>0;
+    if(kw==='has file')   return(e.files||[]).length>0;
+    if(kw==='has rating') return!!e.rating;
+    if(kw==='unrated')    return!e.rating;
+    if(kw==='has mood')   return!!e.mood;
+    if(['great','good','okay','tired','confused'].includes(kw))return e.mood===kw;
+    if(kw==='today')      return e.date===today;
+    if(kw==='yesterday')  {const y=new Date(Date.now()-864e5).toISOString().split('T')[0];return e.date===y;}
+    if(kw==='this week')  {const w=new Date(Date.now()-7*864e5).toISOString().split('T')[0];return e.date>=w;}
+    if(kw==='this month') return e.date.startsWith(today.slice(0,7));
+    if(kw==='last month') {const d=new Date();d.setMonth(d.getMonth()-1);return e.date.startsWith(d.toISOString().slice(0,7));}
+    if(kw==='review')     return!!(e.reviewDate&&e.reviewDate<=today);
+  }
+
+  /* ── day name (prefix min 3 chars) ── */
+  if(raw in DAY_ALIASES)
+    return new Date(e.date+'T00:00:00').getDay()===DAY_ALIASES[raw];
+  for(const[a,dow]of Object.entries(DAY_ALIASES))
+    if(raw.length>=3&&a.startsWith(raw)&&new Date(e.date+'T00:00:00').getDay()===dow)return true;
+
+  /* ── month name (prefix min 3 chars) ── */
+  if(raw in MONTH_ALIASES)
+    return new Date(e.date+'T00:00:00').getMonth()+1===MONTH_ALIASES[raw];
+  for(const[a,mn]of Object.entries(MONTH_ALIASES))
+    if(raw.length>=3&&a.startsWith(raw)&&new Date(e.date+'T00:00:00').getMonth()+1===mn)return true;
+
+  /* ── date prefix 2025 / 2025-03 / 2025-03-14 ── */
   if(/^\d{4}(-\d{1,2}(-\d{1,2})?)?$/.test(raw)&&e.date.startsWith(raw))return true;
+
+  /* ── subject id / label ── */
   const sub=SUBJECTS.find(x=>x.id===e.subject)||{label:''};
   if(e.subject.toLowerCase().includes(raw)||sub.label.toLowerCase().includes(raw))return true;
+
+  /* ── tags ── */
   if((e.tags||[]).some(t=>t.toLowerCase().includes(raw)))return true;
-  const hay=[(e.notes||''),(e.titles||[]).map(t=>t.text).join(' '),(e.time||''),(e.todos||[]).map(t=>t.text).join(' ')].join(' ').toLowerCase();
-  return hay.includes(raw);
+
+  /* ── full-text haystack ── */
+  const hay=[
+    e.notes||'',
+    (e.titles||[]).map(t=>t.text+' '+(t.url||'')).join(' '),
+    e.time||'',
+    todos.map(t=>t.text).join(' '),
+    e.batch||'',
+    e.reviewDate||'',
+    (e.files||[]).map(f=>f.name).join(' '),
+  ].join(' ').toLowerCase();
+
+  // exact substring
+  if(hay.includes(raw))return true;
+
+  // word-prefix match (min 2 chars) — "pen" matches "pending" in notes
+  if(raw.length>=2){
+    if(hay.split(/\s+/).some(w=>w.startsWith(raw)))return true;
+  }
+
+  // fuzzy on haystack words (min 5 chars to avoid noise)
+  if(raw.length>=5){
+    const maxD=raw.length>=7?2:1;
+    if(hay.split(/\s+/).some(w=>{
+      if(Math.abs(w.length-raw.length)>3)return false;
+      return _editDist(raw,w.slice(0,raw.length+2))<=maxD;
+    }))return true;
+  }
+
+  return false;
 }
 function parseSearchTokens(q){
-  if(!q)return[];const raw=q.trim().toLowerCase();
-  if(raw.startsWith('#'))return[{type:'tag',val:raw.slice(1)}];
-  if(raw in DAY_ALIASES||Object.keys(DAY_ALIASES).some(a=>a.startsWith(raw)&&raw.length>=3))return[{type:'day',val:raw}];
-  if(raw in MONTH_ALIASES||Object.keys(MONTH_ALIASES).some(a=>a.startsWith(raw)&&raw.length>=3))return[{type:'month',val:raw}];
-  if(/^\d{4}(-\d{1,2})?$/.test(raw))return[{type:'date',val:raw}];
+  if(!q)return[];
+  const raw=q.trim().toLowerCase();
+  const kw=_resolveKW(raw);
+  if(kw)                               return[{type:'filter',val:kw}];
+  if(raw.startsWith('#'))              return[{type:'tag',val:raw.slice(1)}];
+  if(/^rating\s*[><=!]/.test(raw))     return[{type:'filter',val:raw}];
+  if(/^words?\s*[><=]/.test(raw))      return[{type:'filter',val:raw}];
+  if(/^batch\s*[:]\s*(g1|g2|both)$/.test(raw)) return[{type:'filter',val:raw}];
+  if(raw in DAY_ALIASES||Object.keys(DAY_ALIASES).some(a=>a.startsWith(raw)&&raw.length>=3))
+    return[{type:'day',val:raw}];
+  if(raw in MONTH_ALIASES||Object.keys(MONTH_ALIASES).some(a=>a.startsWith(raw)&&raw.length>=3))
+    return[{type:'month',val:raw}];
+  if(/^\d{4}(-\d{1,2})?$/.test(raw))  return[{type:'date',val:raw}];
   const s=SUBJECTS.find(x=>x.id.toLowerCase()===raw||x.label.toLowerCase().includes(raw));
   return[s?{type:'subject',val:s.id}:{type:'text',val:raw}];
 }
@@ -2314,7 +2559,7 @@ function buildEntryRow(e){
   if(e.mood)badges+=`<span style="font-size:11px">${moodEmo(e.mood)}</span>`;
   if(e.rating)badges+=`<span class="er-badge" style="background:var(--accent-dim);color:var(--accent)">★${e.rating}</span>`;
   const pend=(e.todos||[]).filter(t=>!t.done).length;
-  if(pend)badges+=`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">☐${pend}</span>`;
+  if(pend)badges+=`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">${pend}</span>`;
   if((e.youtubes||[]).length)badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">▶${e.youtubes.length}</span>`;
   if((e.files||[]).length)badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">📎${e.files.length}</span>`;
   const dateLabel=isToday?'Today':`${d.getDate()} ${MSHORT[d.getMonth()]}`;
@@ -2510,7 +2755,7 @@ function renderGrid(items){
       const dt=new Date(e.date+'T00:00:00');
       const title=(e.titles||[]).find(t=>t.text)?.text||'Untitled';
       const pend=(e.todos||[]).filter(t=>!t.done).length;
-      return `<div class="wf-entry" data-id="${e.id}"><div class="wf-e-dot" style="background:${s.color}"></div><span class="wf-e-sid" style="color:${s.color}">${e.subject}</span><span class="wf-e-title">${esc(title)}</span><span class="wf-e-day">${DAYS[dt.getDay()]} ${dt.getDate()}</span><div class="wf-e-badges">${e.mood?`<span style="font-size:11px">${moodEmo(e.mood)}</span>`:''}${pend?`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">☐${pend}</span>`:''}</div></div>`;
+      return `<div class="wf-entry" data-id="${e.id}"><div class="wf-e-dot" style="background:${s.color}"></div><span class="wf-e-sid" style="color:${s.color}">${e.subject}</span><span class="wf-e-title">${esc(title)}</span><span class="wf-e-day">${DAYS[dt.getDay()]} ${dt.getDate()}</span><div class="wf-e-badges">${e.mood?`<span style="font-size:11px">${moodEmo(e.mood)}</span>`:''}${pend?`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">${pend}</span>`:''}</div></div>`;
     }).join('');
     return `<div class="wf-folder${isThisWeek?' wf-open':''}" id="${fid}">
       <div class="wf-folder-head" onclick="toggleWeekFolder('${fid}')">
@@ -2540,7 +2785,7 @@ function renderCal(){
     const dow=new Date(ds+'T00:00:00').getDay(),isHol=dow===0||dow===6;
     const de=byDate[ds]||[],pendTodos=(todoByDate[ds]||[]).filter(t=>!t.done);
     const dots=de.slice(0,6).map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{color:'#8b92a8'};return`<div class="cal-dot" style="background:${s.color}"></div>`;}).join('');
-    cells+=`<div class="cal-cell${ds===today?' today':''}${isHol?' holiday':''}" onclick="openDayPanel('${ds}')" onmouseenter="showCalTip(event,'${ds}')" onmouseleave="hideCalTip()"><div class="cal-num">${d}</div>${isHol?'<div class="cal-hday">Wknd</div>':''}<div class="cal-dots">${dots}</div>${de.length?`<div class="cal-count">${de.length}</div>`:''}${pendTodos.length?`<div class="cal-todo-badge">☐${pendTodos.length}</div>`:''}</div>`;
+    cells+=`<div class="cal-cell${ds===today?' today':''}${isHol?' holiday':''}" onclick="openDayPanel('${ds}')" onmouseenter="showCalTip(event,'${ds}')" onmouseleave="hideCalTip()"><div class="cal-num">${d}</div>${isHol?'<div class="cal-hday">Wknd</div>':''}<div class="cal-dots">${dots}</div>${de.length?`<div class="cal-count">${de.length}</div>`:''}${pendTodos.length?`<div class="cal-todo-badge">${pendTodos.length}</div>`:''}</div>`;
   }
   const tot=Math.ceil((fd+dm)/7)*7;for(let d=1;d<=tot-(fd+dm);d++)cells+=`<div class="cal-cell other-m"><div class="cal-num">${d}</div></div>`;
   c.innerHTML=`<div class="cal-wrap"><div class="cal-nav"><button class="cal-nav-btn" onclick="calNav(-1)">◀</button><h2>${MONTHS[calMonth]} ${calYear}</h2><button class="cal-nav-btn" onclick="calNav(1)">▶</button><button class="cal-nav-btn" onclick="calToday()">Today</button></div><div class="cal-grid">${DAYS.map(d=>`<div class="cal-dh">${d}</div>`).join('')}${cells}</div></div>`;
@@ -2556,7 +2801,7 @@ function showCalTip(event,dateStr){
     const dt=new Date(dateStr+'T00:00:00');
     let html=`<div class="caltip-date">${DAYSFULL[dt.getDay()]}, ${dateStr}</div>`;
     if(de.length){html+=`<div class="caltip-section">Entries (${de.length})</div>`;de.slice(0,4).forEach(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{color:'#8b92a8',label:e.subject};const t=(e.titles||[]).find(x=>x.text)?.text||'Untitled';html+=`<div class="caltip-entry" style="border-left:2px solid ${s.color};padding-left:6px"><span style="font-size:9.5px;color:${s.color};font-weight:700">${e.subject}</span> ${esc(t.substring(0,34))}${t.length>34?'…':''}</div>`;});if(de.length>4)html+=`<div style="font-size:9.5px;color:var(--text4);margin-top:3px">+${de.length-4} more</div>`;}
-    if(dueTodos.length){html+=`<div class="caltip-section">Tasks Due (${dueTodos.length})</div>`;dueTodos.slice(0,4).forEach(t=>{html+=`<div class="caltip-todo"><span>☐</span><span>${esc(t.text.substring(0,36))}${t.text.length>36?'…':''}</span></div>`;});}
+    if(dueTodos.length){html+=`<div class="caltip-section">Tasks Due (${dueTodos.length})</div>`;dueTodos.slice(0,4).forEach(t=>{html+=`<div class="caltip-todo"><span></span><span>${esc(t.text.substring(0,36))}${t.text.length>36?'…':''}</span></div>`;});}
     const tip=document.getElementById('calTip');tip.innerHTML=html;
     const rect=event.currentTarget.getBoundingClientRect();let left=rect.right+8;if(left+250>window.innerWidth-10)left=rect.left-258;
     tip.style.left=Math.max(6,left)+'px';tip.style.top=Math.max(6,Math.min(rect.top,window.innerHeight-200))+'px';
@@ -3463,6 +3708,369 @@ area.addEventListener('touchmove',e=>{
     commit(current > OPEN_DIST);
   }, {passive:true, capture:true});
 
+})();
+
+/* ── MOBILE BACK BUTTON HANDLER ── */
+(function(){
+  // Push a dummy state whenever something opens, pop it on back button
+  // Priority (highest first): ytPopup, fvOverlay, cmdpal, helpModal,
+  //   entryModal, detailOverlay, dayPanel, sideOverlay, selBar
+
+  const STACK_KEY = 'slp_hist';
+
+  function push(tag){
+    history.pushState({slp: tag}, '');
+  }
+
+  function topOpen(){
+    if(document.getElementById('ytPopup')?.classList.contains('open'))        return 'yt';
+    if(document.getElementById('fvOverlay')?.classList.contains('open'))      return 'fv';
+    if(document.getElementById('cmdpal')?.classList.contains('open'))         return 'cmd';
+    if(document.getElementById('helpModal')?.classList.contains('open'))      return 'help';
+    if(document.getElementById('ghModal')?.classList.contains('open'))        return 'gh';
+    if(document.getElementById('entryModal')?.classList.contains('open'))     return 'entry';
+    if(document.getElementById('detailOverlay')?.classList.contains('open'))  return 'detail';
+    if(document.getElementById('dayPanel')?.classList.contains('open'))       return 'day';
+    if(document.getElementById('sidebar')?.classList.contains('mobile-open')) return 'sidebar';
+    if(selIds.size)                                                             return 'sel';
+    return null;
+  }
+
+  function closeTop(tag){
+    if(tag==='yt')      closeYTPopup();
+    else if(tag==='fv') closeFV();
+    else if(tag==='cmd')closeCmd();
+    else if(tag==='help')closeHelp();
+    else if(tag==='gh') document.getElementById('ghModal')?.classList.remove('open');
+    else if(tag==='entry')closeModal();
+    else if(tag==='detail')closeDetailPanelAnimated();
+    else if(tag==='day')closeDayPanel();
+    else if(tag==='sidebar')closeMobileSidebar();
+    else if(tag==='sel')clearSel();
+  }
+
+  /* Intercept popstate (back button) */
+  window.addEventListener('popstate', e=>{
+    const tag = topOpen();
+    if(tag){
+      closeTop(tag);
+      // re-push so back button works for the next layer too
+      history.pushState({slp: tag}, '');
+    }
+    // if nothing open, let the browser do its normal thing
+  });
+
+  /* ── Patch every opener to push a history state ── */
+
+  // detail panel
+  const _openDP = openDetailPanel;
+  openDetailPanel = function(id){
+    _openDP(id);
+    push('detail');
+  };
+
+  // day panel
+  const _openDay = openDayPanel;
+  openDayPanel = function(d){
+    _openDay(d);
+    push('day');
+  };
+
+  // entry modal
+  const _openModal = openModal;
+  openModal = function(id,date){
+    _openModal(id,date);
+    push('entry');
+  };
+
+  // help modal
+  const _openHelp = openHelp;
+  openHelp = function(){
+    _openHelp();
+    push('help');
+  };
+
+  // command palette
+  const _openCmd = openCmd;
+  openCmd = function(){
+    _openCmd();
+    push('cmd');
+  };
+
+  // yt popup
+  const _openYT = openYTPopup;
+  openYTPopup = function(id){
+    _openYT(id);
+    push('yt');
+  };
+
+  // file viewer
+  const _viewFile = viewFile;
+  viewFile = function(eid,idx){
+    _viewFile(eid,idx);
+    push('fv');
+  };
+
+  // gh connect modal
+  const _openGH = openGHConnectModal;
+  openGHConnectModal = function(){
+    _openGH();
+    push('gh');
+  };
+
+  // sidebar (mobile)
+  const _toggleSidebar = toggleMobileSidebar;
+  toggleMobileSidebar = function(){
+    const wasOpen = document.getElementById('sidebar')?.classList.contains('mobile-open');
+    _toggleSidebar();
+    if(!wasOpen) push('sidebar');
+  };
+
+  // selection bar
+  const _toggleSel = toggleSel;
+  toggleSel = function(id){
+    const wasEmpty = selIds.size===0;
+    _toggleSel(id);
+    if(wasEmpty && selIds.size>0) push('sel');
+  };
+
+  // push one baseline state on load so the very first back
+  // presses close a panel rather than exiting the app
+  history.replaceState({slp:'base'}, '');
+  push('base');
+
+})();
+
+/* ═══════════════════════════════════
+   UX IMPROVEMENTS
+═══════════════════════════════════ */
+
+/* ── 1. HAPTIC FEEDBACK ── */
+function haptic(type='light'){
+  if(!navigator.vibrate)return;
+  if(type==='light')   navigator.vibrate(8);
+  else if(type==='medium') navigator.vibrate(18);
+  else if(type==='heavy')  navigator.vibrate([20,30,20]);
+  else if(type==='success')navigator.vibrate([8,40,8]);
+  else if(type==='error')  navigator.vibrate([30,20,30]);
+}
+// patch key actions
+const _saveEntry=saveEntry;
+saveEntry=async function(){await _saveEntry.apply(this,arguments);haptic('success');};
+const _deleteEntry=deleteEntry;
+deleteEntry=async function(id){haptic('heavy');await _deleteEntry(id);};
+const _togglePin=togglePin;
+togglePin=async function(id){await _togglePin(id);haptic('medium');};
+const _toggleCardTodo=toggleCardTodo;
+toggleCardTodo=async function(eid,tid){await _toggleCardTodo(eid,tid);haptic('light');};
+
+/* ── 2. RIPPLE EFFECT on entry rows ── */
+document.addEventListener('pointerdown',e=>{
+  const row=e.target.closest('.entry-row,.wf-entry');
+  if(!row)return;
+  const r=row.getBoundingClientRect();
+  const size=Math.max(r.width,r.height)*1.6;
+  const rip=document.createElement('div');
+  rip.className='ripple';
+  rip.style.cssText=`width:${size}px;height:${size}px;left:${e.clientX-r.left-size/2}px;top:${e.clientY-r.top-size/2}px`;
+  row.appendChild(rip);
+  setTimeout(()=>rip.remove(),520);
+},{passive:true});
+
+/* ── 3. LONG PRESS TO SELECT (mobile) ── */
+(function(){
+  let timer=null,target=null;
+  const DELAY=430;
+
+  document.addEventListener('touchstart',e=>{
+    const row=e.target.closest('.entry-row');
+    if(!row||e.target.closest('button,a'))return;
+    target=row;
+    timer=setTimeout(()=>{
+      haptic('medium');
+      row.classList.add('longpress-active');
+      setTimeout(()=>row.classList.remove('longpress-active'),400);
+      toggleSel(row.dataset.id);
+      target=null;
+    },DELAY);
+  },{passive:true});
+
+  const cancel=()=>{clearTimeout(timer);target=null;};
+  document.addEventListener('touchend',cancel,{passive:true});
+  document.addEventListener('touchmove',cancel,{passive:true});
+  document.addEventListener('touchcancel',cancel,{passive:true});
+})();
+
+/* ── 4. DOUBLE-CLICK TO EDIT (desktop) ── */
+document.addEventListener('dblclick',e=>{
+  const row=e.target.closest('.entry-row');
+  if(!row||window.innerWidth<=768)return;
+  if(e.target.closest('button,a'))return;
+  editEntry(row.dataset.id);
+});
+
+/* ── 5. SWIPE LEFT ON ROW TO DELETE (mobile) ── */
+(function(){
+  const THRESHOLD=72;
+  let x0=0,y0=0,row=null,bg=null,dragging=false;
+
+  document.addEventListener('touchstart',e=>{
+    const r=e.target.closest('.entry-row');
+    if(!r||e.target.closest('button,a,.todo-chk'))return;
+    // don't steal from edge-swipe zone
+    if(e.touches[0].clientX<40)return;
+    x0=e.touches[0].clientX;
+    y0=e.touches[0].clientY;
+    row=r;dragging=false;
+    // ensure delete bg exists
+    if(!row.querySelector('.swd-bg')){
+      bg=document.createElement('div');
+      bg.className='swd-bg';bg.textContent='🗑';
+      row.appendChild(bg);
+    } else bg=row.querySelector('.swd-bg');
+  },{passive:true});
+
+  document.addEventListener('touchmove',e=>{
+    if(!row)return;
+    const dx=e.touches[0].clientX-x0;
+    const dy=Math.abs(e.touches[0].clientY-y0);
+    if(!dragging&&dy>18){row=null;return;}
+    if(dx>-10)return;  // only left swipe
+    dragging=true;
+    const travel=Math.min(Math.abs(dx),110);
+    row.style.transform=`translateX(${-travel}px)`;
+    row.style.transition='none';
+    if(bg)bg.style.opacity=String(Math.min(travel/THRESHOLD,1));
+  },{passive:true});
+
+  document.addEventListener('touchend',e=>{
+    if(!row||!dragging){row=null;dragging=false;return;}
+    const dx=x0-e.changedTouches[0].clientX;
+    if(dx>=THRESHOLD){
+      // animate out then delete
+      row.style.transition='transform .22s ease,opacity .22s ease';
+      row.style.transform='translateX(-105%)';
+      row.style.opacity='0';
+      const id=row.dataset.id;
+      haptic('heavy');
+      setTimeout(()=>deleteEntry(id),220);
+    } else {
+      row.style.transition='transform .28s cubic-bezier(.34,1.56,.64,1)';
+      row.style.transform='';
+      if(bg)bg.style.opacity='0';
+    }
+    row=null;dragging=false;
+  },{passive:true});
+})();
+
+/* ── 6. SCROLL TO TOP BUTTON ── */
+(function(){
+  const btn=document.getElementById('scrollTopBtn');
+  const va=document.getElementById('viewArea');
+  if(!btn||!va)return;
+  // move button above status bar
+  btn.style.bottom='44px';
+  va.addEventListener('scroll',()=>{
+    btn.classList.toggle('show',va.scrollTop>320);
+  },{passive:true});
+})();
+
+/* ── 7. MODAL DRAFT AUTOSAVE ── */
+(function(){
+  const DRAFT_KEY='slp_draft';
+  const dot=document.getElementById('draftDot');
+
+  function saveDraft(){
+    if(!document.getElementById('entryModal').classList.contains('open'))return;
+    const d={
+      date:document.getElementById('fDate')?.value||'',
+      notes:document.getElementById('fNotes')?.value||'',
+      titles:[...(document.querySelectorAll('#titlesList .t-row')||[])].map(r=>({
+        text:r.querySelector('.t-title')?.value||'',
+        url:r.querySelector('.t-url')?.value||''
+      })),
+      savedAt:Date.now()
+    };
+    localStorage.setItem(DRAFT_KEY,JSON.stringify(d));
+    if(dot)dot.classList.add('show');
+    setTimeout(()=>dot?.classList.remove('show'),1200);
+  }
+
+  // autosave every 8 seconds while modal open
+  let draftTimer=null;
+  const _openModal2=openModal;
+  openModal=function(){
+    _openModal2.apply(this,arguments);
+    // offer to restore draft if fresh (< 30 min) and no editId
+    if(!editId){
+      try{
+        const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');
+        if(d&&(Date.now()-d.savedAt)<30*60*1000&&(d.notes||d.titles?.some(t=>t.text))){
+          setTimeout(()=>{
+            if(confirm('📝 You have an unsaved draft. Restore it?')){
+              if(d.date)document.getElementById('fDate').value=d.date;
+              if(d.notes)document.getElementById('fNotes').value=d.notes;
+              (d.titles||[]).forEach(t=>{if(t.text)addTitleRow(t.text,t.url);});
+              onNotesInput();onDateChange();
+            } else localStorage.removeItem(DRAFT_KEY);
+          },200);
+        }
+      }catch(ex){}
+    }
+    draftTimer=setInterval(saveDraft,8000);
+  };
+
+  const _closeModal2=closeModal;
+  closeModal=function(){
+    clearInterval(draftTimer);
+    _closeModal2.apply(this,arguments);
+  };
+
+  // clear draft on successful save
+  const _saveEntry2=saveEntry;
+  saveEntry=async function(){
+    await _saveEntry2.apply(this,arguments);
+    localStorage.removeItem(DRAFT_KEY);
+    clearInterval(draftTimer);
+  };
+
+  // also save on note input change
+  document.getElementById('fNotes')?.addEventListener('input',()=>{
+    clearTimeout(window._draftInputTimer);
+    window._draftInputTimer=setTimeout(saveDraft,3000);
+  });
+})();
+
+/* ── 8. KEYBOARD NAV: Tab through modal fields nicely ── */
+document.getElementById('entryModal')?.addEventListener('keydown',e=>{
+  if(e.key==='Tab'){
+    const focusable=[...document.querySelectorAll(
+      '#entryModal input:not([type=hidden]):not([disabled]),#entryModal textarea,#entryModal select,#entryModal button:not([disabled])'
+    )].filter(el=>{
+      const s=window.getComputedStyle(el);
+      return s.display!=='none'&&s.visibility!=='hidden'&&el.offsetParent!==null;
+    });
+    if(!focusable.length)return;
+    const idx=focusable.indexOf(document.activeElement);
+    if(e.shiftKey){
+      if(idx<=0){e.preventDefault();focusable[focusable.length-1].focus();}
+    } else {
+      if(idx===focusable.length-1){e.preventDefault();focusable[0].focus();}
+    }
+  }
+});
+
+/* ── 9. SMOOTH SIDEBAR TOGGLE INDICATOR (PC) ── */
+(function(){
+  const sb=document.getElementById('sidebar');
+  const hb=document.getElementById('hamburgerBtn');
+  if(!sb||!hb)return;
+  const obs=new MutationObserver(()=>{
+    const collapsed=sb.classList.contains('collapsed');
+    hb.style.opacity=collapsed?'1':'0.6';
+    hb.title=collapsed?'Open sidebar (Ctrl+B)':'Close sidebar (Ctrl+B)';
+  });
+  obs.observe(sb,{attributes:true,attributeFilter:['class']});
 })();
 /* ── KICK OFF ── */
 init();
