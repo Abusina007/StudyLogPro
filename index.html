@@ -1368,7 +1368,6 @@ async function saveData() {
     return true;
   }
 }
-
 async function syncNow() {
   if (!ghToken) {
     toast('Connect GitHub first', 'err');
@@ -1378,15 +1377,7 @@ async function syncNow() {
 
   setSyncStatus('syncing', 'Syncing...');
 
-  // 1. Push local changes to GitHub
-  const pushOk = await saveData();
-  if (!pushOk) {
-    toast('Push failed. Check console for errors.', 'err');
-    setSyncStatus('ok', 'Sync failed');
-    return;
-  }
-
-  // 2. Pull latest from GitHub
+  // 1. PULL first — so we never overwrite cloud-only entries
   const gistData = await loadFromGist();
   if (gistData && gistData.entries) {
     if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
@@ -1407,16 +1398,22 @@ async function syncNow() {
 
     entries = applyTombstones(Object.values(merged));
     lsSave({ version: 7, entries });
-    render();
-    buildSubjList();
-    updateSideTagCloud();
-
-    toast('Full sync completed (push + pull)', 'ok');
-  } else {
-    toast('No cloud data found – only local data pushed', 'info');
   }
 
-  setSyncStatus('ok', 'Synced');
+  // 2. PUSH the merged result — now cloud gets everything
+  const pushOk = await saveData();
+
+  render();
+  buildSubjList();
+  updateSideTagCloud();
+
+  if (pushOk) {
+    toast('Synced ✓ (pull + push)', 'ok');
+    setSyncStatus('ok', 'Synced ✓');
+  } else {
+    toast('Pull done, push failed — check token', 'err');
+    setSyncStatus('ok', 'Partial sync');
+  }
 }
 
 async function loadData() {
@@ -2272,11 +2269,14 @@ async function importData() {
       }
 
       // Ensure each new entry has valid timestamps
-      const now = Date.now();
-      newEntries.forEach(entry => {
-        if (!entry.updatedAt) entry.updatedAt = now;
-        if (!entry.createdAt) entry.createdAt = now;
-      });
+// Ensure each new entry has valid timestamps AND wins in merge
+const now = Date.now();
+newEntries.forEach(entry => {
+  entry.updatedAt = now;                 // always fresh so local wins merge
+  if (!entry.createdAt) entry.createdAt = now;
+  delete deletedIds[entry.id];          // un-tombstone if previously deleted
+});
+saveDeletedIds();
 
       // Merge into current entries
       entries = [...entries, ...newEntries];
