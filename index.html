@@ -1807,33 +1807,34 @@ const searchIcon = document.getElementById('tbSearchIcon');
 const searchExpand = document.getElementById('tbSearchExpand');
 const searchInput = document.getElementById('searchInp');
 
-if (searchIcon && searchExpand) {
-  // Function to expand and focus
-  const expandAndFocus = () => {
-    const wasOpen = searchExpand.classList.contains('open');
-    if (!wasOpen) {
-      searchExpand.classList.add('open');
-      // Wait a tiny bit for the element to become visible before focusing
-      setTimeout(() => {
-        searchInput.focus();
-        // For mobile, some browsers need a slight extra nudge
-        searchInput.click(); // ensures keyboard on some devices
-      }, 50);
-    } else {
+// Function to expand the search bar (if collapsed) and focus the input
+function expandAndFocusSearch() {
+  if (!searchExpand || !searchInput) return;
+  const wasOpen = searchExpand.classList.contains('open');
+  if (!wasOpen) {
+    searchExpand.classList.add('open');
+    // Wait a tiny bit for the element to become visible before focusing
+    setTimeout(() => {
       searchInput.focus();
-    }
-  };
+      // For mobile, some browsers need a slight extra nudge to open keyboard
+      searchInput.click();
+    }, 50);
+  } else {
+    searchInput.focus();
+  }
+}
 
+if (searchIcon && searchExpand) {
   // On icon click (works for both mouse and touch)
   searchIcon.addEventListener('click', (e) => {
     e.stopPropagation();
-    expandAndFocus();
+    expandAndFocusSearch();
   });
 
   // Also handle touchstart for better mobile responsiveness
   searchIcon.addEventListener('touchstart', (e) => {
-    e.preventDefault(); // prevents double-trigger with click
-    expandAndFocus();
+    e.preventDefault(); // prevents double‑trigger with click
+    expandAndFocusSearch();
   });
 
   // Close if clicking outside the search container
@@ -2207,12 +2208,7 @@ document.addEventListener('keydown',e=>{
   if(e.altKey&&(e.key==='n'||e.key==='N')){e.preventDefault();openModal();return;}
 if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
   e.preventDefault();
-  const expand = document.getElementById('tbSearchExpand');
-  const inp = document.getElementById('searchInp');
-  if (expand && !expand.classList.contains('open')) {
-    expand.classList.add('open');
-  }
-  if (inp) inp.focus();
+  expandAndFocusSearch();   // uses the function defined above
   return;
 }
   if((e.ctrlKey||e.metaKey)&&e.key==='e'){e.preventDefault();exportAll();return;}
