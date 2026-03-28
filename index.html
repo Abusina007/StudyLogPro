@@ -1237,13 +1237,13 @@ async function loadFromGist() {
     // Load entries data
     let data = null;
     if (gist.files[GIST_FILENAME]?.raw_url) {
-      const res = await fetch(gist.files[GIST_FILENAME].raw_url);
-      if (res.ok) data = await res.json();
+    const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) data = await res.json();
     }
     // Load routine if present
     if (gist.files[ROUTINE_FILENAME]?.raw_url) {
       try {
-        const res = await fetch(gist.files[ROUTINE_FILENAME].raw_url);
+        const res = await fetch(gist.files[ROUTINE_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
         if (res.ok) {
           const r = await res.json();
           if (r.meta && r.subjects && r.schedule) {
