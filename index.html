@@ -672,7 +672,7 @@ input[type=date]{color-scheme:dark}
 .dp-subj-label{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px}
 .dp-big-date{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.4px;line-height:1.2}
 .dp-meta-line{font-size:11.5px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
-.dp-hdr-actions{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.dp-hdr-actions{display:flex;gap:7px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
 .dp-act{background:var(--panel2);border:1px solid var(--border);color:var(--text2);padding:6px 11px;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:500;transition:all var(--tr);white-space:nowrap}
 .dp-act:hover{border-color:var(--border2);color:var(--text);background:var(--panel3)}
 .dp-act.danger:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
@@ -793,7 +793,76 @@ input, textarea, [contenteditable] {
   user-select: text;
   -webkit-touch-callout: default;
 }
-
+/* ▀▄▀▄ PULL TO REFRESH ▀▄▀▄ */
+#ptr-wrap {
+  position: fixed;
+  top: -72px;
+  left: 50%;
+  width: 56px; height: 56px;
+  transform: translate3d(-50%, 0, 0);
+  will-change: transform, opacity;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+}
+#ptr-wrap.ptr-visible { opacity: 1; transition: opacity 0.12s ease; }
+#ptr-wrap.ptr-snap-back {
+  transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease;
+  transform: translate3d(-50%, 0, 0) !important;
+  opacity: 0 !important;
+}
+#ptr-wrap.ptr-hold {
+  transition: transform 0.32s cubic-bezier(0.34, 1.5, 0.64, 1);
+}
+.ptr-bg {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 1px 6px rgba(0,0,0,0.25);
+}
+[data-theme="light"] .ptr-bg {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.08);
+}
+.ptr-svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.ptr-track { fill: none; stroke: var(--border); stroke-width: 2.5; }
+.ptr-arc {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 113.1;
+  stroke-dashoffset: 113.1;
+  will-change: stroke-dashoffset;
+}
+.ptr-arc.ptr-ready { stroke: var(--green); transition: stroke 0.2s ease; }
+.ptr-icon {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; line-height: 1;
+  will-change: transform, opacity;
+}
+.ptr-icon.ptr-arrow { transition: transform 0.08s linear; }
+.ptr-icon.ptr-spinner { opacity: 0; transform: scale(0.4); transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1); }
+.ptr-icon.ptr-spinner.active { opacity: 1; transform: scale(1); animation: ptrSpin 0.72s linear infinite; }
+.ptr-icon.ptr-arrow.hide { opacity: 0; transform: scale(0.3) !important; transition: opacity 0.15s ease, transform 0.18s ease; }
+.ptr-done-ring {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--green);
+  opacity: 0; transform: scale(0.85);
+}
+.ptr-done-ring.burst { animation: ptrBurst 0.55s cubic-bezier(0.4,0,0.2,1) forwards; }
+@keyframes ptrSpin { to { transform: rotate(360deg); } }
+@keyframes ptrBurst {
+  0%   { opacity: 0.85; transform: scale(0.9); }
+  55%  { opacity: 0.35; transform: scale(1.4); }
+  100% { opacity: 0;    transform: scale(1.65); }
+}
 </style>
 </head>
 <body>
@@ -1172,9 +1241,9 @@ input, textarea, [contenteditable] {
           <div class="dp-meta-line" id="dpMetaLine"></div>
         </div>
         <div class="dp-hdr-actions">
-          <button class="dp-act" style="margin-right: 10px;" onclick="dpPin()" id="dpPinBtn">📌</button>
+          <button class="dp-act" onclick="dpPin()" id="dpPinBtn">📌</button>
           <button class="dp-act" onclick="dpEdit()">✎ Edit</button>
-          <button class="m-close danger" onclick="dpDel()">×</button>
+          <button class="m-close danger" onclick="dpDel()"><svg width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 6H21M5 6V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V6M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="#697098" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 11V17" stroke="#697098" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M10 11V17" stroke="#697098" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
         </div>
       </div>
     </div>
@@ -1195,7 +1264,17 @@ input, textarea, [contenteditable] {
   </div>
   <div class="dp-day-body" id="dayPanelBody"></div>
 </div>
-
+<!-- ▀▄▀▄ PULL TO REFRESH ▀▄▀▄ -->
+<div id="ptr-wrap">
+  <div class="ptr-bg"></div>
+  <svg class="ptr-svg" viewBox="0 0 56 56">
+    <circle class="ptr-track" cx="28" cy="28" r="18"/>
+    <circle class="ptr-arc"   cx="28" cy="28" r="18" id="ptrArc"/>
+  </svg>
+  <div class="ptr-icon ptr-arrow"   id="ptrArrow">↓</div>
+  <div class="ptr-icon ptr-spinner" id="ptrSpinner">⟳</div>
+  <div class="ptr-done-ring" id="ptrDoneRing"></div>
+</div>
 <div id="undoBar">
   <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
@@ -2949,7 +3028,149 @@ document.addEventListener('touchend', e => {
   if (now - lastTap < 300) e.preventDefault();
   lastTap = now;
 }, { passive: false });
+/* ── PULL TO REFRESH ── */
+(function () {
+  // Element starts at CSS top:-72px, transform translateY(0) = fully hidden.
+  // rubberBand(dy) must reach ~72px at TRIGGER so indicator enters view.
+  const TRIGGER  = 68;    // px of finger travel to arm sync
+  const MAX_DRAG = 140;   // finger travel ceiling
+  const HOLD_Y   = 90;    // translateY while syncing (top:-72+90 = 18px, nicely visible)
+  const CIRC     = 113.1; // 2π × 18
 
+  const wrap     = document.getElementById('ptr-wrap');
+  const arc      = document.getElementById('ptrArc');
+  const arrow    = document.getElementById('ptrArrow');
+  const spinner  = document.getElementById('ptrSpinner');
+  const doneRing = document.getElementById('ptrDoneRing');
+  if (!wrap) return;
+
+  let startY = 0, curDY = 0;
+  let pulling = false, locked = false, armed = false;
+  let rafId = null;
+
+  // Rubber-band: grows fast at first, tapers off.
+  // At dy=68: returns ~80px → element top at -72+80=8px (visible).
+  // At dy=140: returns ~115px → element top at 43px (still controlled).
+  function rb(dy) {
+    return dy * 1.65 / (1 + dy * 0.0055);
+  }
+
+  function setY(y) {
+    wrap.style.transform = `translate3d(-50%, ${y}px, 0)`;
+  }
+
+  function frame() {
+    rafId = null;
+    if (!pulling || locked) return;
+    const vis   = rb(curDY);
+    const ratio = Math.min(curDY / TRIGGER, 1);
+    setY(vis);
+    arc.style.strokeDashoffset = CIRC * (1 - ratio);
+    arrow.style.transform = `rotate(${ratio * 200}deg)`;
+    arc.classList.toggle('ptr-ready', ratio >= 1);
+    // Micro-bump when threshold crossed
+    if (ratio >= 1 && !armed) {
+      armed = true;
+      wrap.style.transform = `translate3d(-50%, ${vis}px, 0) scale(1.1)`;
+      setTimeout(() => {
+        if (pulling) wrap.style.transform = `translate3d(-50%, ${rb(curDY)}px, 0) scale(1)`;
+      }, 130);
+    }
+  }
+
+  function startFrame() {
+    if (!rafId) rafId = requestAnimationFrame(frame);
+  }
+
+  function snapBack() {
+    pulling = false; armed = false; locked = false;
+    cancelAnimationFrame(rafId); rafId = null;
+    wrap.classList.add('ptr-snap-back');
+    wrap.classList.remove('ptr-visible');
+    setTimeout(() => {
+      wrap.classList.remove('ptr-snap-back');
+      resetVisuals();
+    }, 480);
+  }
+
+  function doSync() {
+    pulling = false; armed = false; locked = true;
+    cancelAnimationFrame(rafId); rafId = null;
+
+    // Slide to hold position
+    wrap.classList.add('ptr-hold');
+    setY(HOLD_Y);
+    arc.style.strokeDashoffset = 0;
+    arc.classList.add('ptr-ready');
+    arrow.classList.add('hide');
+    spinner.classList.add('active');
+
+    const finish = () => {
+      spinner.classList.remove('active');
+      // Burst ring feedback
+      doneRing.classList.remove('burst');
+      void doneRing.offsetWidth;
+      doneRing.classList.add('burst');
+      setTimeout(() => {
+        wrap.classList.add('ptr-snap-back');
+        wrap.classList.remove('ptr-hold', 'ptr-visible');
+        setTimeout(() => {
+          wrap.classList.remove('ptr-snap-back');
+          resetVisuals();
+          locked = false;
+        }, 480);
+      }, 500);
+    };
+
+    if (typeof ghToken !== 'undefined' && ghToken) {
+      syncNow().then(finish).catch(finish);
+    } else {
+      if (typeof render === 'function') render();
+      if (typeof buildSubjList === 'function') buildSubjList();
+      if (typeof updateSideTagCloud === 'function') updateSideTagCloud();
+      if (typeof toast === 'function') toast('Refreshed ✓', 'ok');
+      setTimeout(finish, 750);
+    }
+  }
+
+  function resetVisuals() {
+    arc.style.strokeDashoffset = CIRC;
+    arc.classList.remove('ptr-ready');
+    arrow.classList.remove('hide');
+    arrow.style.transform = '';
+    spinner.classList.remove('active');
+    doneRing.classList.remove('burst');
+    setY(0);
+    curDY = 0; armed = false;
+  }
+
+  document.addEventListener('touchstart', e => {
+    if (locked) return;
+    const va = document.getElementById('viewArea');
+    if (!va || !va.contains(e.target)) return;
+    if (va.scrollTop > 3) return;
+    startY  = e.touches[0].clientY;
+    curDY   = 0; armed = false; pulling = true;
+    wrap.classList.remove('ptr-snap-back', 'ptr-hold');
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!pulling || locked) return;
+    const va = document.getElementById('viewArea');
+    if (va && va.scrollTop > 3) { pulling = false; return; }
+    const raw = e.touches[0].clientY - startY;
+    if (raw <= 0) { wrap.classList.remove('ptr-visible'); return; }
+    curDY = Math.min(raw, MAX_DRAG);
+    wrap.classList.add('ptr-visible');
+    startFrame();
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    if (!pulling || locked) return;
+    if (curDY >= TRIGGER) doSync();
+    else snapBack();
+  });
+})();
 /* ── KICK OFF ── */
 init();
 
