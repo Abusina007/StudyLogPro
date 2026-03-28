@@ -260,8 +260,8 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 
 /* ▀▄▀▄ MOBILE SIDEBAR ▀▄▀▄ */
 @media(max-width:768px){
-  #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);width:min(var(--sidebar),85vw)!important;box-shadow:var(--shadow);transition: .2s ease}
-  #sidebar.mobile-open{transform:translateX(0);transition: .2s ease-in}
+  #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);width:min(var(--sidebar),85vw)!important;box-shadow:var(--shadow);transition:transform .26s cubic-bezier(.4,0,.2,1)}
+  #sidebar.mobile-open{transform:translateX(0)}
   #sidebar.collapsed{transform:translateX(-100%);width:var(--sidebar)!important}
 }
 
@@ -660,11 +660,11 @@ input[type=date]{color-scheme:dark}
 /* ▀▄▀▄ DETAIL PANEL ▀▄▀▄ */
 .detail-overlay{position:fixed;inset:0;z-index:700;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
 .detail-overlay.open{opacity:1;visibility:visible}
-.detail-overlay::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
+.detail-overlay::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,var(--ov-alpha,.65));backdrop-filter:blur(var(--ov-blur,4px));transition:background .3s ease,backdrop-filter .3s ease}
 .detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;max-height:65vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(50px);transition:transform .28s cubic-bezier(.4,0,.2,1)}
 .detail-overlay.open .detail-panel{transform:none}
 @media(min-width:720px){.detail-overlay{align-items:center}.detail-panel{border-radius:18px;max-height:88vh;margin:20px}}
-.dp-handle{width:36px;height:4px;background:var(--border3);border-radius:2px;margin:20px auto 0;flex-shrink:0}
+.dp-handle{width:36px;height:4px;background:var(--border3);border-radius:2px;margin:10px auto 0;flex-shrink:0;padding:12px 24px;background-clip:content-box;box-sizing:content-box;cursor:grab;}
 .dp-header{padding:14px 18px 13px;flex-shrink:0}
 .dp-header-row{display:flex;align-items:flex-start;gap:11px}
 .dp-color-bar{width:4px;border-radius:2px;align-self:stretch;flex-shrink:0;min-height:48px}
@@ -863,6 +863,29 @@ input, textarea, [contenteditable] {
   55%  { opacity: 0.35; transform: scale(1.4); }
   100% { opacity: 0;    transform: scale(1.65); }
 }
+
+/* ▀▄▀▄ DETAIL PANEL DRAG MORPH ▀▄▀▄ */
+.detail-panel { will-change: transform, border-radius, opacity; }
+.entry-row.dp-target-glow {
+  background: var(--accent-dim2) !important;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+}
+.entry-row.dp-land-flash {
+  animation: dpLandFlash 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes dpLandFlash {
+  0%   { background: var(--accent-dim) !important; box-shadow: 0 0 0 2.5px var(--accent); }
+  35%  { background: var(--accent-dim2) !important; box-shadow: 0 0 0 1px var(--accent-dim); }
+  100% { background: inherit !important; box-shadow: none; }
+}
+
+/* ▀▄▀▄ SWIPE VIEW TRANSITIONS ▀▄▀▄ */
+#viewArea{overflow-x:hidden;}
+.view-slide-left{animation:slideFromRight .28s cubic-bezier(.4,0,.2,1) both}
+.view-slide-right{animation:slideFromLeft .28s cubic-bezier(.4,0,.2,1) both}
+@keyframes slideFromRight{from{opacity:0;transform:translateX(48px)}to{opacity:1;transform:none}}
+@keyframes slideFromLeft{from{opacity:0;transform:translateX(-48px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -1229,7 +1252,7 @@ input, textarea, [contenteditable] {
   <div id="fvContent"></div>
 </div>
 <!-- ▀▄▀▄ DETAIL PANEL ▀▄▀▄ -->
-<div id="detailOverlay" class="detail-overlay" onclick="if(event.target===this)closeDetailPanel()">
+<div id="detailOverlay" class="detail-overlay" onclick="if(event.target===this)closeDetailPanelAnimated()">
   <div class="detail-panel">
     <div class="dp-handle"></div>
     <div class="dp-header">
@@ -1250,7 +1273,7 @@ input, textarea, [contenteditable] {
     <div class="dp-divider"></div>
     <div class="dp-body" id="dpBody"></div>
     <div class="dp-close-strip">
-      <button class="dp-close-btn" onclick="closeDetailPanel()">← Back</button>
+      <button class="dp-close-btn" onclick="closeDetailPanelAnimated()">← Back</button>
     </div>
   </div>
 </div>
@@ -2352,10 +2375,54 @@ function openDetailPanel(id){
   document.getElementById('dpBody').innerHTML=html;
   document.getElementById('detailOverlay').classList.add('open');
 }
+function closeDetailPanelAnimated() {
+    const panel = document.querySelector('.detail-panel');
+    const ov    = document.getElementById('detailOverlay');
+    if (!panel || !ov) { closeDetailPanel(); return; }
+    panel.style.transition = 'transform .32s cubic-bezier(.4,0,1,1), opacity .24s ease';
+    panel.style.transform  = 'translateY(64px)';
+    panel.style.opacity    = '0';
+    ov.style.transition    = 'opacity .28s ease';
+    ov.style.opacity       = '0';
+    setTimeout(() => {
+        panel.style.transition = '';
+        panel.style.transform  = '';
+        panel.style.opacity    = '';
+        ov.style.transition    = '';
+        ov.style.opacity       = '';
+        closeDetailPanel();
+    }, 310);
+}
+function closeDetailPanelAnimated(){
+  const panel=document.querySelector('.detail-panel');
+  const ov=document.getElementById('detailOverlay');
+  if(!panel||!ov||!ov.classList.contains('open')){closeDetailPanel();return;}
+  const row=detailId?document.querySelector(`.entry-row[data-id="${detailId}"]`):null;
+  panel.style.transition='transform .3s cubic-bezier(.4,0,1,1),opacity .22s ease';
+  panel.style.transform='translateY(80px)';
+  panel.style.opacity='0';
+  ov.style.transition='opacity .28s ease';
+  ov.style.opacity='0';
+  setTimeout(()=>{
+    closeDetailPanel();
+    if(row){
+      row.scrollIntoView({behavior:'smooth',block:'nearest'});
+      row.classList.remove('dp-land-flash');
+      void row.offsetWidth;
+      row.classList.add('dp-land-flash');
+      setTimeout(()=>row.classList.remove('dp-land-flash'),950);
+    }
+  },300);
+}
 function closeDetailPanel(){
   const panel=document.querySelector('.detail-panel');
-  if(panel){panel.style.transform='';panel.style.maxHeight='';panel.style.borderRadius='';}
-  document.getElementById('detailOverlay').classList.remove('open');
+  const ov=document.getElementById('detailOverlay');
+  if(panel) panel.style.cssText='';
+  if(ov){
+    ov.style.transition='none';
+    ov.classList.remove('open');
+    requestAnimationFrame(()=>{if(ov){ov.style.transition='';ov.style.opacity='';}});
+  }
   detailId=null;
 }
 function dpEdit(){const id=detailId;closeDetailPanel();editEntry(id);}
@@ -2880,57 +2947,139 @@ function runCmd(i){closeCmd();CMDS[i]?.fn();}
 function cmdKey(e){const items=document.querySelectorAll('.cmd-item');if(e.key==='ArrowDown'){e.preventDefault();cmdIdx=Math.min(cmdIdx+1,items.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();cmdIdx=Math.max(cmdIdx-1,0);}else if(e.key==='Enter'){e.preventDefault();items[cmdIdx]?.click();return;}else if(e.key==='Escape'){closeCmd();return;}items.forEach((el,i)=>el.classList.toggle('hi',i===cmdIdx));}
 
 /* ── DETAIL PANEL DRAG ── */
-function initDetailDrag(){
-  const panel = document.querySelector('.detail-panel');
-  const handle = document.querySelector('.dp-handle');
-  if(!panel||!handle) return;
+function initDetailDrag() {
+  const overlay = document.getElementById('detailOverlay');
+  const panel   = document.querySelector('.detail-panel');
+  const handle  = document.querySelector('.dp-handle');
+  if (!panel || !handle) return;
 
-  let startY=0, dragY=0, dragging=false, expanded=false;
+  let startY = 0, dragY = 0, visualY = 0;
+  let dragging = false, expanded = false;
+  let panelRect = null, targetRow = null;
+  let rafId = null;
 
-  function dragStart(y){
-    startY=y; dragY=0; dragging=true;
-    panel.style.transition='none';
+  /* rubber-band resistance — fast start, tapers off */
+  function resist(dy) { return dy < 55 ? dy : 55 + (dy - 55) * 0.26; }
+  function lerp(a, b, t) { return a + (b - a) * Math.min(Math.max(t, 0), 1); }
+  function getRow() { return detailId ? document.querySelector(`.entry-row[data-id="${detailId}"]`) : null; }
+
+  /* ── per-frame update ── */
+  function applyFrame() {
+    rafId = null;
+    if (!dragging) return;
+
+    visualY = dragY > 0 ? resist(dragY) : Math.max(-80, dragY * 0.5);
+    const p  = Math.min(Math.max(dragY, 0) / 110, 1); // 0–1 progress
+
+    panel.style.transform    = `translateY(${visualY}px)`;
+    panel.style.borderRadius = `${lerp(18, 12, p)}px ${lerp(18, 12, p)}px 0 0`;
+    panel.style.opacity      = String(lerp(1, 0.78, p));
+
+    /* handle morphs: color + widens */
+    handle.style.background  = p > 0.42 ? 'var(--accent)' : '';
+    handle.style.width       = lerp(36, 52, p) + 'px';
+
+    /* backdrop fades + de-blurs */
+    overlay.style.setProperty('--ov-alpha', lerp(0.65, 0.15, p));
+    overlay.style.setProperty('--ov-blur',  lerp(4,    1,    p) + 'px');
+
+    /* glow the target row once halfway there */
+    if (targetRow) targetRow.classList.toggle('dp-target-glow', p > 0.42);
   }
-  function dragMove(y){
-    if(!dragging) return;
-    const dy=y-startY;
-    // allow drag down freely, limit drag up to 80px
-    dragY = dy>0 ? dy : Math.max(-80,dy);
-    panel.style.transform=`translateY(${dragY}px)`;
+
+  function schedule() { if (!rafId) rafId = requestAnimationFrame(applyFrame); }
+
+  /* ── drag start ── */
+  function onStart(y) {
+    if (expanded) return;
+    startY = y; dragY = 0; visualY = 0; dragging = true;
+    panel.style.transition = 'none';
+    panelRect  = panel.getBoundingClientRect();
+    targetRow  = getRow();
+    cancelAnimationFrame(rafId);
   }
-  function dragEnd(){
-    if(!dragging) return;
-    dragging=false;
-    panel.style.transition='';
-    if(dragY>110){
-      // dragged down far — close
-      closeDetailPanel();
-    } else if(dragY<-50){
-      // dragged up — expand to fill
-      panel.style.transform='';
-      panel.style.maxHeight='100vh';
-      panel.style.borderRadius='0';
-      expanded=true;
+
+  /* ── drag move ── */
+  function onMove(y) {
+    if (!dragging) return;
+    dragY = y - startY;
+    schedule();
+  }
+
+  /* ── cleanup helpers ── */
+  function resetHandle() { handle.style.background = ''; handle.style.width = ''; }
+function resetOverlay() {
+    overlay.style.setProperty('--ov-alpha', '0');
+    overlay.style.setProperty('--ov-blur', '0px');
+    setTimeout(() => {
+        overlay.style.removeProperty('--ov-alpha');
+        overlay.style.removeProperty('--ov-blur');
+    }, 340);
+}
+  function clearGlow() { targetRow?.classList.remove('dp-target-glow'); }
+
+  /* ── spring back ── */
+  function springBack() {
+    resetHandle(); resetOverlay(); clearGlow();
+    panel.style.transition   = 'transform .52s cubic-bezier(.34,1.56,.64,1), border-radius .4s ease, opacity .3s ease';
+    panel.style.transform    = '';
+    panel.style.borderRadius = '';
+    panel.style.opacity      = '';
+    if (expanded) { panel.style.maxHeight = ''; expanded = false; }
+    setTimeout(() => { panel.style.transition = ''; panel.style.willChange = ''; }, 560);
+  }
+
+  /* ── FLIP: panel flies to entry row ── */
+function flyToRow() {
+    resetHandle(); clearGlow();
+    panel.style.transition='transform .3s cubic-bezier(.4,0,1,1),opacity .22s ease';
+    panel.style.transform='translateY(80px)';
+    panel.style.opacity='0';
+    overlay.style.transition='opacity .28s ease';
+    overlay.style.opacity='0';
+    setTimeout(closeDetailPanel,300);
+  }
+
+  /* ── landing flash on the row ── */
+  function landFlash(row) {
+    row.classList.remove('dp-land-flash');
+    void row.offsetWidth;
+    row.classList.add('dp-land-flash');
+    setTimeout(() => row.classList.remove('dp-land-flash'), 950);
+  }
+
+  /* ── drag end ── */
+  function onEnd() {
+    if (!dragging) return;
+    dragging = false;
+    cancelAnimationFrame(rafId); rafId = null;
+    clearGlow(); resetHandle();
+
+    if (dragY > 110) {
+      flyToRow();
+    } else if (dragY < -50) {
+      /* expand to full screen */
+      panel.style.transition   = 'transform .42s cubic-bezier(.34,1.56,.64,1), border-radius .3s ease, opacity .2s ease';
+      panel.style.transform    = '';
+      panel.style.maxHeight    = '100vh';
+      panel.style.borderRadius = '0';
+      panel.style.opacity      = '';
+      resetOverlay();
+      expanded = true;
     } else {
-      // bounce back
-      panel.style.transform='';
-      if(expanded){
-        panel.style.maxHeight='';
-        panel.style.borderRadius='';
-        expanded=false;
-      }
+      springBack();
     }
   }
 
-  // touch
-  handle.addEventListener('touchstart',e=>dragStart(e.touches[0].clientY),{passive:true});
-  window.addEventListener('touchmove',e=>{if(dragging)dragMove(e.touches[0].clientY);},{passive:true});
-  window.addEventListener('touchend',dragEnd);
+  /* touch */
+  handle.addEventListener('touchstart', e => onStart(e.touches[0].clientY), { passive: true });
+  window.addEventListener('touchmove',  e => { if (dragging) onMove(e.touches[0].clientY); }, { passive: true });
+  window.addEventListener('touchend',   onEnd);
 
-  // mouse (desktop)
-  handle.addEventListener('mousedown',e=>{dragStart(e.clientY);e.preventDefault();});
-  window.addEventListener('mousemove',e=>{if(dragging)dragMove(e.clientY);});
-  window.addEventListener('mouseup',dragEnd);
+  /* mouse */
+  handle.addEventListener('mousedown', e => { onStart(e.clientY); e.preventDefault(); });
+  window.addEventListener('mousemove', e => { if (dragging) onMove(e.clientY); });
+  window.addEventListener('mouseup',   onEnd);
 }
 
 /* ── MISC ── */
@@ -3170,6 +3319,150 @@ document.addEventListener('touchend', e => {
     if (curDY >= TRIGGER) doSync();
     else snapBack();
   });
+})();
+
+/* ── SWIPE LEFT/RIGHT TO SWITCH VIEWS ── */
+(function(){
+  const VIEWS=['list','grid','calendar','stats'];
+  const THRESHOLD=52;   // min px horizontal travel to trigger
+  const MAX_VERT=80;    // max px vertical drift allowed
+  let x0=0,y0=0,t0=0,swiping=false;
+
+  function idx(){return VIEWS.indexOf(currentView);}
+
+  function goView(dir){
+    // dir: +1 = swipe left (next), -1 = swipe right (prev)
+    const next=idx()+dir;
+    if(next<0||next>=VIEWS.length)return;
+    const cl=dir===1?'view-slide-left':'view-slide-right';
+    switchView(VIEWS[next]);
+    // apply animation to the newly visible container
+    const map={list:'listCont',grid:'gridCont',calendar:'calCont',stats:'statsCont'};
+    const el=document.getElementById(map[VIEWS[next]]);
+    if(!el)return;
+    el.classList.remove('view-slide-left','view-slide-right');
+    void el.offsetWidth;
+    el.classList.add(cl);
+    setTimeout(()=>el.classList.remove(cl),300);
+  }
+
+  const area=document.getElementById('main');
+  if(!area)return;
+
+  area.addEventListener('touchstart',e=>{
+    // don't hijack if detail/day panel is open or user is on sidebar
+    if(document.getElementById('detailOverlay')?.classList.contains('open'))return;
+    if(document.getElementById('dayPanel')?.classList.contains('open'))return;
+    if(document.getElementById('entryModal')?.classList.contains('open'))return;
+    if(e.touches.length!==1)return;
+    x0=e.touches[0].clientX;
+    y0=e.touches[0].clientY;
+    t0=Date.now();
+    swiping=true;
+  },{passive:true});
+
+area.addEventListener('touchmove',e=>{
+    if(!swiping)return;
+    const dx=e.touches[0].clientX-x0;
+    const dy=Math.abs(e.touches[0].clientY-y0);
+    if(dy>MAX_VERT){swiping=false;return;}
+    if(Math.abs(dx)>18){
+      // suppress both horizontal scroll AND pull-to-refresh
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  },{passive:false});
+
+  area.addEventListener('touchend',e=>{
+    if(!swiping){swiping=false;return;}
+    swiping=false;
+    const dx=e.changedTouches[0].clientX-x0;
+    const dy=Math.abs(e.changedTouches[0].clientY-y0);
+    const dt=Date.now()-t0;
+    if(dy>MAX_VERT||Math.abs(dx)<THRESHOLD||dt>600)return;
+    goView(dx<0?1:-1);  // swipe left → next, swipe right → prev
+  },{passive:true});
+})();
+
+/* ── EDGE SWIPE TO OPEN SIDEBAR ── */
+(function(){
+  const EDGE_ZONE = 28;   // px width of trigger zone from left
+  const SAFE_PAD  = 12;   // dead band at absolute left edge (avoids system back)
+  const OPEN_DIST = 55;   // px travel needed to commit open
+  const MAX_VERT  = 65;   // cancel if vertical drift exceeds this
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sideOverlay');
+  if(!sidebar||!overlay) return;
+
+  let x0=0, y0=0, tracking=false, dragging=false, current=0, sidebarW=0;
+
+  function isSmall(){ return window.innerWidth<=768; }
+  function isOpen(){ return sidebar.classList.contains('mobile-open'); }
+
+  function setDrag(px){
+    const clamped = Math.max(0, Math.min(px, sidebarW));
+    sidebar.style.transition = 'none';
+    sidebar.style.transform  = `translateX(${clamped - sidebarW}px)`;
+    overlay.style.display    = 'block';
+    overlay.style.opacity    = String((clamped / sidebarW) * 0.85);
+    overlay.style.transition = 'none';
+  }
+
+  function commit(open){
+    sidebar.style.transition = '';
+    overlay.style.transition = '';
+    if(open){
+      sidebar.style.transform = '';
+      sidebar.classList.add('mobile-open');
+      overlay.classList.add('show');
+      overlay.style.opacity = '';
+      overlay.style.display = '';
+    } else {
+      sidebar.style.transform = '';
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('show');
+      overlay.style.opacity = '';
+      overlay.style.display = '';
+    }
+    tracking=false; dragging=false; current=0;
+  }
+
+  /* capture:true so this fires BEFORE swipe-view and PTR listeners */
+  document.addEventListener('touchstart', e=>{
+    if(!isSmall()||isOpen()) return;
+    const tx = e.touches[0].clientX;
+    if(tx < SAFE_PAD || tx > SAFE_PAD + EDGE_ZONE) return;
+    // measure sidebar width once when gesture starts
+    sidebarW = sidebar.getBoundingClientRect().width ||
+               parseFloat(getComputedStyle(sidebar).width) || 264;
+    x0=e.touches[0].clientX;
+    y0=e.touches[0].clientY;
+    tracking=true; dragging=false; current=0;
+  }, {passive:true, capture:true});
+
+  document.addEventListener('touchmove', e=>{
+    if(!tracking) return;
+    const dx = e.touches[0].clientX - x0;
+    const dy = Math.abs(e.touches[0].clientY - y0);
+    if(!dragging){
+      if(dy > MAX_VERT || (dy > dx && dy > 10)){ tracking=false; return; }
+      if(dx < 6) return;  // wait for clear rightward intent
+      dragging=true;
+    }
+    current = dx;
+    setDrag(current);
+    // stop here so swipe-view and PTR never see this touch
+    e.preventDefault();
+    e.stopPropagation();
+  }, {passive:false, capture:true});
+
+  document.addEventListener('touchend', e=>{
+    if(!tracking) return;
+    if(!dragging){ tracking=false; return; }
+    commit(current > OPEN_DIST);
+  }, {passive:true, capture:true});
+
 })();
 /* ── KICK OFF ── */
 init();
