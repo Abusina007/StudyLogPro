@@ -737,7 +737,6 @@ input[type=date]{color-scheme:dark}
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><polyline points="8,4 8,8 11,10"/></svg>This Week<span class="nav-badge" id="navWeekCnt">0</span>
       </div>
     </div>
-
 <div class="sb-sec sb-sec-sub" style="flex-shrink:0">
   <div class="sb-lbl" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="subjToggle">
     <span>Subjects</span>
@@ -752,7 +751,6 @@ input[type=date]{color-scheme:dark}
     <div class="subj-list" id="subjList"></div>
   </div>
 </div>
-      <div class="subj-list" id="subjList"></div>
     <div class="sb-sec">
       <div class="sb-lbl">Date Range <span class="sb-lbl-a" onclick="clearDates()">Clear</span></div>
       <div class="date-row"><label>From</label><input class="date-inp" type="date" id="dateFrom" onchange="applyFilters()"></div>
@@ -1142,10 +1140,15 @@ async function ghFetch(method, path, body) {
     };
     if (body !== undefined) opts.body = JSON.stringify(body);
     const res = await fetch('https://api.github.com' + path, opts);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // Return the response object so we can check status
+      return { status: res.status, ok: false };
+    }
     if (method === 'DELETE') return true;
     return await res.json();
-  } catch (e) { return null; }
+  } catch (e) {
+    return null;
+  }
 }
 
 // Validate token and get username
@@ -1205,13 +1208,23 @@ async function saveToGist(data, routineData) {
     const files = { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } };
     if (routineData) files[ROUTINE_FILENAME] = { content: JSON.stringify(routineData, null, 2) };
     const res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
-    if (!res) throw new Error('GitHub API error');
+    if (!res) {
+      // Check if the error is 401
+      if (res && res.status === 401) throw new Error('GitHub token invalid');
+      throw new Error('GitHub API error');
+    }
     return true;
   } catch (err) {
     console.error('GitHub sync failed:', err);
-    toast('Sync to GitHub failed: ' + err.message, 'err');
+    // If token invalid, disconnect automatically
+    if (err.message.includes('token') || err.message.includes('401')) {
+      disconnectGitHub();
+      toast('GitHub token expired – please reconnect', 'err');
+    }
     return false;
-  } finally { ghSyncing = false; }
+  } finally {
+    ghSyncing = false;
+  }
 }
 
 async function loadFromGist() {
@@ -1324,40 +1337,85 @@ function lsSave(d) { try { localStorage.setItem('studylog_v7', JSON.stringify(d)
 async function saveData() {
   setSyncStatus('syncing', ghToken ? 'Saving…' : 'Saving…');
   const data = { version: 7, entries, saved: new Date().toISOString() };
-  lsSave(data);
+  lsSave(data); // always save to localStorage
+
   if (ghToken) {
-    const ok = await saveToGist(data);
-    setSyncStatus('ok', ok ? 'Synced ✓' : 'Saved locally');
-    if (ok) toast('Changes synced to GitHub', 'ok');
-    else toast('Sync failed – data saved locally only', 'err');
+    try {
+      // Validate token – if invalid, disconnect and return false
+      const user = await validateToken(ghToken);
+      if (!user) {
+        console.warn('Stored token is invalid – disconnecting');
+        disconnectGitHub();
+        toast('GitHub token expired or invalid. Please reconnect.', 'err');
+        setSyncStatus('ok', 'Saved locally');
+        return false;
+      }
+
+      // Push to gist
+      const ok = await saveToGist(data);
+      setSyncStatus('ok', ok ? 'Synced ✓' : 'Saved locally');
+      if (ok) toast('Changes synced to GitHub', 'ok');
+      else toast('Sync failed – data saved locally only', 'err');
+      return ok;
+    } catch (err) {
+      console.error('Sync error:', err);
+      setSyncStatus('ok', 'Saved locally');
+      toast('Sync error: ' + err.message, 'err');
+      return false;
+    }
   } else {
     setSyncStatus('ok', 'Saved');
+    return true;
   }
 }
 
 async function syncNow() {
   if (!ghToken) {
     toast('Connect GitHub first', 'err');
+    openGHConnectModal();
     return;
   }
-  setSyncStatus('syncing', 'Fetching from GitHub…');
+
+  setSyncStatus('syncing', 'Syncing...');
+
+  // 1. Push local changes to GitHub
+  const pushOk = await saveData();
+  if (!pushOk) {
+    toast('Push failed. Check console for errors.', 'err');
+    setSyncStatus('ok', 'Sync failed');
+    return;
+  }
+
+  // 2. Pull latest from GitHub
   const gistData = await loadFromGist();
   if (gistData && gistData.entries) {
     if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+
     const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
     const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
     const merged = {};
+
     for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
-      const l = localMap[id], c = cloudMap[id];
-      merged[id] = (l && c) ? ((c.updatedAt||0) >= (l.updatedAt||0) ? c : l) : (l || c);
+      const l = localMap[id];
+      const c = cloudMap[id];
+      if (l && c) {
+        merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
+      } else {
+        merged[id] = l || c;
+      }
     }
+
     entries = applyTombstones(Object.values(merged));
     lsSave({ version: 7, entries });
-    render(); buildSubjList(); updateSideTagCloud();
-    toast('Synced from GitHub', 'ok');
+    render();
+    buildSubjList();
+    updateSideTagCloud();
+
+    toast('Full sync completed (push + pull)', 'ok');
   } else {
-    toast('No cloud data found', 'err');
+    toast('No cloud data found – only local data pushed', 'info');
   }
+
   setSyncStatus('ok', 'Synced');
 }
 
@@ -1614,6 +1672,7 @@ const MONTH_ALIASES = {jan:1,january:1,feb:2,february:2,mar:3,march:3,apr:4,apri
 const SUGG_TAGS = ['exam','revision','assignment','lab','quiz','important','confused','formula','theorem','practice'];
 
 let entries = [], editId = null, formYTs = [], formFiles = [], formTags = [], formTodos = [], formMood = '', formRating = 7, formRatingOn = false;
+let isSaving = false;   // prevents rapid clicks
 let selSubj = 'OTHER', selTime = '';
 let activeSubjs = [], activeTagFilters = [], activeNav = 'all', currentView = 'list', groupMode = 'day';
 let calMonth = new Date().getMonth(), calYear = new Date().getFullYear();
@@ -2036,7 +2095,17 @@ function openModal(id=null,dateOverride=null){
   document.getElementById('entryModal').classList.add('open');
   setTimeout(()=>document.getElementById('fDate').focus(),80);
 }
-function closeModal(){document.getElementById('entryModal').classList.remove('open');editId=null;}
+function closeModal() {
+  document.getElementById('entryModal').classList.remove('open');
+  editId = null;
+  // Reset save button state in case modal closed without saving
+  const saveBtn = document.querySelector('#entryModal .btn-p');
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save';
+  }
+  isSaving = false;
+}
 function addTitleRow(text='',url=''){const row=document.createElement('div');row.className='t-row';row.innerHTML=`<input class="t-title" placeholder="Session title…" value="${esc(text)}"><input class="t-url" placeholder="https:// (optional)" value="${esc(url)}"><button class="t-del" onclick="this.closest('.t-row').remove()">✕</button>`;document.getElementById('titlesList').appendChild(row);}
 function onNotesInput(){const v=document.getElementById('fNotes').value;const wc=wCount(v);document.getElementById('notesStats').textContent=`${wc}w · ${v.length}c · ~${Math.max(1,Math.ceil(wc/200))}min`;}
 function onDateChange(){renderSchedPicker(document.getElementById('fDate').value,document.getElementById('fBatch').value);}
@@ -2062,16 +2131,93 @@ function handleFiles(files){for(const f of files){if(f.size>10*1024*1024){toast(
 function renderFilePrevs(){document.getElementById('filePrevs').innerHTML=formFiles.map((f,i)=>`<div class="fprev">${fIco(f.type)} <span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">${esc(f.name)}</span><button onclick="formFiles.splice(${i},1);renderFilePrevs()">✕</button></div>`).join('');}
 
 /* ── SAVE / DELETE / PIN ── */
-async function saveEntry(){
-  const date=document.getElementById('fDate').value;if(!date){toast('Select a date','err');return;}
-  const titles=[...document.querySelectorAll('#titlesList .t-row')].map(r=>({text:r.querySelector('.t-title').value.trim(),url:r.querySelector('.t-url').value.trim()})).filter(t=>t.text);
-  const rating=formRatingOn?formRating:0;
-  const entry={id:editId||Date.now().toString(),date,subject:selSubj,time:selTime,batch:document.getElementById('fBatch').value,titles,notes:document.getElementById('fNotes').value.trim(),youtubes:[...formYTs],files:formFiles.map(f=>({...f})),tags:[...formTags],todos:formTodos.map(t=>({...t})),mood:formMood,rating,reviewDate:document.getElementById('reviewDate').value,updatedAt:Date.now()};
-  if(!editId)entry.createdAt=Date.now();
-  if(editId){const idx=entries.findIndex(e=>e.id===editId);if(idx>-1)entries[idx]={...entries[idx],...entry};}
-  else entries.unshift(entry);
-  await saveData();closeModal();render();buildSubjList();updateSideTagCloud();
-  toast(editId?'Updated ✓':'Saved ✓','ok');
+async function saveEntry() {
+  // Cooldown protection
+  if (isSaving) {
+    toast('Please wait, saving in progress...', 'info');
+    return;
+  }
+  isSaving = true;
+
+  const saveBtn = document.querySelector('#entryModal .btn-p');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';   // optional visual feedback
+  }
+
+  const date = document.getElementById('fDate').value;
+  if (!date) {
+    toast('Select a date', 'err');
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+    }
+    isSaving = false;
+    return;
+  }
+
+  // Duplicate check for new entries (not editing)
+  if (!editId) {
+    const existing = entries.find(e => e.date === date && e.subject === selSubj);
+    if (existing) {
+      toast(`An entry for ${selSubj} on ${date} already exists. Use edit instead.`, 'err');
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save';
+      }
+      isSaving = false;
+      return;
+    }
+  }
+
+  // Gather titles
+  const titles = [...document.querySelectorAll('#titlesList .t-row')].map(r => ({
+    text: r.querySelector('.t-title').value.trim(),
+    url: r.querySelector('.t-url').value.trim()
+  })).filter(t => t.text);
+
+  const rating = formRatingOn ? formRating : 0;
+
+  const entry = {
+    id: editId || Date.now().toString(),
+    date,
+    subject: selSubj,
+    time: selTime,
+    batch: document.getElementById('fBatch').value,
+    titles,
+    notes: document.getElementById('fNotes').value.trim(),
+    youtubes: [...formYTs],
+    files: formFiles.map(f => ({ ...f })),
+    tags: [...formTags],
+    todos: formTodos.map(t => ({ ...t })),
+    mood: formMood,
+    rating,
+    reviewDate: document.getElementById('reviewDate').value,
+    updatedAt: Date.now()
+  };
+  if (!editId) entry.createdAt = Date.now();
+
+  if (editId) {
+    const idx = entries.findIndex(e => e.id === editId);
+    if (idx > -1) entries[idx] = { ...entries[idx], ...entry };
+  } else {
+    entries.unshift(entry);
+  }
+
+  await saveData();
+
+  closeModal();
+  render();
+  buildSubjList();
+  updateSideTagCloud();
+  toast(editId ? 'Updated ✓' : 'Saved ✓', 'ok');
+
+  // Re-enable button and reset flag
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save';
+  }
+  isSaving = false;
 }
 function editEntry(id){openModal(id);}
 async function deleteEntry(id){const idx=entries.findIndex(e=>e.id===id);if(idx<0)return;lastDel={entry:{...entries[idx]},idx};deletedIds[id]=Date.now();entries.splice(idx,1);await saveData();render();buildSubjList();updateSideTagCloud();showUndo();}
@@ -2107,8 +2253,55 @@ function expEntries(list,fname){
   const md=list.map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{label:e.subject};const d=new Date(e.date+'T00:00:00');let o=`# ${e.date} – ${s.label}${e.time?' ('+e.time+')':''}\n\n**Date:** ${d.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;if(e.mood)o+=`**Mood:** ${moodEmo(e.mood)}\n`;if(e.rating)o+=`**Rating:** ${e.rating}/10\n`;o+='\n';if((e.titles||[]).length){o+='## Topics\n\n';e.titles.forEach(t=>{o+=t.url?`- [${t.text}](${t.url})\n`:`- ${t.text}\n`;});o+='\n';}if(e.notes)o+=`## Notes\n\n${e.notes}\n\n`;if((e.todos||[]).length){o+='## Tasks\n\n';e.todos.forEach(t=>{o+=`- [${t.done?'x':' '}] ${t.text}${t.due?' (due '+t.due+')':''}\n`;});o+='\n';}if((e.tags||[]).length)o+=`**Tags:** ${e.tags.map(t=>'#'+t).join(' ')}\n\n`;if((e.youtubes||[]).length){o+='## Videos\n\n';e.youtubes.forEach(y=>o+=`- https://youtube.com/watch?v=${y}\n`);}return o+'---\n';}).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download=fname+'.md';a.click();toast('Exported ✓','ok');
 }
-function importData(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!d.entries)throw new Error('Invalid format');entries=[...entries,...d.entries.filter(n=>!entries.find(x=>x.id===n.id))];await saveData();render();buildSubjList();updateSideTagCloud();toast(`Imported ${d.entries.length} entries ✓`,'ok');}catch(err){toast('Import failed','err');}};inp.click();}
+async function importData() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.json';
+  inp.onchange = async e => {
+    try {
+      const file = e.target.files[0];
+      const text = await file.text();
+      const d = JSON.parse(text);
+      if (!d.entries) throw new Error('Invalid format: missing entries array');
 
+      // Filter new entries
+      const newEntries = d.entries.filter(n => !entries.find(x => x.id === n.id));
+      if (newEntries.length === 0) {
+        toast('No new entries to import (all already exist)', 'info');
+        return;
+      }
+
+      // Ensure each new entry has valid timestamps
+      const now = Date.now();
+      newEntries.forEach(entry => {
+        if (!entry.updatedAt) entry.updatedAt = now;
+        if (!entry.createdAt) entry.createdAt = now;
+      });
+
+      // Merge into current entries
+      entries = [...entries, ...newEntries];
+
+      // Save to localStorage and sync to GitHub
+      setSyncStatus('syncing', 'Importing and syncing...');
+      const syncOk = await saveData(); // wait for sync to finish
+
+      // Refresh UI
+      render();
+      buildSubjList();
+      updateSideTagCloud();
+
+      if (syncOk) {
+        toast(`Imported ${newEntries.length} new entries and synced ✓`, 'ok');
+      } else {
+        toast(`Imported ${newEntries.length} new entries but sync failed. Data saved locally.`, 'err');
+      }
+    } catch (err) {
+      console.error('Import error:', err);
+      toast('Import failed: ' + err.message, 'err');
+    }
+  };
+  inp.click();
+}
 /* ── FILE VIEWER ── */
 async function viewFile(eid,idx){
   const entry=entries.find(e=>e.id===eid);if(!entry)return;const f=entry.files[idx];
