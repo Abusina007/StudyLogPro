@@ -1124,7 +1124,14 @@ function mergeDeletedIds(cloudDeleted) {
   saveDeletedIds();
 }
 function applyTombstones(list) {
-  return list.filter(e => !deletedIds[e.id]);
+  return list.filter(e => {
+    if (!deletedIds[e.id]) return true;
+    if (e.updatedAt && e.updatedAt > deletedIds[e.id]) {
+      delete deletedIds[e.id]; // re-imported after deletion — clear stale tombstone
+      return true;
+    }
+    return false;
+  });
 }
 
 async function ghFetch(method, path, body) {
