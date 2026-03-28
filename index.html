@@ -661,10 +661,10 @@ input[type=date]{color-scheme:dark}
 .detail-overlay{position:fixed;inset:0;z-index:700;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
 .detail-overlay.open{opacity:1;visibility:visible}
 .detail-overlay::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
-.detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;max-height:85vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(50px);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;max-height:65vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(50px);transition:transform .28s cubic-bezier(.4,0,.2,1)}
 .detail-overlay.open .detail-panel{transform:none}
 @media(min-width:720px){.detail-overlay{align-items:center}.detail-panel{border-radius:18px;max-height:88vh;margin:20px}}
-.dp-handle{width:36px;height:4px;background:var(--border3);border-radius:2px;margin:10px auto 0;flex-shrink:0}
+.dp-handle{width:36px;height:4px;background:var(--border3);border-radius:2px;margin:20px auto 0;flex-shrink:0}
 .dp-header{padding:14px 18px 13px;flex-shrink:0}
 .dp-header-row{display:flex;align-items:flex-start;gap:11px}
 .dp-color-bar{width:4px;border-radius:2px;align-self:stretch;flex-shrink:0;min-height:48px}
@@ -778,6 +778,22 @@ input[type=date]{color-scheme:dark}
 .top-tags-wrap{display:flex;flex-wrap:wrap;gap:6px}
 .ttag{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dim);border:1px solid rgba(47,129,247,.2);color:var(--accent);padding:5px 12px;border-radius:20px;font-size:12px}
 .ttag-cnt{background:rgba(47,129,247,.2);padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700}
+/* ▀▄▀▄ APP-LIKE: NO SELECT / COPY ▀▄▀▄ */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Re-enable only where typing is needed */
+input, textarea, [contenteditable] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
 </style>
 </head>
 <body>
@@ -1156,9 +1172,9 @@ input[type=date]{color-scheme:dark}
           <div class="dp-meta-line" id="dpMetaLine"></div>
         </div>
         <div class="dp-hdr-actions">
+          <button class="dp-act" style="margin-right: 10px;" onclick="dpPin()" id="dpPinBtn">📌</button>
           <button class="dp-act" onclick="dpEdit()">✎ Edit</button>
-          <button class="dp-act" onclick="dpPin()" id="dpPinBtn">📌</button>
-          <button class="dp-act danger" onclick="dpDel()">✕</button>
+          <button class="m-close danger" onclick="dpDel()">×</button>
         </div>
       </div>
     </div>
@@ -1295,16 +1311,32 @@ function saveDeletedIds() {
   localStorage.setItem('slp_deleted', JSON.stringify(deletedIds));
 }
 function mergeDeletedIds(cloudDeleted) {
+  if (!cloudDeleted) return;
+  const liveMap = Object.fromEntries(entries.map(e => [e.id, e]));
   for (const id in cloudDeleted) {
-    if (!deletedIds[id] || cloudDeleted[id] > deletedIds[id]) deletedIds[id] = cloudDeleted[id];
+    if (liveMap[id]) {
+      // entry is alive in memory — only accept tombstone if strictly newer than entry
+      const entryTime = liveMap[id].updatedAt || liveMap[id].createdAt || 0;
+      if (cloudDeleted[id] > entryTime) {
+        deletedIds[id] = cloudDeleted[id];
+      }
+      // else: ignore — entry was re-created/imported after deletion
+    } else {
+      if (!deletedIds[id] || cloudDeleted[id] > deletedIds[id]) {
+        deletedIds[id] = cloudDeleted[id];
+      }
+    }
   }
   saveDeletedIds();
 }
 function applyTombstones(list) {
   return list.filter(e => {
     if (!deletedIds[e.id]) return true;
-    if (e.updatedAt && e.updatedAt > deletedIds[e.id]) {
-      delete deletedIds[e.id]; // re-imported after deletion — clear stale tombstone
+    // use any available timestamp — if none, assume entry is recent and keep it
+    const entryTime = e.updatedAt || e.createdAt || Date.now();
+    if (entryTime > deletedIds[e.id]) {
+      delete deletedIds[e.id];
+      saveDeletedIds();
       return true;
     }
     return false;
@@ -1324,9 +1356,14 @@ async function ghFetch(method, path, body) {
     };
     if (body !== undefined) opts.body = JSON.stringify(body);
     const res = await fetch('https://api.github.com' + path, opts);
-    if (!res.ok) {
-      // Return the response object so we can check status
-      return { status: res.status, ok: false };
+if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        ghToken = '';
+        localStorage.removeItem('slp_gh_token');
+        updateSyncUI();
+        toast('GitHub token expired – please reconnect', 'err');
+      }
+      return null;
     }
     if (method === 'DELETE') return true;
     return await res.json();
@@ -1519,39 +1556,18 @@ function disconnectGitHub() {
 function lsSave(d) { try { localStorage.setItem('studylog_v7', JSON.stringify(d)); } catch (e) {} saveDeletedIds(); }
 
 async function saveData() {
-  setSyncStatus('syncing', ghToken ? 'Saving…' : 'Saving…');
   const data = { version: 7, entries, saved: new Date().toISOString() };
-  lsSave(data); // always save to localStorage
-
+  lsSave(data);
   if (ghToken) {
-    try {
-      // Validate token – if invalid, disconnect and return false
-      const user = await validateToken(ghToken);
-      if (!user) {
-        console.warn('Stored token is invalid – disconnecting');
-        disconnectGitHub();
-        toast('GitHub token expired or invalid. Please reconnect.', 'err');
-        setSyncStatus('ok', 'Saved locally');
-        return false;
-      }
-
-      // Push to gist
-      const ok = await saveToGist(data);
-      setSyncStatus('ok', ok ? 'Synced ✓' : 'Saved locally');
-      if (ok) toast('Changes synced to GitHub', 'ok');
-      else toast('Sync failed – data saved locally only', 'err');
-      return ok;
-    } catch (err) {
-      console.error('Sync error:', err);
-      setSyncStatus('ok', 'Saved locally');
-      toast('Sync error: ' + err.message, 'err');
-      return false;
-    }
-  } else {
-    setSyncStatus('ok', 'Saved');
-    return true;
+    setSyncStatus('syncing', 'Saving…');
+    const ok = await saveToGist(data);
+    setSyncStatus('ok', ok ? 'Synced ✓' : 'Saved locally');
+    return ok;
   }
+  setSyncStatus('ok', 'Saved');
+  return true;
 }
+
 async function syncNow() {
   if (!ghToken) {
     toast('Connect GitHub first', 'err');
@@ -1580,7 +1596,11 @@ async function syncNow() {
       }
     }
 
-    entries = applyTombstones(Object.values(merged));
+const afterTombstone = applyTombstones(Object.values(merged));
+    const survivingIds = new Set(afterTombstone.map(e => e.id));
+    const rescued = entries.filter(e => !survivingIds.has(e.id) && !deletedIds[e.id]);
+    const next = [...afterTombstone, ...rescued];
+    entries = next.length >= entries.length ? next : entries;
     lsSave({ version: 7, entries });
   }
 
@@ -1886,24 +1906,40 @@ async function init() {
     const gm = localStorage.getItem('slp_group'); if (gm) groupMode = gm;
     updateSyncUI();
     // Background sync from GitHub
-    if (ghToken) {
+if (ghToken) {
       setSyncStatus('syncing', 'Syncing…');
-      const gistData = await loadFromGist();
-      if (gistData && gistData.entries) {
-        if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
-        const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
-        const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-        const merged = {};
-        for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
-          const l = localMap[id], c = cloudMap[id];
-          merged[id] = (l && c) ? ((c.updatedAt||0) >= (l.updatedAt||0) ? c : l) : (l || c);
+      try {
+        const gistData = await loadFromGist();
+        if (gistData && gistData.entries) {
+          // mergeDeletedIds now respects live entries (Change 1)
+          if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+          const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
+          const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
+          const merged = {};
+          for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
+            const l = localMap[id], c = cloudMap[id];
+            merged[id] = (l && c) ? ((c.updatedAt||0) >= (l.updatedAt||0) ? c : l) : (l || c);
+          }
+          const afterTombstone = applyTombstones(Object.values(merged));
+          const survivingIds = new Set(afterTombstone.map(e => e.id));
+          // always rescue live in-memory entries not explicitly deleted
+          const rescued = entries.filter(e => !survivingIds.has(e.id) && !deletedIds[e.id]);
+          const next = [...afterTombstone, ...rescued];
+          // safety gate: never silently drop entries
+          if (next.length >= entries.length || rescued.length > 0) {
+            entries = next;
+          } else {
+            // cloud returned less — keep whichever is bigger
+            entries = next.length < entries.length ? entries : next;
+          }
+          lsSave({ version: 7, entries });
+          render(); buildSubjList(); updateSideTagCloud();
         }
-        entries = applyTombstones(Object.values(merged));
-        lsSave({ version: 7, entries });
-        render(); buildSubjList(); updateSideTagCloud();
-        setSyncStatus('ok', 'Synced ✓');
+      } catch(e) {
+        console.warn('Background sync failed silently', e);
+      }
+      setSyncStatus('ok', 'Synced ✓');
     }
-  }
 } else {
     showSetup();
   }
@@ -2884,6 +2920,35 @@ function fIco(t){if(!t)return'📄';if(t.startsWith('image/'))return'🖼';if(t=
 function moodEmo(m){return{great:'😄',good:'😊',okay:'😐',tired:'😪',confused:'🤔'}[m]||'';}
 let tToast;
 function toast(msg,type=''){clearTimeout(tToast);const t=document.getElementById('toast');t.textContent=msg;t.className='show'+(type?' '+type:'');tToast=setTimeout(()=>t.classList.remove('show'),3200);}
+
+/* ── APP-LIKE LOCKS ── */
+// Block long-press context menu on mobile
+document.addEventListener('contextmenu', e => {
+  if (!e.target.closest('input, textarea, a, [contenteditable]')) {
+    e.preventDefault();
+  }
+});
+
+// Block image drag
+document.addEventListener('dragstart', e => {
+  if (e.target.tagName === 'IMG') e.preventDefault();
+});
+
+// Kill iOS bounce/overscroll on non-scrollable elements
+document.body.addEventListener('touchmove', e => {
+  if (!e.target.closest('#viewArea, #sidebar, .dp-body, .dp-day-body, .cmd-list, .m-body, #calCont, .hmap-scroll')) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+// Prevent double-tap zoom on buttons/cards
+let lastTap = 0;
+document.addEventListener('touchend', e => {
+  if (e.target.closest('input, textarea, select')) return;
+  const now = Date.now();
+  if (now - lastTap < 300) e.preventDefault();
+  lastTap = now;
+}, { passive: false });
 
 /* ── KICK OFF ── */
 init();
