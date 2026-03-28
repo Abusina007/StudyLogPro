@@ -120,7 +120,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 @media(max-width:900px){.tb-ws-name{max-width:75px}.tb-name small{display:none}}
 @media(max-width:800px){.mpxx{display:none};}
 @media(max-width:700px){.tb-ws{max-width:95px}.tb-btn:not(.primary){padding:6px 7px}}
-@media(max-width:600px){.focus-btn{display: none;}}
+@media(max-width:600px){.focus-btn{display: none;}.weeks-52{grid-template-columns:repeat(23,12px);}}
 @media(max-width:540px){.tb-hamburger{display:flex}.tb-sep:not(:first-of-type){display:none}.tb-ws{display:none}.focus-btn{display:none}.for-small{width:25px}.newbtn{width:35px;display:flex;align-items:center;justify-content:center}.nnewbt{display:none}.plusbtn{font-size:16px};}
 @media (min-width: 768px){.forpc{display: none;}}
 /* ▀▄▀▄ LAYOUT ▀▄▀▄ */
@@ -185,6 +185,78 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
   margin-left: 0;
   visibility: hidden;
 }
+
+/* Toolbar replacement in selection mode */
+.toolbar-selection-mode {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--accent-dim2), var(--accent-dim));
+  padding: 0 16px;
+  border-radius: 0;
+  font-size: 14px;
+  color: var(--text);
+  height: var(--toolbar);
+  width: 100%;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.toolbar-selection-mode .sel-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-selection-mode .sel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-selection-mode .sel-n {
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.toolbar-selection-mode button {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 6px 12px;
+  border-radius: var(--rs);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all var(--tr);
+  font-family: var(--font);
+  white-space: nowrap;
+}
+
+.toolbar-selection-mode button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim2);
+}
+
+.toolbar-selection-mode button.danger:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-bg);
+}
+
+.toolbar-selection-mode .sel-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  padding: 4px 8px;
+  margin-left: 4px;
+}
+
 .tb-search-expand.open {
   width: auto;
   margin-left: 6px;
@@ -210,6 +282,101 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 }
 .tb-search-input::placeholder {
   color: var(--text3);
+}
+
+.sel-bar-in-toolbar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--accent-dim2), var(--accent-dim));
+  padding: 4px 12px;
+  border-radius: var(--rs);
+  font-size: 13px;
+  color: var(--text);
+  margin-left: auto;
+  border-left: 1px solid var(--border);
+  white-space: nowrap;
+  flex-shrink: 0;
+  height: 32px;
+}
+/* Selection highlight for all entry types */
+.entry-row.selected,
+.wf-entry.selected,
+.entry-card.selected {
+  border-left: 3px solid var(--accent) !important;
+  background: var(--accent-dim2) !important;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+/* Toolbar selection mode (replaces entire toolbar) */
+.toolbar-selection-mode {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--accent-dim2), var(--accent-dim));
+  padding: 0 16px;
+  border-radius: 0;
+  font-size: 14px;
+  color: var(--text);
+  height: var(--toolbar);
+  width: 100%;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.toolbar-selection-mode .sel-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-selection-mode .sel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-selection-mode .sel-n {
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.toolbar-selection-mode button {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 6px 12px;
+  border-radius: var(--rs);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all var(--tr);
+  font-family: var(--font);
+  white-space: nowrap;
+}
+
+.toolbar-selection-mode button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim2);
+}
+
+.toolbar-selection-mode button.danger:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-bg);
+}
+
+.toolbar-selection-mode .sel-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  padding: 4px 8px;
+  margin-left: 4px;
 }
 .sb-search-wrap{position:relative}
 .sb-search-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:13px}
@@ -407,7 +574,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .stat-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:15px}
 .stat-n{font-size:30px;font-weight:700;color:var(--accent);font-family:var(--mono);line-height:1}
 .stat-l{font-size:11px;color:var(--text3);margin-top:4px}
-.chart-sec{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.chart-sec{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
 .chart-title{font-size:10.5px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:13px}
 .bar-chart{display:flex;flex-direction:column;gap:7px}
 .bar-row{display:flex;align-items:center;gap:10px}
@@ -625,7 +792,19 @@ kbd{background:var(--panel2);border:1px solid var(--border2);color:var(--text);p
 #undoBar.show{transform:translateX(-50%);opacity:1;pointer-events: auto;}
 #undoBar button{background:var(--accent);border:none;color:#fff;padding:4px 12px;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font)}
 #undoBar button:hover{background:var(--accent-h)}
-.sel-bar{padding:8px 14px;background:var(--accent-dim2);border-bottom:1px solid rgba(79,142,247,.18);display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);flex-shrink:0}
+.sel-bar{
+  padding:8px 14px;
+  background: linear-gradient(135deg, var(--accent-dim2), var(--accent-dim));
+  border-bottom: 1px solid var(--accent);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  color:var(--text);
+  flex-shrink:0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: .2s ease-in;
+}
 .sel-n{color:var(--accent);font-weight:700}
 .sel-btn{background:var(--panel2);border:1px solid var(--border);color:var(--text2);padding:4px 11px;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:500;transition:all var(--tr);font-family:var(--font)}
 .sel-btn:hover{border-color:var(--border2);color:var(--text)}
@@ -751,14 +930,14 @@ input[type=date]{color-scheme:dark}
 .stc-l{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:.2px}
 .stc-s{font-size:11px;color:var(--text2)}
 .hmap-scroll{overflow-x:auto;padding-bottom:4px}
-.hmap-grid{display:grid;grid-template-columns:repeat(52,12px);gap:2px;min-width:fit-content}
+.hmap-grid{display:grid;grid-template-columns:repeat(52,12px);gap:2px;min-width:fit-content;}
 .hmc{width:12px;height:12px;border-radius:2px}
 .hml0{background:var(--panel3)}
 .hml1{background:rgba(47,129,247,.25)}
 .hml2{background:rgba(47,129,247,.5)}
 .hml3{background:rgba(47,129,247,.75)}
 .hml4{background:var(--accent)}
-.trend-bars{display:flex;align-items:flex-end;gap:5px;height:88px}
+.trend-bars{display:flex;align-items:flex-end;gap:5px;height:120px}
 .tb-col{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
 .tb-bar{width:100%;background:var(--accent);border-radius:3px 3px 0 0;min-height:3px;transition:height .5s ease}
 .tb-lbl{font-size:9px;color:var(--text3);font-family:var(--mono)}
@@ -1131,8 +1310,8 @@ input, textarea, [contenteditable] {
   </aside>
 
   <main id="main">
-    <div id="selBar" style="display:none"></div>
     <div id="viewArea">
+      <div id="selBar" style="display:none"></div>
       <div class="empty-state" id="emptyState" style="display:none">
         <div class="empty-ico">📖</div>
         <h3>No entries yet</h3>
@@ -1503,6 +1682,7 @@ function saveDeletedIds() {
   for (const id in deletedIds) if (deletedIds[id] < cutoff) delete deletedIds[id];
   localStorage.setItem('slp_deleted', JSON.stringify(deletedIds));
 }
+
 function mergeDeletedIds(cloudDeleted) {
   if (!cloudDeleted) return;
   const liveMap = Object.fromEntries(entries.map(e => [e.id, e]));
@@ -2136,6 +2316,8 @@ if (ghToken) {
     showSetup();
   }
   initDetailDrag();
+  // At the very end of init() function, add:
+reinitToolbarSearch();
 }
 
 /* ══════════════════════════════════
@@ -2479,7 +2661,13 @@ if (searchIcon && searchExpand) {
 /* ══════════════════════════════════
    FILTERS / VIEWS
 ══════════════════════════════════ */
-function setNav(n){activeNav=n;document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));document.getElementById('nav-'+n)?.classList.add('active');applyFilters();}
+function setNav(n){
+  clearSel();                  // clear selection when navigating
+  activeNav = n;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('nav-'+n)?.classList.add('active');
+  applyFilters();
+}
 function applyFilters(){
   const q=document.getElementById('searchInp').value,from=document.getElementById('dateFrom').value,to=document.getElementById('dateTo').value,sort=document.getElementById('sortSel').value;
   const today=new Date().toISOString().split('T')[0],weekAgo=new Date(Date.now()-7*864e5).toISOString().split('T')[0];
@@ -2502,11 +2690,19 @@ function applyFilters(){
 }
 function render(){applyFilters();}
 function switchView(v){
-  currentView=v;localStorage.setItem('slp_view',v);
-  ['vList','vGrid','vCal','vStats'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
-  const vmap={list:'vList',grid:'vGrid',calendar:'vCal',stats:'vStats'};if(vmap[v])document.getElementById(vmap[v])?.classList.add('active');
-  ['listCont','gridCont','calCont','statsCont'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  const cmap={list:'listCont',grid:'gridCont',calendar:'calCont',stats:'statsCont'};const t=document.getElementById(cmap[v]);if(t)t.style.display='';
+  clearSel();                  // clear selection when switching view
+  currentView = v;
+  localStorage.setItem('slp_view', v);
+  ['vList','vGrid','vCal','vStats'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  const vmap = { list:'vList', grid:'vGrid', calendar:'vCal', stats:'vStats' };
+  if(vmap[v]) document.getElementById(vmap[v])?.classList.add('active');
+  ['listCont','gridCont','calCont','statsCont'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+  const cmap = { list:'listCont', grid:'gridCont', calendar:'calCont', stats:'statsCont' };
+  const t = document.getElementById(cmap[v]);
+  if(t) t.style.display = '';
   applyFilters();
 }
 function setGroupMode(m){groupMode=m;localStorage.setItem('slp_group',m);applyFilters();}
@@ -2541,10 +2737,19 @@ function renderList(items){
     }).join('');
   }
   c.innerHTML=ctrlBar+listHTML;
-  c.querySelectorAll('.entry-row').forEach(el=>{
-    el.addEventListener('click',ev=>{if(ev.ctrlKey||ev.metaKey){toggleSel(el.dataset.id);return;}openDetailPanel(el.dataset.id);});
-    el.addEventListener('contextmenu',ev=>{ev.preventDefault();showCtx(ev,el.dataset.id);});
+c.querySelectorAll('.entry-row').forEach(el=>{
+  el.addEventListener('click',ev=>{
+    if(selIds.size > 0 || ev.ctrlKey || ev.metaKey){
+      toggleSel(el.dataset.id);
+      return;
+    }
+    openDetailPanel(el.dataset.id);
   });
+  el.addEventListener('contextmenu',ev=>{
+    ev.preventDefault();
+    if(selIds.size === 0) showCtx(ev,el.dataset.id);
+  });
+});
 }
 /* ── ENTRY ROW (compact) ── */
 function buildEntryRow(e){
@@ -2689,11 +2894,20 @@ function refreshDayPanelBody(){
   const list=document.getElementById('dayPanelBody');
   const dayEntries=entries.filter(e=>e.date===currentDayPanelDate).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   if(!dayEntries.length){list.innerHTML=`<div class="empty-state"><div class="empty-ico">📅</div><h3>No entries for this day</h3><p>Tap "Add Entry" to log something.</p></div>`;return;}
-  list.innerHTML=`<div class="entry-rows-wrap"><div class="entry-rows">${dayEntries.map(buildEntryRow).join('')}</div></div>`;
-  list.querySelectorAll('.entry-row').forEach(el=>{
-    el.addEventListener('click',()=>openDetailPanel(el.dataset.id));
-    el.addEventListener('contextmenu',ev=>{ev.preventDefault();showCtx(ev,el.dataset.id);});
+list.innerHTML=`<div class="entry-rows-wrap"><div class="entry-rows">${dayEntries.map(buildEntryRow).join('')}</div></div>`;
+list.querySelectorAll('.entry-row').forEach(el=>{
+  el.addEventListener('click',ev=>{
+    if(selIds.size > 0 || ev.ctrlKey || ev.metaKey){
+      toggleSel(el.dataset.id);
+      return;
+    }
+    openDetailPanel(el.dataset.id);
   });
+  el.addEventListener('contextmenu',ev=>{
+    ev.preventDefault();
+    if(selIds.size === 0) showCtx(ev,el.dataset.id);
+  });
+});
 }
 function closeDayPanel(){document.getElementById('dayPanel').classList.remove('open');currentDayPanelDate='';}
 function refreshDayPanel(){if(document.getElementById('dayPanel')?.classList.contains('open'))refreshDayPanelBody();}
@@ -2750,13 +2964,14 @@ function renderGrid(items){
     const label=isThisWeek?'This Week':`${MSHORT[start.getMonth()]} ${start.getDate()} – ${MSHORT[end.getMonth()]} ${end.getDate()}`;
     const sublabel=isThisWeek?`${MSHORT[start.getMonth()]} ${start.getDate()} – ${MSHORT[end.getMonth()]} ${end.getDate()}, ${start.getFullYear()}`:`${start.getFullYear()} · ${subjSet.length} subject${subjSet.length!==1?'s':''}`;
     const fid='wf'+wk.replace(/-/g,'');
-    const rows=weekItems.map(e=>{
-      const s=SUBJECTS.find(x=>x.id===e.subject)||{color:'#8b92a8'};
-      const dt=new Date(e.date+'T00:00:00');
-      const title=(e.titles||[]).find(t=>t.text)?.text||'Untitled';
-      const pend=(e.todos||[]).filter(t=>!t.done).length;
-      return `<div class="wf-entry" data-id="${e.id}"><div class="wf-e-dot" style="background:${s.color}"></div><span class="wf-e-sid" style="color:${s.color}">${e.subject}</span><span class="wf-e-title">${esc(title)}</span><span class="wf-e-day">${DAYS[dt.getDay()]} ${dt.getDate()}</span><div class="wf-e-badges">${e.mood?`<span style="font-size:11px">${moodEmo(e.mood)}</span>`:''}${pend?`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">${pend}</span>`:''}</div></div>`;
-    }).join('');
+const rows = weekItems.map(e=>{
+  const selectedClass = selIds.has(e.id) ? ' selected' : '';
+  const s=SUBJECTS.find(x=>x.id===e.subject)||{color:'#8b92a8'};
+  const dt=new Date(e.date+'T00:00:00');
+  const title=(e.titles||[]).find(t=>t.text)?.text||'Untitled';
+  const pend=(e.todos||[]).filter(t=>!t.done).length;
+  return `<div class="wf-entry${selectedClass}" data-id="${e.id}"><div class="wf-e-dot" style="background:${s.color}"></div><span class="wf-e-sid" style="color:${s.color}">${e.subject}</span><span class="wf-e-title">${esc(title)}</span><span class="wf-e-day">${DAYS[dt.getDay()]} ${dt.getDate()}</span><div class="wf-e-badges">${e.mood?`<span style="font-size:11px">${moodEmo(e.mood)}</span>`:''}${pend?`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">${pend}</span>`:''}</div></div>`;
+}).join('');
     return `<div class="wf-folder${isThisWeek?' wf-open':''}" id="${fid}">
       <div class="wf-folder-head" onclick="toggleWeekFolder('${fid}')">
         <span class="wf-folder-ico">${isThisWeek?'📂':'📁'}</span>
@@ -2768,7 +2983,15 @@ function renderGrid(items){
       <div class="wf-body">${rows}</div>
     </div>`;
   }).join('')}</div>`;
-  c.querySelectorAll('.wf-entry').forEach(el=>el.addEventListener('click',()=>openDetailPanel(el.dataset.id)));
+c.querySelectorAll('.wf-entry').forEach(el=>{
+  el.addEventListener('click',ev=>{
+    if(selIds.size > 0 || ev.ctrlKey || ev.metaKey){
+      toggleSel(el.dataset.id);
+      return;
+    }
+    openDetailPanel(el.dataset.id);
+  });
+});
 }
 /* ── CALENDAR ── */
 function renderCal(){
@@ -2856,7 +3079,7 @@ function renderStats(){
   </div>
   <div class="chart-sec"><div class="chart-title">Activity — Last 52 Weeks</div>
     <div style="display:flex;gap:5px;align-items:center;margin-bottom:7px;font-size:9.5px;color:var(--text4)"><span>Less</span><div style="display:flex;gap:2px">${[0,1,2,3,4].map(l=>`<div class="hmc hml${l}" style="width:11px;height:11px"></div>`).join('')}</div><span>More</span></div>
-    <div class="hmap-scroll"><div class="hmap-grid">${hmHTML}</div></div>
+    <div class="hmap-scroll"><div class="hmap-grid weeks-52">${hmHTML}</div></div>
   </div>
   <div class="chart-sec"><div class="chart-title">Weekly Trend (Last 8 Weeks)</div>
     <div class="trend-bars">${weekT.map(w=>`<div class="tb-col"><div class="tb-bar" style="height:${Math.max(3,(w.cnt/maxWT*76))}px"></div><div class="tb-lbl">${w.lbl}</div><div class="tb-val">${w.cnt||''}</div></div>`).join('')}</div>
@@ -3052,12 +3275,132 @@ async function togglePin(id){const e=entries.find(x=>x.id===id);if(!e)return;e.p
 async function dupEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;const cv={...JSON.parse(JSON.stringify(e)),id:Date.now().toString(),createdAt:Date.now(),updatedAt:Date.now(),pinned:false,todos:(e.todos||[]).map(t=>({...t,id:Date.now().toString()+Math.random().toString(36).slice(2),done:false}))};entries.unshift(cv);await saveData();render();toast('Duplicated ✓','ok');}
 
 /* ── SELECTION ── */
+async function togglePinSel() {
+  if (!selIds.size) return;
+  const allPinned = Array.from(selIds).every(id => entries.find(e=>e.id===id)?.pinned);
+  for (const id of selIds) {
+    const e = entries.find(x => x.id === id);
+    if (e) e.pinned = !allPinned;
+  }
+  await saveData();
+  render();
+  toast(allPinned ? 'Unpinned selected' : 'Pinned selected', 'ok');
+  clearSel(); // clears selection and restores toolbar
+}
+
 function toggleSel(id){selIds.has(id)?selIds.delete(id):selIds.add(id);updateSelBar();render();}
-function clearSel(){selIds.clear();updateSelBar();render();}
-function updateSelBar(){const bar=document.getElementById('selBar');if(!selIds.size){bar.style.display='none';return;}bar.style.display='';bar.innerHTML=`<div class="sel-bar"><span class="sel-n">${selIds.size}</span> selected<button class="sel-btn" onclick="pinSel()">Pin</button><button class="sel-btn danger" onclick="delSel()">Delete</button><button class="sel-btn" onclick="expSel()">Export</button><button class="sel-close" onclick="clearSel()">✕</button></div>`;}
-async function delSel(){if(!confirm(`Delete ${selIds.size} entries?`))return;const now=Date.now();selIds.forEach(id=>{deletedIds[id]=now;});entries=entries.filter(e=>!selIds.has(e.id));selIds.clear();await saveData();render();buildSubjList();updateSideTagCloud();updateSelBar();toast('Deleted','ok');}
+function clearSel() {
+  selIds.clear();
+  updateSelBar();
+  render();
+}
+
+let originalToolbarHTML = null;
+
+function reinitToolbarSearch() {
+  // Re-attach search expand after toolbar restoration
+  const searchIcon = document.getElementById('tbSearchIcon');
+  const searchExpand = document.getElementById('tbSearchExpand');
+  const searchInput = document.getElementById('searchInp');
+  if (searchIcon && searchExpand && searchInput) {
+    searchIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      expandAndFocusSearch();
+    });
+    searchIcon.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      expandAndFocusSearch();
+    });
+    searchInput.addEventListener('focus', () => {
+      searchExpand.classList.add('open');
+    });
+    searchExpand.classList.remove('open');
+  }
+}
+
+function updateSelBar() {
+  const toolbar = document.getElementById('toolbar');
+  if (!toolbar) return;
+
+  if (selIds.size === 0) {
+    if (originalToolbarHTML !== null) {
+      toolbar.innerHTML = originalToolbarHTML;
+      originalToolbarHTML = null;
+      reinitToolbarSearch();
+    }
+    return;
+  }
+
+  if (originalToolbarHTML === null) {
+    originalToolbarHTML = toolbar.innerHTML;
+  }
+
+  const allPinned = Array.from(selIds).every(id => entries.find(e => e.id === id)?.pinned);
+  const pinLabel = allPinned ? 'Unpin' : 'Pin';
+
+  toolbar.innerHTML = `
+    <div class="toolbar-selection-mode">
+      <div class="sel-left">
+        <span class="sel-n">${selIds.size}</span>
+        <span>selected</span>
+      </div>
+      <div class="sel-actions">
+        <button class="sel-pin" onclick="togglePinSel()">${pinLabel}</button>
+        <button class="sel-delete danger" onclick="delSel()">Delete</button>
+        <button class="sel-export" onclick="expSel()">Export</button>
+        <button class="sel-close" onclick="clearSel()">✕</button>
+      </div>
+    </div>
+  `;
+}
+
+async function togglePinSel() {
+  if (!selIds.size) return;
+  const allPinned = Array.from(selIds).every(id => entries.find(e=>e.id===id)?.pinned);
+  for (const id of selIds) {
+    const e = entries.find(x => x.id === id);
+    if (e) e.pinned = !allPinned;
+  }
+  await saveData();
+  render();
+  toast(allPinned ? 'Unpinned selected' : 'Pinned selected', 'ok');
+  updateSelBar(); // refresh label and keep bar open
+}
+
+async function togglePinSel() {
+  if (!selIds.size) return;
+  const allPinned = Array.from(selIds).every(id => entries.find(e=>e.id===id)?.pinned);
+  for (const id of selIds) {
+    const e = entries.find(x => x.id === id);
+    if (e) e.pinned = !allPinned;
+  }
+  await saveData();
+  render();
+  toast(allPinned ? 'Unpinned selected' : 'Pinned selected', 'ok');
+  updateSelBar();
+}
+async function delSel() {
+  if (!confirm(`Delete ${selIds.size} entries?`)) return;
+  const now = Date.now();
+  for (const id of selIds) {
+    deletedIds[id] = now;
+  }
+  entries = entries.filter(e => !selIds.has(e.id));
+  selIds.clear();
+  await saveData();
+  render();
+  buildSubjList();
+  updateSideTagCloud();
+  updateSelBar();   // restores toolbar
+  toast('Deleted', 'ok');
+}
 async function pinSel(){entries.forEach(e=>{if(selIds.has(e.id))e.pinned=true;});await saveData();render();}
-function expSel(){expEntries(entries.filter(e=>selIds.has(e.id)),'studylog_selected');}
+function expSel() {
+  if (!selIds.size) return;
+  const selectedEntries = entries.filter(e => selIds.has(e.id));
+  expEntries(selectedEntries, 'studylog_selected');
+  clearSel(); // clears selection after export
+}
 
 /* ── EXPORT/IMPORT ── */
 function exportAll() {
@@ -3426,7 +3769,7 @@ document.addEventListener('touchend', e => {
 (function () {
   // Element starts at CSS top:-72px, transform translateY(0) = fully hidden.
   // rubberBand(dy) must reach ~72px at TRIGGER so indicator enters view.
-  const TRIGGER  = 68;    // px of finger travel to arm sync
+const TRIGGER  = 140;   // longer swipe needed
   const MAX_DRAG = 140;   // finger travel ceiling
   const HOLD_Y   = 90;    // translateY while syncing (top:-72+90 = 18px, nicely visible)
   const CIRC     = 113.1; // 2π × 18
@@ -3568,65 +3911,81 @@ document.addEventListener('touchend', e => {
 
 /* ── SWIPE LEFT/RIGHT TO SWITCH VIEWS ── */
 (function(){
-  const VIEWS=['list','grid','calendar','stats'];
-  const THRESHOLD=52;   // min px horizontal travel to trigger
-  const MAX_VERT=80;    // max px vertical drift allowed
-  let x0=0,y0=0,t0=0,swiping=false;
+  const VIEWS = ['list','grid','calendar','stats'];
+  const THRESHOLD = 85;      // min px horizontal travel to trigger
+  const MAX_VERT = 100;      // max px vertical drift allowed
+  let x0 = 0, y0 = 0, t0 = 0, swiping = false;
 
-  function idx(){return VIEWS.indexOf(currentView);}
+  function idx(){ return VIEWS.indexOf(currentView); }
 
   function goView(dir){
-    // dir: +1 = swipe left (next), -1 = swipe right (prev)
-    const next=idx()+dir;
-    if(next<0||next>=VIEWS.length)return;
-    const cl=dir===1?'view-slide-left':'view-slide-right';
-    switchView(VIEWS[next]);
-    // apply animation to the newly visible container
-    const map={list:'listCont',grid:'gridCont',calendar:'calCont',stats:'statsCont'};
-    const el=document.getElementById(map[VIEWS[next]]);
-    if(!el)return;
+    const next = idx() + dir;
+    if(next < 0 || next >= VIEWS.length) return;
+    const cl = dir === 1 ? 'view-slide-left' : 'view-slide-right';
+    switchView(VIEWS[next]);   // this will also record history
+    const map = { list:'listCont', grid:'gridCont', calendar:'calCont', stats:'statsCont' };
+    const el = document.getElementById(map[VIEWS[next]]);
+    if(!el) return;
     el.classList.remove('view-slide-left','view-slide-right');
     void el.offsetWidth;
     el.classList.add(cl);
     setTimeout(()=>el.classList.remove(cl),300);
   }
 
-  const area=document.getElementById('main');
-  if(!area)return;
+  const area = document.getElementById('main');
+  if(!area) return;
 
-  area.addEventListener('touchstart',e=>{
-    // don't hijack if detail/day panel is open or user is on sidebar
-    if(document.getElementById('detailOverlay')?.classList.contains('open'))return;
-    if(document.getElementById('dayPanel')?.classList.contains('open'))return;
-    if(document.getElementById('entryModal')?.classList.contains('open'))return;
-    if(e.touches.length!==1)return;
-    x0=e.touches[0].clientX;
-    y0=e.touches[0].clientY;
-    t0=Date.now();
-    swiping=true;
-  },{passive:true});
+  area.addEventListener('touchstart', e => {
+    if(document.getElementById('detailOverlay')?.classList.contains('open')) return;
+    if(document.getElementById('dayPanel')?.classList.contains('open')) return;
+    if(document.getElementById('entryModal')?.classList.contains('open')) return;
+    if(e.touches.length !== 1) return;
 
-area.addEventListener('touchmove',e=>{
-    if(!swiping)return;
-    const dx=e.touches[0].clientX-x0;
-    const dy=Math.abs(e.touches[0].clientY-y0);
-    if(dy>MAX_VERT){swiping=false;return;}
-    if(Math.abs(dx)>18){
-      // suppress both horizontal scroll AND pull-to-refresh
+    // ----- PREVENT SWIPE INSIDE HORIZONTAL SCROLLABLE AREAS -----
+    let node = e.target;
+    let inHorizScroll = false;
+    while (node && node !== area) {
+      const style = window.getComputedStyle(node);
+      if (style.overflowX === 'auto' || style.overflowX === 'scroll') {
+        if (node.scrollWidth > node.clientWidth) {
+          inHorizScroll = true;
+          break;
+        }
+      }
+      node = node.parentNode;
+    }
+    if (inHorizScroll) {
+      swiping = false;
+      return;
+    }
+    // ------------------------------------------------------------
+
+    x0 = e.touches[0].clientX;
+    y0 = e.touches[0].clientY;
+    t0 = Date.now();
+    swiping = true;
+  }, { passive: true });
+
+  area.addEventListener('touchmove', e => {
+    if(!swiping) return;
+    const dx = e.touches[0].clientX - x0;
+    const dy = Math.abs(e.touches[0].clientY - y0);
+    if(dy > MAX_VERT){ swiping = false; return; }
+    if(Math.abs(dx) > 18){
       e.preventDefault();
       e.stopPropagation();
     }
-  },{passive:false});
+  }, { passive: false });
 
-  area.addEventListener('touchend',e=>{
-    if(!swiping){swiping=false;return;}
-    swiping=false;
-    const dx=e.changedTouches[0].clientX-x0;
-    const dy=Math.abs(e.changedTouches[0].clientY-y0);
-    const dt=Date.now()-t0;
-    if(dy>MAX_VERT||Math.abs(dx)<THRESHOLD||dt>600)return;
-    goView(dx<0?1:-1);  // swipe left → next, swipe right → prev
-  },{passive:true});
+  area.addEventListener('touchend', e => {
+    if(!swiping){ swiping = false; return; }
+    swiping = false;
+    const dx = e.changedTouches[0].clientX - x0;
+    const dy = Math.abs(e.changedTouches[0].clientY - y0);
+    const dt = Date.now() - t0;
+    if(dy > MAX_VERT || Math.abs(dx) < THRESHOLD || dt > 600) return;
+    goView(dx < 0 ? 1 : -1);
+  }, { passive: true });
 })();
 
 /* ── EDGE SWIPE TO OPEN SIDEBAR ── */
@@ -3877,30 +4236,103 @@ document.addEventListener('pointerdown',e=>{
   setTimeout(()=>rip.remove(),520);
 },{passive:true});
 
-/* ── 3. LONG PRESS TO SELECT (mobile) ── */
+/* ── 3. LONG PRESS (short: context menu, long: selection mode) ── */
 (function(){
-  let timer=null,target=null;
-  const DELAY=430;
+  let touchTimer = null;
+  let longPressRow = null;
+  let startX = 0, startY = 0;
+  let pressed = false;
 
-  document.addEventListener('touchstart',e=>{
-    const row=e.target.closest('.entry-row');
-    if(!row||e.target.closest('button,a'))return;
-    target=row;
-    timer=setTimeout(()=>{
-      haptic('medium');
-      row.classList.add('longpress-active');
-      setTimeout(()=>row.classList.remove('longpress-active'),400);
-      toggleSel(row.dataset.id);
-      target=null;
-    },DELAY);
-  },{passive:true});
+  const MOVE_TOLERANCE = 12;        // px – cancel if moved too much
+  const CONTEXT_DELAY  = 450;       // ms – show context menu (only for .entry-row)
+  const SELECT_DELAY   = 3200;      // ms – enter selection mode (3.2 seconds)
 
-  const cancel=()=>{clearTimeout(timer);target=null;};
-  document.addEventListener('touchend',cancel,{passive:true});
-  document.addEventListener('touchmove',cancel,{passive:true});
-  document.addEventListener('touchcancel',cancel,{passive:true});
+  function cancelPress() {
+    if (touchTimer) clearTimeout(touchTimer);
+    touchTimer = null;
+    if (longPressRow) longPressRow = null;
+    pressed = false;
+  }
+
+  function showContextForRow(row, touchX, touchY) {
+    if (selIds.size > 0) return;          // don't show menu in selection mode
+    const id = row.dataset.id;
+    if (!id) return;
+    // use the finger's coordinates for positioning (offset slightly to avoid covering)
+    const fakeEvent = {
+      clientX: touchX,
+      clientY: touchY,
+      preventDefault: () => {}
+    };
+    showCtx(fakeEvent, id);
+    haptic('medium');
+  }
+
+  function enterSelectionMode(row) {
+    if (selIds.size > 0) return;           // already in selection mode
+    hideCtx();                             // close any open context menu
+    const id = row.dataset.id;
+    if (!id) return;
+    toggleSel(id);                         // selects the row
+    haptic('light');
+    row.classList.add('longpress-active');
+    setTimeout(() => row.classList.remove('longpress-active'), 300);
+  }
+
+  document.addEventListener('touchstart', e => {
+    const row = e.target.closest('.entry-row, .wf-entry');
+    if (!row) return;
+    if (e.target.closest('button, a, .todo-chk')) return;
+    // don't interfere if selection mode is active (normal tap selects)
+    if (selIds.size > 0) return;
+
+    longPressRow = row;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    pressed = true;
+
+    // Schedule context menu only for entry rows (not grid entries)
+    const isEntryRow = row.classList.contains('entry-row');
+    if (isEntryRow) {
+      touchTimer = setTimeout(() => {
+        // first threshold: context menu
+        showContextForRow(longPressRow, startX, startY);
+        // schedule selection mode after additional delay
+        touchTimer = setTimeout(() => {
+          if (pressed && longPressRow) {
+            enterSelectionMode(longPressRow);
+            cancelPress();
+          }
+        }, SELECT_DELAY - CONTEXT_DELAY);
+      }, CONTEXT_DELAY);
+    } else {
+      // For grid entries (wf-entry), only enter selection mode after the long delay
+      touchTimer = setTimeout(() => {
+        if (pressed && longPressRow) {
+          enterSelectionMode(longPressRow);
+          cancelPress();
+        }
+      }, SELECT_DELAY);
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!pressed || !longPressRow) return;
+    const dx = Math.abs(e.touches[0].clientX - startX);
+    const dy = Math.abs(e.touches[0].clientY - startY);
+    if (dx > MOVE_TOLERANCE || dy > MOVE_TOLERANCE) {
+      cancelPress();
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    cancelPress();
+  });
+
+  document.addEventListener('touchcancel', () => {
+    cancelPress();
+  });
 })();
-
 /* ── 4. DOUBLE-CLICK TO EDIT (desktop) ── */
 document.addEventListener('dblclick',e=>{
   const row=e.target.closest('.entry-row');
@@ -3909,59 +4341,6 @@ document.addEventListener('dblclick',e=>{
   editEntry(row.dataset.id);
 });
 
-/* ── 5. SWIPE LEFT ON ROW TO DELETE (mobile) ── */
-(function(){
-  const THRESHOLD=72;
-  let x0=0,y0=0,row=null,bg=null,dragging=false;
-
-  document.addEventListener('touchstart',e=>{
-    const r=e.target.closest('.entry-row');
-    if(!r||e.target.closest('button,a,.todo-chk'))return;
-    // don't steal from edge-swipe zone
-    if(e.touches[0].clientX<40)return;
-    x0=e.touches[0].clientX;
-    y0=e.touches[0].clientY;
-    row=r;dragging=false;
-    // ensure delete bg exists
-    if(!row.querySelector('.swd-bg')){
-      bg=document.createElement('div');
-      bg.className='swd-bg';bg.textContent='🗑';
-      row.appendChild(bg);
-    } else bg=row.querySelector('.swd-bg');
-  },{passive:true});
-
-  document.addEventListener('touchmove',e=>{
-    if(!row)return;
-    const dx=e.touches[0].clientX-x0;
-    const dy=Math.abs(e.touches[0].clientY-y0);
-    if(!dragging&&dy>18){row=null;return;}
-    if(dx>-10)return;  // only left swipe
-    dragging=true;
-    const travel=Math.min(Math.abs(dx),110);
-    row.style.transform=`translateX(${-travel}px)`;
-    row.style.transition='none';
-    if(bg)bg.style.opacity=String(Math.min(travel/THRESHOLD,1));
-  },{passive:true});
-
-  document.addEventListener('touchend',e=>{
-    if(!row||!dragging){row=null;dragging=false;return;}
-    const dx=x0-e.changedTouches[0].clientX;
-    if(dx>=THRESHOLD){
-      // animate out then delete
-      row.style.transition='transform .22s ease,opacity .22s ease';
-      row.style.transform='translateX(-105%)';
-      row.style.opacity='0';
-      const id=row.dataset.id;
-      haptic('heavy');
-      setTimeout(()=>deleteEntry(id),220);
-    } else {
-      row.style.transition='transform .28s cubic-bezier(.34,1.56,.64,1)';
-      row.style.transform='';
-      if(bg)bg.style.opacity='0';
-    }
-    row=null;dragging=false;
-  },{passive:true});
-})();
 
 /* ── 6. SCROLL TO TOP BUTTON ── */
 (function(){
