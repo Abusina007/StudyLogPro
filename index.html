@@ -304,8 +304,19 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .wf-entry.selected,
 .entry-card.selected {
   border-left: 3px solid var(--accent) !important;
-  background: var(--accent-dim2) !important;
-  box-shadow: inset 0 0 0 1px var(--accent);
+  background: rgba(47,129,247,.18) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(47,129,247,.4) !important;
+}
+.entry-row.selected .er-icon {
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes checkPop {
+  from { transform: scale(0) rotate(-30deg); opacity:0; }
+  to   { transform: scale(1) rotate(0deg);   opacity:1; }
 }
 
 /* Toolbar selection mode (replaces entire toolbar) */
@@ -1148,6 +1159,36 @@ input, textarea, [contenteditable] {
   border-radius:var(--rs);
 }
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ▀▄▀▄ SELECTION CHECK ICON ▀▄▀▄ */
+.entry-row.selected { background: rgba(47,129,247,.15) !important; }
+[data-theme="light"] .entry-row.selected { background: rgba(37,99,235,.11) !important; }
+.er-icon.sel-active {
+  background: var(--accent-dim) !important;
+  color: var(--accent) !important;
+  border: 1.5px solid rgba(47,129,247,.45);
+}
+.er-sel-check {
+  font-size: 16px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes checkPop {
+  from { transform: scale(0) rotate(-25deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+/* ▀▄▀▄ SELECTION CHECK ICON ▀▄▀▄ */
+.entry-row.selected { background: rgba(47,129,247,.18) !important; box-shadow: inset 0 0 0 1.5px rgba(47,129,247,.35) !important; }
+[data-theme="light"] .entry-row.selected { background: rgba(37,99,235,.13) !important; }
+.er-icon { transition: background .15s, color .15s; }
+.er-sel-check {
+  font-size: 17px; font-weight: 800; line-height: 1;
+  animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes checkPop {
+  from { transform: scale(0) rotate(-30deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
 </style>
 </head>
 <body>
@@ -2750,6 +2791,7 @@ c.querySelectorAll('.entry-row').forEach(el=>{
 function buildEntryRow(e){
   const s=SUBJECTS.find(x=>x.id===e.subject)||{label:e.subject,color:'#8b92a8',bg:'rgba(139,146,168,.14)'};
   const d=new Date(e.date+'T00:00:00');
+  const isSel=selIds.has(e.id);
   const title=(e.titles||[]).find(t=>t.text)?.text||'Untitled session';
   const today=new Date().toISOString().split('T')[0];
   const isToday=e.date===today;
@@ -2763,9 +2805,12 @@ function buildEntryRow(e){
   if((e.youtubes||[]).length)badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">▶${e.youtubes.length}</span>`;
   if((e.files||[]).length)badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">📎${e.files.length}</span>`;
   const dateLabel=isToday?'Today':`${d.getDate()} ${MSHORT[d.getMonth()]}`;
-  return `<div class="entry-row${e.pinned?' pinned':''}${selIds.has(e.id)?' selected':''}" data-id="${e.id}">
+  const iconHTML=isSel
+    ? '<div style="width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;background:var(--accent);margin:10px 11px;flex-shrink:0;border:2px solid rgba(255,255,255,.3)">✓</div>'
+    : `<div class="er-icon" style="background:${isSel?'#2f81f7':s.bg};color:${isSel?'#ffffff':s.color};font-size:${isSel?'20px':'9.5px'};font-weight:${isSel?'900':'800'}">${isSel?'&#10003;':e.subject.slice(0,4)}</div>`;
+  return `<div class="entry-row${e.pinned?' pinned':''}${isSel?' selected':''}" data-id="${e.id}" style="${isSel?'background:rgba(47,129,247,.25)!important;border-left:3px solid var(--accent);box-shadow:inset 0 0 0 1.5px rgba(47,129,247,.5);':''}">
     <div class="er-accent" style="background:${s.color}"></div>
-    <div class="er-icon" style="background:${s.bg};color:${s.color}">${e.subject.slice(0,4)}</div>
+    ${iconHTML}
     <div class="er-content">
       <div class="er-top">
         <span class="er-title">${esc(title)}</span>
@@ -3374,19 +3419,16 @@ async function togglePinSel() {
   clearSel(); // clears selection → restores toolbar
 }
 async function delSel() {
+  if (!selIds.size) return;
   if (!confirm(`Delete ${selIds.size} entries?`)) return;
   const now = Date.now();
-  for (const id of selIds) {
-    deletedIds[id] = now;
-  }
+  for (const id of selIds) { deletedIds[id] = now; }
   saveDeletedIds();
   entries = entries.filter(e => !selIds.has(e.id));
-  selIds.clear();
   await saveData();
-  render();
+  clearSel();
   buildSubjList();
   updateSideTagCloud();
-  clearSel(); // clears selection → restores toolbar + re-renders
   toast('Deleted', 'ok');
 }
 async function pinSel(){entries.forEach(e=>{if(selIds.has(e.id))e.pinned=true;});await saveData();render();}
