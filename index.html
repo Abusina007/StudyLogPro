@@ -1706,7 +1706,7 @@ function applyTombstones(list) {
   return list.filter(e => {
     if (!deletedIds[e.id]) return true;
     // use any available timestamp — if none, assume entry is recent and keep it
-    const entryTime = e.updatedAt || e.createdAt || Date.now();
+    const entryTime = e.updatedAt || e.createdAt || 0;
     if (entryTime > deletedIds[e.id]) {
       delete deletedIds[e.id];
       saveDeletedIds();
@@ -1973,7 +1973,7 @@ const afterTombstone = applyTombstones(Object.values(merged));
     const survivingIds = new Set(afterTombstone.map(e => e.id));
     const rescued = entries.filter(e => !survivingIds.has(e.id) && !deletedIds[e.id]);
     const next = [...afterTombstone, ...rescued];
-    entries = next.length >= entries.length ? next : entries;
+    entries = next;
     lsSave({ version: 7, entries });
   }
 
@@ -2297,13 +2297,8 @@ if (ghToken) {
           // always rescue live in-memory entries not explicitly deleted
           const rescued = entries.filter(e => !survivingIds.has(e.id) && !deletedIds[e.id]);
           const next = [...afterTombstone, ...rescued];
-          // safety gate: never silently drop entries
-          if (next.length >= entries.length || rescued.length > 0) {
-            entries = next;
-          } else {
-            // cloud returned less — keep whichever is bigger
-            entries = next.length < entries.length ? entries : next;
-          }
+          // rescued already protects false-deletions — always accept next
+          entries = next;
           lsSave({ version: 7, entries });
           render(); buildSubjList(); updateSideTagCloud();
         }
@@ -3375,9 +3370,8 @@ async function togglePinSel() {
     if (e) e.pinned = !allPinned;
   }
   await saveData();
-  render();
   toast(allPinned ? 'Unpinned selected' : 'Pinned selected', 'ok');
-  updateSelBar();
+  clearSel(); // clears selection → restores toolbar
 }
 async function delSel() {
   if (!confirm(`Delete ${selIds.size} entries?`)) return;
@@ -3385,13 +3379,14 @@ async function delSel() {
   for (const id of selIds) {
     deletedIds[id] = now;
   }
+  saveDeletedIds();
   entries = entries.filter(e => !selIds.has(e.id));
   selIds.clear();
   await saveData();
   render();
   buildSubjList();
   updateSideTagCloud();
-  updateSelBar();   // restores toolbar
+  clearSel(); // clears selection → restores toolbar + re-renders
   toast('Deleted', 'ok');
 }
 async function pinSel(){entries.forEach(e=>{if(selIds.has(e.id))e.pinned=true;});await saveData();render();}
