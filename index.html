@@ -55,8 +55,8 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 /* ▀▄▀▄ SETUP/LOGIN OVERLAY ▀▄▀▄ */
 #setupOverlay{position:fixed;inset:0;background:var(--bg);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .25s}
 #setupOverlay.hidden{display:none}
-.su-card{background:var(--panel);border:1px solid var(--border2);border-radius:16px;padding:40px 48px;max-width:460px;width:100%;text-align:center;box-shadow:var(--shadow)}
-.su-logo{width:60px;height:60px;background:linear-gradient(135deg,#000000,#000000);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;margin:0 auto 20px;}
+.su-card{padding:40px 28px;text-align:center;}
+.su-logo{width:60px;height:60px;background:linear-gradient(135deg,#001e36,#001e36);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;margin:0 auto 10px;}
 .su-progress{display:flex;gap:5px;justify-content:center;margin-bottom:22px}
 .su-dot{width:8px;height:8px;border-radius:50%;background:var(--panel4);transition:all .2s}
 .su-dot.on{background:var(--accent);width:22px;border-radius:4px}
@@ -121,7 +121,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 @media(max-width:800px){.mpxx{display:none};}
 @media(max-width:700px){.tb-ws{max-width:95px}.tb-btn:not(.primary){padding:6px 7px}}
 @media(max-width:600px){.focus-btn{display: none;}.weeks-52{grid-template-columns:repeat(23,12px);}}
-@media(max-width:540px){.tb-hamburger{display:flex}.tb-sep:not(:first-of-type){display:none}.tb-ws{display:none}.focus-btn{display:none}.for-small{width:25px}.newbtn{width:35px;display:flex;align-items:center;justify-content:center}.nnewbt{display:none}.plusbtn{font-size:16px};}
+@media(max-width:540px){.tb-hamburger{display:flex}.tb-sep:not(:first-of-type){display:none}.tb-ws{display:none}.focus-btn{display:none}.for-small{width:25px}.newbtn{width:35px;display:flex;align-items:center;justify-content:center;}.nnewbt{display:none}.plusbtn{font-size:16px};}
 @media (min-width: 768px){.forpc{display: none;}}
 /* ▀▄▀▄ LAYOUT ▀▄▀▄ */
 #body{display:flex;flex:1;overflow:hidden;position:relative;}
@@ -445,7 +445,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 
 /* ▀▄▀▄ MAIN ▀▄▀▄ */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-#viewArea{flex:1;overflow-y:auto;padding:18px 22px}
+#viewArea{flex:1;overflow-y:auto;padding:18px 22px;}
 @media(max-width:600px){#viewArea{padding:12px 12px}}
 
 /* ▀▄▀▄ VIEW CTRL BAR ▀▄▀▄ */
@@ -554,7 +554,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .gc-tag{font-size:9.5px;padding:1px 6px;border-radius:20px;background:var(--panel3);color:var(--text3)}
 
 /* ▀▄▀▄ CALENDAR ▀▄▀▄ */
-.cal-wrap{max-width:920px;margin:0 auto}
+.cal-wrap{max-width:920px;margin:0 auto;margin-top: 5vh;}
 .cal-nav{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .cal-nav h2{font-size:18px;font-weight:600;flex:1;text-align:center}
 .cal-nav-btn{background:var(--panel2);border:1px solid var(--border);color:var(--text2);padding:7px 13px;border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:500;transition:all var(--tr)}
@@ -610,7 +610,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .sb-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
 .sb-dot.saving{background:var(--amber);animation:pulse .8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.sb-flex{flex:1;min-width:6px}
+.sb-flex{flex:1;min-width:1px}
 
 /* ▀▄▀▄ OVERLAY/MODAL ▀▄▀▄ */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:810;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;}
@@ -851,7 +851,7 @@ input[type=date]{color-scheme:dark}
 .detail-overlay{position:fixed;inset:0;z-index:700;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
 .detail-overlay.open{opacity:1;visibility:visible}
 .detail-overlay::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,var(--ov-alpha,.65));backdrop-filter:blur(var(--ov-blur,4px));transition:background .3s ease,backdrop-filter .3s ease}
-.detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;max-height:65vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(50px);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;max-height:55vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(50px);transition:transform .28s cubic-bezier(.4,0,.2,1)}
 .detail-overlay.open .detail-panel{transform:none}
 @media(min-width:720px){.detail-overlay{align-items:center}.detail-panel{border-radius:18px;max-height:88vh;margin:20px}}
 .dp-handle{width:36px;height:4px;background:var(--border3);border-radius:2px;margin:10px auto 0;flex-shrink:0;padding:12px 24px;background-clip:content-box;box-sizing:content-box;cursor:grab;}
@@ -1082,14 +1082,15 @@ input, textarea, [contenteditable] {
 /* scroll to top button */
 #scrollTopBtn{
   position:fixed;bottom:48px;right:14px;width:40px;height:40px;
-  border-radius:50%;background:var(--accent);color:#fff;border:none;
+  border-radius:32%;background:var(--accent);color:#fff;border:none;
   font-size:18px;cursor:pointer;z-index:300;
-  box-shadow:0 4px 16px rgba(47,129,247,.45);
+  box-shadow:0 4px 6px rgba(27, 75, 143, 0.2);
   opacity:0;transform:translateY(12px) scale(.85);
   transition:opacity .22s,transform .22s cubic-bezier(.34,1.56,.64,1);
   pointer-events:none;display:flex;align-items:center;justify-content:center;
+
 }
-#scrollTopBtn.show{opacity:1;transform:none;pointer-events:auto;}
+#scrollTopBtn.show{opacity:1;transform:none;pointer-events:auto;opacity: 80%;}
 #scrollTopBtn:hover{background:var(--accent-h);transform:scale(1.08);}
 #scrollTopBtn:active{transform:scale(.94);}
 
@@ -1189,6 +1190,86 @@ input, textarea, [contenteditable] {
   from { transform: scale(0) rotate(-30deg); opacity: 0; }
   to   { transform: scale(1) rotate(0deg);   opacity: 1; }
 }
+/* Floating Action Button for mobile */
+.fab-add {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 32%;
+  background: var(--accent);
+  opacity: 80%;
+  color: white;
+  border: none;
+  font-size: 28px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s;
+  font-family: var(--font);
+    box-shadow:0 4px 6px rgba(27, 75, 143, 0.2);
+}
+
+.fab-add:hover {
+  background: var(--accent-h);
+  transform: scale(1.05);
+}
+
+.fab-add:active {
+  transform: scale(0.96);
+}
+
+.fab-add.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+/* Hide FAB on desktop, show only on mobile */
+@media (min-width: 769px) {
+  .fab-add {
+    display: none;
+  }
+}
+
+/* Adjust scroll-to-top button position on mobile so it doesn't overlap FAB */
+@media (max-width: 768px) {
+  #scrollTopBtn {
+    bottom: 86px;
+  }
+}
+/* Custom placeholder for date inputs on mobile */
+input[type="date"]:invalid:not(:focus)::before,
+input.date-inp:invalid:not(:focus)::before,
+.finp[type="date"]:invalid:not(:focus)::before {
+  content: "dd-mm-yyyy";
+  position: absolute;
+  color: var(--text3);
+  background: inherit;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Ensure date inputs have relative positioning for absolute pseudo-element */
+input[type="date"],
+input.date-inp,
+.finp[type="date"] {
+  position: relative;
+}
+
+/* Also for the sidebar date inputs */
+.sb-sec .date-inp:invalid:not(:focus)::before {
+  left: 8px;
+}
 </style>
 </head>
 <body>
@@ -1197,6 +1278,7 @@ input, textarea, [contenteditable] {
 <div id="setupOverlay">
   <div class="su-card">
     <div class="su-logo">SL</div>
+    <div class="tb-name" style="margin-bottom: 30px;">StudyLog Pro</div>
     <div id="suContent"></div>
   </div>
 </div>
@@ -1376,8 +1458,8 @@ input, textarea, [contenteditable] {
 </svg> <span id="statusStreak">0 streak</span></div>
   <div class="sb-item"><span id="statusTodos">0 tasks</span></div>
   <div class="sb-flex"></div>
-  <div class="sb-item" style="opacity:.35;cursor:pointer;" onclick="openHelp()">F1</div>
   <div class="sb-item" id="statusTime"></div>
+  <div class="sb-item" style="opacity:.35;cursor:pointer;" onclick="openHelp()"><span class="mpxx">F1</span></div>
 </div>
 
 <!-- ▀▄▀▄ ENTRY MODAL ▀▄▀▄ -->
@@ -1528,7 +1610,9 @@ input, textarea, [contenteditable] {
 <!-- ▀▄▀▄ CONTEXT MENU ▀▄▀▄ -->
 <div id="ctxMenu">
   <div class="ctx-item" onclick="ctxDo('edit')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg>Edit<kbd>E</kbd></div>
-  <div class="ctx-item" onclick="ctxDo('pin')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 1.5l-1 1 1.5 1.5-3 3.5-1.5-.5-.9.9 3 3 .9-.9-.5-1.5 3.5-3 1.5 1.5 1-1z"/></svg><span id="ctxPinLbl">Pin</span><kbd>P</kbd></div>
+  <div class="ctx-item" onclick="ctxDo('pin')"><svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/20/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M6.5 5C6.5 4.44772 6.94772 4 7.5 4H9H15H16.5C17.0523 4 17.5 4.44772 17.5 5C17.5 5.55228 17.0523 6 16.5 6H16.095L16.9132 15H19C19.5523 15 20 15.4477 20 16C20 16.5523 19.5523 17 19 17H16H13V22C13 22.5523 12.5523 23 12 23C11.4477 23 11 22.5523 11 22V17H8H5C4.44772 17 4 16.5523 4 16C4 15.4477 4.44772 15 5 15H7.08679L7.90497 6H7.5C6.94772 6 6.5 5.55228 6.5 5ZM9.91321 6L9.09503 15H12H14.905L14.0868 6H9.91321Z" fill="currentColor"></path>
+</svg><span id="ctxPinLbl">Pin</span><kbd>P</kbd></div>
   <div class="ctx-item" onclick="ctxDo('dup')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="5" width="9" height="10" rx="1.5"/><path d="M5 5V3a1.5 1.5 0 0 1 1.5-1.5h7A1.5 1.5 0 0 1 15 3v7a1.5 1.5 0 0 1-1.5 1.5H11"/></svg>Duplicate</div>
   <div class="ctx-item" onclick="ctxDo('export')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg>Export</div>
   <div class="ctx-sep"></div>
@@ -1619,12 +1703,14 @@ input, textarea, [contenteditable] {
 <g id="SVGRepo_iconCarrier"> <metadata> <sfw> <slices> </slices> <slicesourcebounds width="505" height="984" bottomleftorigin="true" x="0" y="-552"> </slicesourcebounds> </sfw> </metadata> <g> <g> <g> <path d="M23,23H1c-0.4,0-0.7-0.2-0.9-0.5c-0.2-0.3-0.2-0.7,0-1l11-20c0.4-0.6,1.4-0.6,1.8,0l11,20c0.2,0.3,0.2,0.7,0,1 C23.7,22.8,23.4,23,23,23z M2.7,21h18.6L12,4.1L2.7,21z"/> </g> </g> <g> <g> <path d="M12,16c-0.6,0-1-0.4-1-1v-5c0-0.6,0.4-1,1-1s1,0.4,1,1v5C13,15.6,12.6,16,12,16z"/> </g> </g> <g> <g> <circle cx="12" cy="18" r="1"/> </g> <g> <path d="M12,19.5c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5S12.8,19.5,12,19.5z M12,17.5c-0.3,0-0.5,0.2-0.5,0.5 s0.2,0.5,0.5,0.5s0.5-0.2,0.5-0.5S12.3,17.5,12,17.5z"/> </g> </g> </g> </g>
 
 </svg>
-  Deleted.<button onclick="undoDelete()">Undo (Ctrl+Z)</button></div>
+  Deleted.<button onclick="undoDelete()">Undo <span class="mpxx">(Ctrl+Z)</span></button></div>
 <div id="toast"></div>
 <!-- scroll to top -->
 <button id="scrollTopBtn" onclick="viewArea.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 <!-- draft indicator dot (injected into modal title) -->
 <span id="draftDot"></span>
+<!-- Floating Action Button for new entry (mobile) -->
+<button class="fab-add" id="fabAddBtn" title="New entry">+</button>
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <script>
 'use strict';
@@ -2026,7 +2112,7 @@ const afterTombstone = applyTombstones(Object.values(merged));
   updateSideTagCloud();
 
   if (pushOk) {
-    toast('Synced ✓ (pull + push)', 'ok');
+    toast('Synced ✓', 'ok');
     setSyncStatus('ok', 'Synced ✓');
   } else {
     toast('Pull done, push failed — check token', 'err');
@@ -2148,8 +2234,8 @@ function renderSuStep() {
         <input class="finp" id="suTokenInp" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;font-family:var(--mono);font-size:12px">
         <button class="su-btn" style="width:auto;padding:8px 16px;margin:0" onclick="suConnectGH()">Connect</button>
       </div>
-      <button class="su-btn-sec" onclick="skipToLocal(none)">StudyLog Pro</button>
-      <div class="su-note">🔒 Token stored locally. Data in a private GitHub Gist. GitHub is free for this use.</div>`;
+      <button class="su-btn-sec" onclick="skipToLocal(none)">Login as guest</button>
+      <div class="su-note">Welcome to StudyLog Pro. Pick up where you left off.</div>`;
     // Allow Enter key in token input
     setTimeout(() => {
       const inp = document.getElementById('suTokenInp');
@@ -2249,11 +2335,13 @@ function openGHConnectModal() {
           <div class="fg">
             <label class="flbl">Token</label>
             <input class="finp" id="ghTokenInp" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="font-family:var(--mono);font-size:12px">
+            
           </div>
         </div>
         <div class="m-foot">
           <div></div>
           <div class="m-foot-r">
+            
             <button class="btn-c" onclick="closeGHModal()">Cancel</button>
             <button class="btn-p" onclick="applyGHToken()">Connect & Sync</button>
           </div>
@@ -3110,12 +3198,12 @@ function renderStats(){
   const svgRing=`<svg width="80" height="80" viewBox="0 0 80 80" class="comp-ring"><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--panel3)" stroke-width="8"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--green)" stroke-width="8" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-dashoffset="${circ/4}" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="44" text-anchor="middle" font-size="14" font-weight="800" fill="var(--green)" font-family="var(--mono)">${compRate}%</text></svg>`;
   c.innerHTML=`<div>
   <div class="stat-top-grid">
-    <div class="stc"><div class="stc-ico">📚</div><div class="stc-n">${entries.length}</div><div class="stc-l">Total Entries</div></div>
-    <div class="stc"><div class="stc-ico">🔥</div><div class="stc-n">${st}</div><div class="stc-l">Day Streak</div></div>
-    <div class="stc"><div class="stc-ico">📝</div><div class="stc-n">${totalWords>=1000?(totalWords/1000).toFixed(1)+'k':totalWords}</div><div class="stc-l">Words Written</div></div>
-    <div class="stc"><div class="stc-ico">📅</div><div class="stc-n">${tw}</div><div class="stc-l">This Week</div></div>
-    <div class="stc"><div class="stc-ico">☑</div><div class="stc-n">${dT}</div><div class="stc-l">Tasks Done</div><div class="stc-s">${tT} total</div></div>
-    <div class="stc"><div class="stc-ico">★</div><div class="stc-n">${avgRating||'—'}</div><div class="stc-l">Avg Rating</div><div class="stc-s">${avgRated.length} rated</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${entries.length}</div><div class="stc-l">Total Entries</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${st}</div><div class="stc-l">Day Streak</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${totalWords>=1000?(totalWords/1000).toFixed(1)+'k':totalWords}</div><div class="stc-l">Words Written</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${tw}</div><div class="stc-l">This Week</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${dT}</div><div class="stc-l">Tasks Done</div><div class="stc-s">${tT} total</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${avgRating||'—'}</div><div class="stc-l">Avg Rating</div><div class="stc-s">${avgRated.length} rated</div></div>
   </div>
   <div class="chart-sec"><div class="chart-title">Activity — Last 52 Weeks</div>
     <div style="display:flex;gap:5px;align-items:center;margin-bottom:7px;font-size:9.5px;color:var(--text4)"><span>Less</span><div style="display:flex;gap:2px">${[0,1,2,3,4].map(l=>`<div class="hmc hml${l}" style="width:11px;height:11px"></div>`).join('')}</div><span>More</span></div>
@@ -4487,6 +4575,50 @@ document.getElementById('entryModal')?.addEventListener('keydown',e=>{
     hb.title=collapsed?'Open sidebar (Ctrl+B)':'Close sidebar (Ctrl+B)';
   });
   obs.observe(sb,{attributes:true,attributeFilter:['class']});
+})();
+
+// Floating Action Button - show/hide on scroll (mobile only)
+(function() {
+  const fab = document.getElementById('fabAddBtn');
+  const viewArea = document.getElementById('viewArea');
+  if (!fab || !viewArea) return;
+
+  let lastScrollTop = 0;
+  let ticking = false;
+  const SCROLL_THRESHOLD = 320; // hide after scrolling down 80->>320px
+
+  function checkScroll() {
+    const scrollTop = viewArea.scrollTop;
+    if (scrollTop > SCROLL_THRESHOLD) {
+      fab.classList.add('hidden');
+    } else {
+      fab.classList.remove('hidden');
+    }
+    lastScrollTop = scrollTop;
+    ticking = false;
+  }
+
+  viewArea.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(checkScroll);
+      ticking = true;
+    }
+  });
+
+  // Open modal on click
+  fab.addEventListener('click', function(e) {
+    e.stopPropagation();
+    openModal();
+  });
+
+  // Ensure FAB becomes visible again when modal closes (in case modal was opened while hidden)
+  const originalCloseModal = closeModal;
+  window.closeModal = function() {
+    originalCloseModal();
+    if (viewArea.scrollTop <= SCROLL_THRESHOLD) {
+      fab.classList.remove('hidden');
+    }
+  };
 })();
 /* ── KICK OFF ── */
 init();
