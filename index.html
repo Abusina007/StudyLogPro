@@ -116,9 +116,10 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .tb-btn svg{width:14px;height:14px;flex-shrink:0}
 .theme-toggle{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:var(--rs);border:1px solid var(--border);background:none;cursor:pointer;font-size:15px;transition:all var(--tr);color:var(--text2);flex-shrink:0}
 .theme-toggle:hover{background:var(--panel2);border-color:var(--border2)}
+@media(max-width:1077px){.tb-ws{display: none;}}
 @media(max-width:950px){.tb-v-lbl{display:none}.tb-v{padding:5px 8px}}
 @media(max-width:900px){.tb-ws-name{max-width:75px}.tb-name small{display:none}}
-@media(max-width:800px){.mpxx{display:none};}
+@media(max-width:850px){.mpxx{display:none};}
 @media(max-width:700px){.tb-ws{max-width:95px}.tb-btn:not(.primary){padding:6px 7px}}
 @media(max-width:600px){.focus-btn{display: none;}.weeks-52{grid-template-columns:repeat(23,12px);}}
 @media(max-width:540px){.tb-hamburger{display:flex}.tb-sep:not(:first-of-type){display:none}.tb-ws{display:none}.focus-btn{display:none}.for-small{width:25px}.newbtn{width:35px;display:flex;align-items:center;justify-content:center;}.nnewbt{display:none}.plusbtn{font-size:16px};}
@@ -264,6 +265,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 }
 .tb-search-input {
   width: 100%;
+  min-width: 150px;
   background: var(--panel2);
   border: 1px solid var(--border);
   border-radius: var(--rs);
@@ -1270,6 +1272,22 @@ input.date-inp,
 .sb-sec .date-inp:invalid:not(:focus)::before {
   left: 8px;
 }
+/* Hide desktop new button on mobile, show on PC */
+@media (max-width: 768px) {
+  #desktopNewBtn {
+    display: none !important;
+  }
+  .tb-search-container {
+    max-width: 100% !important;
+    margin: 0 8px !important;
+  }
+}
+/* Ensure search input has enough width on PC */
+@media (min-width: 769px) {
+  .tb-search-container {
+    min-width: 220px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1300,13 +1318,13 @@ input.date-inp,
     <div class="tb-logo">SL</div>
     <div class="tb-name focus-btn mpxx" id="tbName">StudyLog Pro<small id="tbSub">AIML · 1A</small></div>
   </div>
-  <div class="tb-sep"></div>
+
   <div class="tb-ws" id="wsChip" onclick="changeWorkspace()">
     <span class="tb-ws-ico">📂</span>
     <span class="tb-ws-name" id="wsName">No workspace</span>
     <span class="tb-ws-badge local" id="wsBadge">local</span>
   </div>
-  <div class="tb-sep"></div>
+
   <div class="tb-views">
     <button class="tb-v active" id="vList" onclick="switchView('list')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2.5" rx="1"/><rect x="1" y="7" width="14" height="2.5" rx="1"/><rect x="1" y="12" width="14" height="2.5" rx="1"/></svg><span class="tb-v-lbl">List</span>
@@ -1320,21 +1338,21 @@ input.date-inp,
     <button class="tb-v" id="vStats" onclick="switchView('stats')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="10" width="3" height="5" rx="1"/><rect x="6.5" y="6" width="3" height="9" rx="1"/><rect x="12" y="2" width="3" height="13" rx="1"/></svg><span class="tb-v-lbl">Stats</span>
     </button>
-    
   </div>
-<div class="tb-search-container" id="tbSearchContainer">
-  <button class="tb-search-icon" id="tbSearchIcon" title="Search (Ctrl+F)">⌕</button>
-  <div class="tb-search-expand" id="tbSearchExpand">
-    <input class="tb-search-input" id="searchInp" placeholder="Search…" autocomplete="off" oninput="applyFilters()">
+      <div class="tb-sep"></div>
+  
+  <!-- Always visible search input -->
+  <div class="tb-search-container" style="flex:1; max-width: 280px; margin: 0 10px;">
+    <input class="tb-search-input" id="searchInp" placeholder="Search…" autocomplete="off" oninput="applyFilters()" style="width: 100%;">
   </div>
-</div>
+  
   <div class="tb-spacer"></div>
-
   <div class="tb-actions">
     <button class="tb-btn focus-btn mpxx" onclick="toggleFocus()" title="F10"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 5V2h3M12 2h3v3M1 11v3h3M12 14h3v-3"/></svg></button>
-    <div class="tb-sep"></div>
+
     <button class="tb-btn focus-btn mpxx" onclick="openHelp()" title="F1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M6 6c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2v1.5"/><circle cx="8" cy="12" r=".8" fill="currentColor" stroke="none"/></svg></button>
-    <button class="tb-btn primary newbtn" onclick="openModal()"><span class="plusbtn">+</span><span class="mpx nnewbt"> New </span><span class="focus-btn mpx" style="font-size:9.5px;opacity:.55;font-family:var(--mono);margin-left:2px">Alt+N</span></button>
+    <!-- New button – hidden on mobile, visible on PC -->
+    <button class="tb-btn primary newbtn" id="desktopNewBtn" onclick="openModal()"><span class="plusbtn">+</span><span class="mpx nnewbt"> New </span><span class="focus-btn mpx" style="font-size:9.5px;opacity:.55;font-family:var(--mono);margin-left:2px">Alt+N</span></button>
   </div>
 </div>
 
@@ -1457,8 +1475,8 @@ input.date-inp,
   <path d="M12.8324 21.8013C15.9583 21.1747 20 18.926 20 13.1112c0 -5.2916 -3.8733 -8.81527 -6.6585 -10.43435 -0.618 -0.35928 -1.3415 0.11321 -1.3415 0.82807V5.3334c0 1.44186 -0.6062 4.07371 -2.29068 5.1684 -0.86 0.5589 -1.7888 -0.2776 -1.89332 -1.29792l-0.08583 -0.83784c-0.09977 -0.97401 -1.09176 -1.56529 -1.87021 -0.97144C4.46147 8.46144 3 10.3296 3 13.1112c0 7.1111 5.28889 8.8889 7.9333 8.8889 0.1538 0 0.3155 -0.0046 0.4838 -0.0143C10.1113 21.8742 8 21.064 8 18.4442c0 -2.0493 1.49507 -3.4357 2.631 -4.1096 0.3055 -0.1813 0.6631 0.0541 0.6631 0.4093v0.5892c0 0.4509 0.1744 1.1558 0.5895 1.6383 0.4698 0.546 1.1593 -0.026 1.2149 -0.7441 0.0176 -0.2265 0.2454 -0.3709 0.4416 -0.2562 0.6413 0.3748 1.4599 1.1754 1.4599 2.4731 0 2.048 -1.129 2.9901 -2.1676 3.3571Z" fill="#ff3639" stroke-width="1"></path>
 </svg> <span id="statusStreak">0 streak</span></div>
   <div class="sb-item"><span id="statusTodos">0 tasks</span></div>
-  <div class="sb-flex"></div>
   <div class="sb-item" id="statusTime"></div>
+  <div class="sb-flex"></div>
   <div class="sb-item" style="opacity:.35;cursor:pointer;" onclick="openHelp()"><span class="mpxx">F1</span></div>
 </div>
 
@@ -2640,10 +2658,10 @@ function matchesQuery(e,q){
   /* ── keyword resolution: exact → prefix → fuzzy ── */
   const kw=_resolveKW(raw);
   if(kw){
-    if(kw==='pending')    return pending.length>0;
+    if(kw==='pending')    return (e.todos||[]).some(t => !t.done);
     if(kw==='done')       return done.length>0;
-    if(kw==='overdue')    return pending.some(t=>t.due&&t.due<today);
-    if(kw==='due today')  return pending.some(t=>t.due===today);
+    if(kw==='overdue')    return (e.todos||[]).some(t => !t.done && t.due && t.due < today);
+    if(kw==='due today')  return (e.todos||[]).some(t => !t.done && t.due === today);
     if(kw==='has task')   return todos.length>0;
     if(kw==='no tasks')   return todos.length===0;
     if(kw==='no notes')   return(e.notes||'').trim().length===0;
@@ -2883,15 +2901,33 @@ function buildEntryRow(e){
   const title=(e.titles||[]).find(t=>t.text)?.text||'Untitled session';
   const today=new Date().toISOString().split('T')[0];
   const isToday=e.date===today;
-  const preview=e.notes?e.notes.replace(/\n/g,' ').substring(0,80):(e.todos||[]).length?`${(e.todos||[]).length} task${(e.todos||[]).length!==1?'s':''} · ${(e.todos||[]).filter(t=>t.done).length} done`:'No notes';
-  let badges='';
-  if(e.pinned)badges+=`<span style="font-size:11px">📌</span>`;
-  if(e.mood)badges+=`<span style="font-size:11px">${moodEmo(e.mood)}</span>`;
-  if(e.rating)badges+=`<span class="er-badge" style="background:var(--accent-dim);color:var(--accent)">★${e.rating}</span>`;
-  const pend=(e.todos||[]).filter(t=>!t.done).length;
-  if(pend)badges+=`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">${pend}</span>`;
-  if((e.youtubes||[]).length)badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">▶${e.youtubes.length}</span>`;
-  if((e.files||[]).length)badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">📎${e.files.length}</span>`;
+const todos = e.todos || [];
+const pendingCount = todos.filter(t => !t.done).length;
+let preview = '';
+if (e.notes) {
+  preview = e.notes.replace(/\n/g,' ').substring(0,80);
+} else if (todos.length) {
+  const doneCount = todos.filter(t => t.done).length;
+  // Show first incomplete task (strikethrough if done) or first task if all done
+  const firstTask = todos[0];
+  if (firstTask) {
+    const taskText = firstTask.text.length > 50 ? firstTask.text.substring(0,47)+'…' : firstTask.text;
+    preview = firstTask.done ? `<span style="text-decoration:line-through;opacity:0.7">✓ ${esc(taskText)}</span>` : `${esc(taskText)}`;
+    if (todos.length > 1) preview += ` +${todos.length-1} more`;
+  } else {
+    preview = `${todos.length} task${todos.length!==1?'s':''} · ${doneCount} done`;
+  }
+} else {
+  preview = 'No notes';
+}
+let badges='';
+if(e.pinned) badges+=`<span style="font-size:11px">📌</span>`;
+if(e.mood) badges+=`<span style="font-size:11px">${moodEmo(e.mood)}</span>`;
+if(e.rating) badges+=`<span class="er-badge" style="background:var(--accent-dim);color:var(--accent)">★${e.rating}</span>`;
+const pend = (e.todos||[]).filter(t=>!t.done).length;
+if(pend) badges+=`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">${pend}</span>`;
+if((e.youtubes||[]).length) badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">▶${e.youtubes.length}</span>`;
+if((e.files||[]).length) badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">📎${e.files.length}</span>`;
   const dateLabel=isToday?'Today':`${d.getDate()} ${MSHORT[d.getMonth()]}`;
   const iconHTML=isSel
     ? '<div style="width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;background:var(--accent);margin:10px 11px;flex-shrink:0;border:2px solid rgba(255,255,255,.3)">✓</div>'
@@ -3805,7 +3841,7 @@ function resetFilters(){activeSubjs=[];activeTagFilters=[];activeNav='all';docum
 /* ── STATS ── */
 function updateNavCounts(){const t=new Date().toISOString().split('T')[0],w=new Date(Date.now()-7*864e5).toISOString().split('T')[0];document.getElementById('navAllCnt').textContent=entries.length;document.getElementById('navPinCnt').textContent=entries.filter(e=>e.pinned).length;document.getElementById('navTodayCnt').textContent=entries.filter(e=>e.date===t).length;document.getElementById('navWeekCnt').textContent=entries.filter(e=>e.date>=w).length;}
 function updateStats(){
-  const w=new Date(Date.now()-7*864e5).toISOString().split('T')[0];const tw=entries.filter(e=>e.date>=w).length,st=calcStreak();const pT=entries.reduce((a,e)=>a+(e.todos||[]).filter(t=>!t.done).length,0);
+  const w=new Date(Date.now()-7*864e5).toISOString().split('T')[0];const tw=entries.filter(e=>e.date>=w).length,st=calcStreak();const pT = entries.reduce((a,e) => a + (e.todos||[]).filter(t => !t.done).length, 0);
   const el=document.getElementById('sideStats');if(el)el.innerHTML=`<div class="sb-stat"><div class="sb-stat-n">${entries.length}</div><div class="sb-stat-l">Entries</div></div><div class="sb-stat"><div class="sb-stat-n">${tw}</div><div class="sb-stat-l">This week</div></div><div class="sb-stat"><div class="sb-stat-n">${st}</div><div class="sb-stat-l">Streak</div></div><div class="sb-stat"><div class="sb-stat-n">${new Set(entries.map(e=>e.subject)).size}</div><div class="sb-stat-l">Subjects</div></div>`;
   const sE=document.getElementById('statusEntries');if(sE)sE.textContent=entries.length+' entr'+(entries.length!==1?'ies':'y');
   const sS=document.getElementById('statusStreak');if(sS)sS.textContent=st+' streak';
@@ -3833,7 +3869,11 @@ if(e.key==='Escape'){if(ytOpen){closeYTPopup();return;}if(cmdOpen){closeCmd();re
   if(e.altKey&&(e.key==='n'||e.key==='N')){e.preventDefault();openModal();return;}
 if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
   e.preventDefault();
-  expandAndFocusSearch();   // uses the function defined above
+  const searchInput = document.getElementById('searchInp');
+  if (searchInput) {
+    searchInput.focus();
+    searchInput.select();
+  }
   return;
 }
   if((e.ctrlKey||e.metaKey)&&e.key==='e'){e.preventDefault();exportAll();return;}
