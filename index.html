@@ -1719,12 +1719,14 @@ function applyTombstones(list) {
 async function ghFetch(method, path, body) {
   if (!ghToken) return null;
   try {
-    const opts = {
+const opts = {
       method,
+      cache: 'no-store',
       headers: {
         Authorization: `token ${ghToken}`,
         Accept: 'application/vnd.github.v3+json',
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
       },
     };
     if (body !== undefined) opts.body = JSON.stringify(body);
@@ -1828,16 +1830,29 @@ async function loadFromGist() {
     if (!gistId) return null;
     const gist = await ghFetch('GET', `/gists/${gistId}`);
     if (!gist || !gist.files) return null;
-    // Load entries data
+// Build hash-free raw URL — raw_url contains a commit hash that GitHub CDN caches
+    // Hash-free format always returns the latest committed version
+    const ghUser = localStorage.getItem('slp_gh_user');
+    function latestRaw(filename) {
+      if (ghUser && gistId) {
+        return `https://gist.githubusercontent.com/${ghUser}/${gistId}/raw/${filename}?t=${Date.now()}`;
+      }
+      // fallback: strip commit hash from raw_url
+      const f = gist.files[filename];
+      if (!f) return null;
+      return f.raw_url.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/') + '?t=' + Date.now();
+    }
     let data = null;
-    if (gist.files[GIST_FILENAME]?.raw_url) {
-    const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-    if (res.ok) data = await res.json();
+    const entriesUrl = latestRaw(GIST_FILENAME);
+    if (entriesUrl) {
+      const res = await fetch(entriesUrl, { cache: 'no-store' });
+      if (res.ok) data = await res.json();
     }
     // Load routine if present
-    if (gist.files[ROUTINE_FILENAME]?.raw_url) {
+    if (gist.files[ROUTINE_FILENAME]) {
       try {
-        const res = await fetch(gist.files[ROUTINE_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
+        const routineUrl = latestRaw(ROUTINE_FILENAME);
+        const res = await fetch(routineUrl, { cache: 'no-store' });
         if (res.ok) {
           const r = await res.json();
           if (r.meta && r.subjects && r.schedule) {
@@ -1948,6 +1963,7 @@ async function syncNow() {
     return;
   }
 
+  ghSyncing = false; // clear any stuck flag from background operations
   setSyncStatus('syncing', 'Syncing...');
 
   // 1. PULL first — so we never overwrite cloud-only entries
