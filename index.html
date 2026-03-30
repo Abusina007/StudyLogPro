@@ -3738,79 +3738,51 @@ function initDetailDrag() {
   const panel   = document.querySelector('.detail-panel');
   if (!panel || !overlay) return;
 
-  /* ── state ── */
-  let startY = 0, dragY = 0, dragging = false, isFS = false;
+  let startY = 0, dragY = 0, dragging = false;
   let tid = null, rafId = null;
 
-  /* ── helpers ── */
   const dpBody  = () => document.getElementById('dpBody');
-  const getRow  = () => detailId
-    ? document.querySelector(`.entry-row[data-id="${detailId}"]`) : null;
-  const resist  = d => d < 55 ? d : 55 + (d - 55) * 0.26;
   const blocked = el => !!el.closest('button,a,input,select,textarea');
 
-  /* ── hard-reset all state (called whenever panel closes) ── */
-  function hardReset() {
-    isFS = false; dragging = false;
-    dragY = 0; startY = 0; tid = null;
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  function resist(d) {
+    return d < 0 ? 0 : d / (1 + d * 0.012);
   }
 
-  /* watch overlay class so state resets even if panel is closed via
-     back-button, backdrop-tap, keyboard Esc, etc. */
+  function hardReset() {
+    dragging = false; dragY = 0; startY = 0; tid = null;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    panel.style.transition = '';
+    panel.style.transform  = '';
+    panel.style.opacity    = '';
+    overlay.style.transition = '';
+    overlay.style.opacity  = '';
+  }
+
   new MutationObserver(() => {
     if (!overlay.classList.contains('open')) hardReset();
   }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
 
-  /* ── fullscreen helpers ── */
-  function goFS() {
-    if (isFS) return;
-    isFS = true;
-    panel.style.transition = 'border-radius .3s ease, max-height .35s cubic-bezier(.4,0,.2,1)';
-    panel.classList.add('dp-fs');
-    overlay.classList.add('dp-fs-ov');
-    setTimeout(() => { panel.style.transition = ''; }, 360);
-  }
-
-  function exitFS() {
-    if (!isFS) return;
-    isFS = false;
-    panel.style.transition = 'border-radius .3s ease, max-height .35s cubic-bezier(.4,0,.2,1)';
-    panel.classList.remove('dp-fs');
-    overlay.classList.remove('dp-fs-ov');
-    setTimeout(() => { panel.style.transition = ''; }, 360);
-    const b = dpBody();
-    if (b) b.scrollTop = 0;
-  }
-
-  /* ── animation helpers ── */
   function springBack() {
-    panel.style.transition = 'transform .46s cubic-bezier(.34,1.56,.64,1), opacity .3s ease, border-radius .3s ease';
-    panel.style.transform  = '';
-    panel.style.opacity    = '';
-    overlay.style.transition = 'opacity .3s ease';
-    overlay.style.opacity  = '';
-    overlay.style.removeProperty('--ov-alpha');
+    panel.style.transition   = 'transform .42s cubic-bezier(.34,1.4,.64,1), opacity .28s ease';
+    panel.style.transform    = '';
+    panel.style.opacity      = '';
+    overlay.style.transition = 'opacity .28s ease';
+    overlay.style.opacity    = '';
     setTimeout(() => {
       panel.style.transition   = '';
-      panel.style.transform    = '';
-      panel.style.opacity      = '';
       overlay.style.transition = '';
-    }, 470);
+    }, 450);
   }
 
   function dismiss() {
-    const row = getRow();
-    panel.style.transition   = 'transform .28s cubic-bezier(.4,0,1,1), opacity .22s ease';
+    const row = detailId ? document.querySelector(`.entry-row[data-id="${detailId}"]`) : null;
+    panel.style.transition   = 'transform .26s cubic-bezier(.4,0,1,1), opacity .2s ease';
     panel.style.transform    = 'translateY(110%)';
     panel.style.opacity      = '0';
-    overlay.style.transition = 'opacity .25s ease';
+    overlay.style.transition = 'opacity .22s ease';
     overlay.style.opacity    = '0';
-    overlay.style.removeProperty('--ov-alpha');
     setTimeout(() => {
       hardReset();
-      panel.classList.remove('dp-fs');
-      overlay.classList.remove('dp-fs-ov');
       closeDetailPanel();
       if (row) {
         row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -3819,73 +3791,9 @@ function initDetailDrag() {
         row.classList.add('dp-land-flash');
         setTimeout(() => row.classList.remove('dp-land-flash'), 900);
       }
-    }, 290);
+    }, 270);
   }
 
-  /* ── drag core ── */
-  function startDrag(y, touchId = null) {
-    tid = touchId; startY = y; dragY = 0; dragging = true;
-    panel.style.transition   = 'none';
-    overlay.style.transition = 'none';
-  }
-
-  function moveDrag(y) {
-    if (!dragging) return;
-    const dy = y - startY;
-    const b  = dpBody();
-    const atTop = !b || b.scrollTop <= 2;
-
-    /* swipe UP → go fullscreen (only when body is at top) */
-    if (dy < -50 && !isFS && atTop) {
-      goFS();
-      dragging = false;
-      return;
-    }
-
-    /* in fullscreen, swipe DOWN at scroll-top → exit fullscreen */
-    if (isFS && dy > 60 && atTop) {
-      exitFS();
-      dragging = false;
-      startY = y;   /* rebase so a continued drag can dismiss normally */
-      return;
-    }
-
-    /* if body is scrolled, don't hijack unless touch is on handle/header */
-    if (!atTop) { dragging = false; return; }
-
-    if (dy <= 0) { dragY = 0; return; }
-    dragY = dy;
-
-    if (!rafId) rafId = requestAnimationFrame(() => {
-      rafId = null;
-      const vis = resist(dragY);
-      const r   = Math.min(dragY / 120, 1);
-      panel.style.transform    = `translateY(${vis}px)`;
-      panel.style.opacity      = String(Math.max(0.6, 1 - r * 0.35));
-      panel.style.borderRadius = isFS ? '0' : `${18 + r * 6}px ${18 + r * 6}px 0 0`;
-      overlay.style.setProperty('--ov-alpha', Math.max(0.08, 0.65 - r * 0.57));
-    });
-  }
-
-  function endDrag() {
-    if (!dragging) return;
-    dragging = false; tid = null;
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    overlay.style.removeProperty('--ov-alpha');
-    if (dragY > 100) dismiss();
-    else springBack();
-    dragY = 0;
-  }
-
-  function cancelDrag() {
-    if (!dragging) return;
-    dragging = false; dragY = 0; tid = null;
-    springBack();
-  }
-
-  /* ── which targets can start a drag ──
-     Handle/header: always.
-     Body content: only when body is scrolled to top. */
   function canStart(el) {
     if (blocked(el)) return false;
     const b = dpBody();
@@ -3894,10 +3802,58 @@ function initDetailDrag() {
     return true;
   }
 
-  /* ── TOUCH — listen on entire panel ── */
+  function onStart(y, touchId = null) {
+    tid = touchId; startY = y; dragY = 0; dragging = true;
+    panel.style.transition   = 'none';
+    overlay.style.transition = 'none';
+  }
+
+  function onMove(y) {
+    if (!dragging) return;
+    const dy  = y - startY;
+    const b   = dpBody();
+    const atTop = !b || b.scrollTop <= 2;
+
+    // Only allow downward drag; ignore upward
+    if (dy <= 0) {
+      if (dragY > 0) {
+        dragY = 0;
+        panel.style.transform = '';
+        panel.style.opacity   = '';
+      }
+      return;
+    }
+
+    // If body is scrolled, only allow drag from handle/header
+    if (!atTop) { dragging = false; return; }
+
+    dragY = dy;
+
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      const vis = resist(dragY);
+      const r   = Math.min(dragY / 160, 1);
+      panel.style.transform    = `translateY(${vis}px)`;
+      panel.style.opacity      = String(Math.max(0.55, 1 - r * 0.45));
+      overlay.style.opacity    = String(Math.max(0.05, 0.65 - r * 0.60));
+    });
+  }
+
+  function onEnd() {
+    if (!dragging) return;
+    dragging = false; tid = null;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    overlay.style.opacity = '';
+    if (dragY > 110) dismiss();
+    else springBack();
+    dragY = 0;
+  }
+
+  // Touch
   panel.addEventListener('touchstart', e => {
     if (!canStart(e.target)) return;
-    startDrag(e.touches[0].clientY, e.touches[0].identifier);
+    onStart(e.touches[0].clientY, e.touches[0].identifier);
   }, { passive: true });
 
   panel.addEventListener('touchmove', e => {
@@ -3905,25 +3861,22 @@ function initDetailDrag() {
     const t = [...e.touches].find(x => x.identifier === tid);
     if (!t) return;
     const dy = t.clientY - startY;
-    /* only preventDefault once we're clearly dragging to avoid killing scroll */
-    if (Math.abs(dy) > 10) e.preventDefault();
-    moveDrag(t.clientY);
+    if (dy > 8) e.preventDefault();
+    onMove(t.clientY);
   }, { passive: false });
 
-  panel.addEventListener('touchend',    endDrag,    { passive: true });
-  panel.addEventListener('touchcancel', cancelDrag, { passive: true });
+  panel.addEventListener('touchend',    onEnd, { passive: true });
+  panel.addEventListener('touchcancel', onEnd, { passive: true });
+  window.addEventListener('touchend', () => { if (dragging) onEnd(); }, { passive: true });
 
-  /* safety net: touchend on window catches finger lifted outside panel */
-  window.addEventListener('touchend', () => { if (dragging) endDrag(); }, { passive: true });
-
-  /* ── MOUSE (desktop fallback) ── */
+  // Mouse (desktop)
   panel.addEventListener('mousedown', e => {
     if (!canStart(e.target)) return;
-    startDrag(e.clientY);
+    onStart(e.clientY);
     e.preventDefault();
   });
-  window.addEventListener('mousemove', e => { if (dragging) moveDrag(e.clientY); });
-  window.addEventListener('mouseup',   () => { if (dragging) endDrag(); });
+  window.addEventListener('mousemove', e => { if (dragging) onMove(e.clientY); });
+  window.addEventListener('mouseup',   () => { if (dragging) onEnd(); });
 }
 
 /* ── MISC ── */
