@@ -1,5 +1,5 @@
 # StudyLog Pro – Academic Journal & Study Tracker
-
+Link: https://abusina007.github.io/StudyLogPro/
 A powerful, offline-first web app to log your academic life – classes, tasks, media, and notes.  
 Designed for engineering students with semester‑wise routines, batch scheduling, and GitHub sync.
 
