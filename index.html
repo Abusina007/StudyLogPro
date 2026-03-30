@@ -312,13 +312,31 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .entry-row.selected .er-icon {
   background: var(--accent) !important;
   color: #fff !important;
-  font-size: 20px !important;
+  font-size: 0 !important;
   font-weight: 900 !important;
   animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 @keyframes checkPop {
   from { transform: scale(0) rotate(-30deg); opacity:0; }
   to   { transform: scale(1) rotate(0deg);   opacity:1; }
+}
+/* When an entry is selected, change its left accent strip to the theme accent */
+.entry-row.selected .er-accent {
+  background: var(--accent) !important;
+}
+
+/* For week‑folder view, change the dot color */
+.wf-entry.selected .wf-e-dot {
+  background: var(--accent) !important;
+}
+
+/* For grid cards, change the subject badge background */
+.entry-card.selected .card-subj-badge {
+  background: var(--accent) !important;
+  color: #fff !important;
 }
 
 /* Toolbar selection mode (replaces entire toolbar) */
@@ -836,7 +854,11 @@ input[type=date]{color-scheme:dark}
 .entry-row{display:flex;align-items:center;gap:0;cursor:pointer;border-bottom:1px solid var(--border);background:var(--panel);transition:background var(--tr-fast);position:relative}
 .entry-row:last-child{border-bottom:none}
 .entry-row:hover{background:var(--panel2)}
-.entry-row.selected{background:var(--accent-dim2)!important}
+.entry-row.selected {
+  background: rgba(47,129,247,.12) !important;
+  border-left: 4px solid var(--accent) !important;
+  position: relative;
+}
 .entry-row.pinned .er-accent{background:var(--amber)!important}
 .er-accent{width:3px;align-self:stretch;flex-shrink:0}
 .er-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;font-family:var(--mono);flex-shrink:0;margin:10px 11px;letter-spacing:.3px}
@@ -853,7 +875,7 @@ input[type=date]{color-scheme:dark}
 .detail-overlay{position:fixed;inset:0;z-index:700;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
 .detail-overlay.open{opacity:1;visibility:visible}
 .detail-overlay::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,var(--ov-alpha,.65));backdrop-filter:blur(var(--ov-blur,4px));transition:background .3s ease,backdrop-filter .3s ease}
-.detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;max-height:55vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(50px);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;min-height: 500px;max-height:55vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(50px);transition:transform .28s cubic-bezier(.4,0,.2,1)}
 .detail-overlay.open .detail-panel{transform:none}
 @media(min-width:720px){.detail-overlay{align-items:center}.detail-panel{border-radius:18px;max-height:88vh;margin:20px}}
 .dp-handle{width:36px;height:4px;background:var(--border3);border-radius:2px;margin:10px auto 0;flex-shrink:0;padding:12px 24px;background-clip:content-box;box-sizing:content-box;cursor:grab;}
@@ -878,7 +900,7 @@ input[type=date]{color-scheme:dark}
 .dp-topic-n{width:22px;height:22px;background:var(--accent-dim);color:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
 .dp-topic-t{flex:1;font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dp-topic-l{font-size:11px;color:var(--accent);text-decoration:none;flex-shrink:0}
-.dp-notes-box{font-size:13.5px;color:var(--text2);line-height:1.85;white-space:pre-wrap;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:13px 15px}
+.dp-notes-box{font-size:13.5px;color:var(--text2);line-height:1.85;white-space:pre-wrap;word-break: break-word;overflow-wrap: break-word;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:13px 15px; max-width: 100%;}
 .dp-todo{display:flex;align-items:center;gap:9px;padding:8px 11px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:4px;transition:opacity .3s}
 .dp-todo.done{opacity:.5}
 .dp-todo-chk{width:19px;height:19px;border-radius:50%;border:2px solid var(--border3);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .22s;flex-shrink:0;color:transparent}
@@ -1303,6 +1325,68 @@ input.date-inp,
 }
 .detail-overlay.dp-fs-ov {
   align-items: stretch !important;
+}
+.modal-tab-slide-left {
+  animation: slideFromRight 0.28s cubic-bezier(.4,0,.2,1) both;
+}
+.modal-tab-slide-right {
+  animation: slideFromLeft 0.28s cubic-bezier(.4,0,.2,1) both;
+}
+
+@keyframes slideFromRight {
+  from { opacity: 0; transform: translateX(48px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes slideFromLeft {
+  from { opacity: 0; transform: translateX(-48px); }
+  to   { opacity: 1; transform: none; }
+}
+.er-icon.er-icon-selected {
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+}
+.entry-row.selected .er-icon::before {
+  content: "✓";
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* ─── Grid Card Selection ─────────────────────────────────── */
+.entry-card.selected {
+  border: 2px solid var(--accent) !important;
+  background: rgba(47,129,247,.08) !important;
+  position: relative;
+}
+
+.entry-card.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+
+/* ─── Week Folder Entry Selection ─────────────────────────── */
+.wf-entry.selected {
+  background: rgba(47,129,247,.12) !important;
+  border-left: 4px solid var(--accent) !important;
+}
+
+.wf-entry.selected .wf-e-dot {
+  background: var(--accent) !important;
 }
 </style>
 </head>
@@ -2508,6 +2592,82 @@ if (ghToken) {
   initDetailDrag();
   // At the very end of init() function, add:
 reinitToolbarSearch();
+initModalSwipe();
+}
+function initModalSwipe() {
+  const modal = document.getElementById('entryModal');
+  if (!modal) return;
+  
+  const tabs = ['main', 'todos', 'media', 'meta'];
+  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+  let isSwiping = false;
+  let swipeThreshold = 50;   // minimum horizontal distance for a swipe
+  let maxVertical = 30;      // maximum allowed vertical drift
+  
+  modal.addEventListener('touchstart', function(e) {
+    // Only consider touches on the modal content area (not on buttons, inputs, etc.)
+    if (e.target.closest('input, textarea, select, button, .m-tab, .m-close')) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+    isSwiping = true;
+  }, { passive: true });
+  
+  modal.addEventListener('touchmove', function(e) {
+    if (!isSwiping) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = Math.abs(e.touches[0].clientY - touchStartY);
+    // If vertical drift exceeds threshold, cancel swipe
+    if (dy > maxVertical) {
+      isSwiping = false;
+      return;
+    }
+    // Optionally, prevent page scroll if horizontal swipe is detected
+    if (Math.abs(dx) > 10) {
+      e.preventDefault();   // stop scrolling while swiping horizontally
+    }
+  }, { passive: false });
+  
+  modal.addEventListener('touchend', function(e) {
+    if (!isSwiping) return;
+    isSwiping = false;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+    const dt = Date.now() - touchStartTime;
+    
+    // Valid swipe: horizontal distance > threshold, vertical drift low, time < 500ms
+    if (Math.abs(dx) > swipeThreshold && dy < maxVertical && dt < 500) {
+      // Determine direction: left (dx < 0) -> next tab, right (dx > 0) -> previous tab
+      const direction = dx < 0 ? 'next' : 'prev';
+      
+      // Find current active tab index
+      let activeIndex = -1;
+      for (let i = 0; i < tabs.length; i++) {
+        const body = document.getElementById('tab-' + tabs[i]);
+        if (body && body.classList.contains('active')) {
+          activeIndex = i;
+          break;
+        }
+      }
+      if (activeIndex === -1) return;
+      
+      let newIndex;
+      if (direction === 'next') {
+        newIndex = activeIndex + 1;
+        if (newIndex >= tabs.length) return;
+      } else {
+        newIndex = activeIndex - 1;
+        if (newIndex < 0) return;
+      }
+      
+      const newTab = tabs[newIndex];
+      const newBtn = document.getElementById('tab-btn-' + newTab);
+      if (newBtn) {
+        // Call switchTab with direction for animation
+        switchTab(newTab, newBtn, direction === 'next' ? 'left' : 'right');
+      }
+    }
+  });
 }
 
 /* ══════════════════════════════════
@@ -2609,10 +2769,12 @@ async function toggleCardTodo(eid,tid) {
    MOOD / RATING
 ══════════════════════════════════ */
 function setMood(m) {
-  // Toggle selection: if already selected, clear it; otherwise set it.
-  formMood = formMood === m ? '' : m;
-
-  // Update all mood buttons: add 'on' class only to the currently selected mood.
+  if (formMood === m) {
+    formMood = '';                     // deselect
+  } else {
+    formMood = m;                      // select new
+  }
+  // Update all mood elements
   document.querySelectorAll('[data-mood]').forEach(el => {
     if (el.dataset.mood === formMood) {
       el.classList.add('on');
@@ -2622,6 +2784,18 @@ function setMood(m) {
   });
 }
 
+function toggleRatingSlider() {
+  const chk = document.getElementById('ratingChk');
+  formRatingOn = chk.checked;
+  const wrap = document.getElementById('ratingSliderWrap');
+  if (wrap) {
+    if (formRatingOn) {
+      wrap.classList.remove('hidden');
+    } else {
+      wrap.classList.add('hidden');
+    }
+  }
+}
 /* ══════════════════════════════════
    SMART SEARCH
 ══════════════════════════════════ */
@@ -2858,9 +3032,13 @@ function setNav(n){
   document.getElementById('nav-'+n)?.classList.add('active');
   applyFilters();
 }
-function applyFilters(){
-  const q=document.getElementById('searchInp').value,from=document.getElementById('dateFrom').value,to=document.getElementById('dateTo').value,sort=document.getElementById('sortSel').value;
-  const today=new Date().toISOString().split('T')[0],weekAgo=new Date(Date.now()-7*864e5).toISOString().split('T')[0];
+function applyFilters() {
+  const q = document.getElementById('searchInp')?.value || '';
+  const from = document.getElementById('dateFrom')?.value || '';
+  const to = document.getElementById('dateTo')?.value || '';
+  const sort = document.getElementById('sortSel')?.value || 'desc';
+  const today = new Date().toISOString().split('T')[0];
+  const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().split('T')[0];
   let f=entries.filter(e=>{
     if(activeNav==='pinned'&&!e.pinned)return false;
     if(activeNav==='today'&&e.date!==today)return false;
@@ -2928,13 +3106,13 @@ function renderList(items){
   }
   c.innerHTML=ctrlBar+listHTML;
 c.querySelectorAll('.entry-row').forEach(el=>{
-  el.addEventListener('click',ev=>{
-    if(selIds.size > 0 || ev.ctrlKey || ev.metaKey){
-      toggleSel(el.dataset.id);
-      return;
-    }
-    openDetailPanel(el.dataset.id);
-  });
+el.addEventListener('click', ev => {
+  if (selIds.size > 0 || ev.ctrlKey || ev.metaKey) {
+    toggleSel(el.dataset.id);
+    return;
+  }
+  openDetailPanel(el.dataset.id);
+});
   el.addEventListener('contextmenu',ev=>{
     ev.preventDefault();
     if(selIds.size === 0) showCtx(ev,el.dataset.id);
@@ -2952,11 +3130,12 @@ function buildEntryRow(e){
 const todos = e.todos || [];
 const pendingCount = todos.filter(t => !t.done).length;
 let preview = '';
+let isTodoPreview = false;
 if (e.notes) {
   preview = e.notes.replace(/\n/g,' ').substring(0,80);
 } else if (todos.length) {
+  isTodoPreview = true;
   const doneCount = todos.filter(t => t.done).length;
-  // Show first incomplete task (strikethrough if done) or first task if all done
   const firstTask = todos[0];
   if (firstTask) {
     const taskText = firstTask.text.length > 50 ? firstTask.text.substring(0,47)+'…' : firstTask.text;
@@ -2977,9 +3156,9 @@ if(pend) badges+=`<span class="er-badge" style="background:var(--amber-bg);color
 if((e.youtubes||[]).length) badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">▶${e.youtubes.length}</span>`;
 if((e.files||[]).length) badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">📎${e.files.length}</span>`;
   const dateLabel=isToday?'Today':`${d.getDate()} ${MSHORT[d.getMonth()]}`;
-  const iconHTML=isSel
-    ? '<div style="width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;background:var(--accent);margin:10px 11px;flex-shrink:0;border:2px solid rgba(255,255,255,.3)">✓</div>'
-    : `<div class="er-icon" style="background:${isSel?'#2f81f7':s.bg};color:${isSel?'#ffffff':s.color};font-size:${isSel?'20px':'9.5px'};font-weight:${isSel?'900':'800'}">${isSel?'&#10003;':e.subject.slice(0,4)}</div>`;
+const iconHTML = `<div class="er-icon" style="background:${isSel ? 'var(--accent)' : s.bg}; color:${isSel ? '#fff' : s.color}">
+  ${isSel ? '✓' : e.subject.slice(0,4)}
+</div>`;
   return `<div class="entry-row${e.pinned?' pinned':''}${isSel?' selected':''}" data-id="${e.id}" style="${isSel?'background:rgba(47,129,247,.25)!important;border-left:3px solid var(--accent);box-shadow:inset 0 0 0 1.5px rgba(47,129,247,.5);':''}">
     <div class="er-accent" style="background:${s.color}"></div>
     ${iconHTML}
@@ -2990,7 +3169,7 @@ if((e.files||[]).length) badges+=`<span class="er-badge" style="background:var(-
       </div>
       <div style="font-size:11px;font-weight:600;color:${s.color};margin-bottom:2px;letter-spacing:.1px;line-height:1.3">${esc(s.label)}${e.time?` <span style="font-weight:400;color:var(--text3);font-size:10px">· ${esc(e.time)}</span>`:''}</div>
       <div class="er-bottom">
-        <span class="er-preview">${esc(preview)}</span>
+        <span class="er-preview">${isTodoPreview ? preview : esc(preview)}</span>
         <div class="er-badges">${badges}</div>
       </div>
     </div>
@@ -3108,13 +3287,13 @@ function refreshDayPanelBody(){
   if(!dayEntries.length){list.innerHTML=`<div class="empty-state"><div class="empty-ico">📅</div><h3>No entries for this day</h3><p>Tap "Add Entry" to log something.</p></div>`;return;}
 list.innerHTML=`<div class="entry-rows-wrap"><div class="entry-rows">${dayEntries.map(buildEntryRow).join('')}</div></div>`;
 list.querySelectorAll('.entry-row').forEach(el=>{
-  el.addEventListener('click',ev=>{
-    if(selIds.size > 0 || ev.ctrlKey || ev.metaKey){
-      toggleSel(el.dataset.id);
-      return;
-    }
-    openDetailPanel(el.dataset.id);
-  });
+el.addEventListener('click', ev => {
+  if (selIds.size > 0 || ev.ctrlKey || ev.metaKey) {
+    toggleSel(el.dataset.id);
+    return;
+  }
+  openDetailPanel(el.dataset.id);
+});
   el.addEventListener('contextmenu',ev=>{
     ev.preventDefault();
     if(selIds.size === 0) showCtx(ev,el.dataset.id);
@@ -3196,13 +3375,13 @@ const rows = weekItems.map(e=>{
     </div>`;
   }).join('')}</div>`;
 c.querySelectorAll('.wf-entry').forEach(el=>{
-  el.addEventListener('click',ev=>{
-    if(selIds.size > 0 || ev.ctrlKey || ev.metaKey){
-      toggleSel(el.dataset.id);
-      return;
-    }
-    openDetailPanel(el.dataset.id);
-  });
+el.addEventListener('click', ev => {
+  if (selIds.size > 0 || ev.ctrlKey || ev.metaKey) {
+    toggleSel(el.dataset.id);
+    return;
+  }
+  openDetailPanel(el.dataset.id);
+});
 });
 }
 /* ── CALENDAR ── */
@@ -3321,38 +3500,110 @@ function renderStats(){
 /* ══════════════════════════════════
    MODAL
 ══════════════════════════════════ */
-function switchTab(tab,btn){document.querySelectorAll('.m-body.tab').forEach(el=>el.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');document.querySelectorAll('.m-tab').forEach(el=>el.classList.remove('active'));btn.classList.add('active');}
-function openModal(id=null,dateOverride=null){
-  editId=id;formYTs=[];formFiles=[];formTags=[];formTodos=[];formMood='';formRating=7;formRatingOn=false;selSubj='OTHER';selTime='';
-  document.getElementById('modalTitle').textContent=id?'Edit Entry':'New Entry';
-  ['titlesList','ytFormRows','filePrevs','todoFormList'].forEach(x=>document.getElementById(x).innerHTML='');
-  document.getElementById('fNotes').value='';document.getElementById('notesStats').textContent='0 words';
-  document.getElementById('tagInp').value='';document.getElementById('ratingInp').value=7;document.getElementById('ratingVal').textContent='7';
-  document.getElementById('reviewDate').value='';document.getElementById('todoInp').value='';document.getElementById('todoDueInp').value='';
-  document.getElementById('ratingChk').checked=false;document.getElementById('ratingSliderWrap').classList.add('hidden');
-  document.querySelectorAll('[data-mood]').forEach(el=>el.classList.remove('on'));
-  renderTags();populateTagSuggestions();switchTab('main',document.getElementById('tab-btn-main'));
-  document.getElementById('fDate').value=dateOverride||new Date().toISOString().split('T')[0];
-  document.getElementById('fBatch').value='G1';
-  if(id){
-    const e=entries.find(x=>x.id===id);if(!e)return;
-    document.getElementById('fDate').value=e.date;document.getElementById('fBatch').value=e.batch||'G1';
-    document.getElementById('fNotes').value=e.notes||'';onNotesInput();
-    (e.titles||[]).forEach(t=>addTitleRow(t.text,t.url));
-    formYTs=[...(e.youtubes||[])];formYTs.forEach(y=>addYTPreview(y));
-    formFiles=(e.files||[]).map(f=>({...f}));renderFilePrevs();
-    formTags=[...(e.tags||[])];renderTags();populateTagSuggestions();
-    formTodos=(e.todos||[]).map(t=>({...t}));renderFormTodos();
-    formMood=e.mood||'';setMood(formMood);
-    formRatingOn=!!e.rating;formRating=e.rating||7;
-    document.getElementById('ratingChk').checked=formRatingOn;
-    if(formRatingOn){document.getElementById('ratingSliderWrap').classList.remove('hidden');document.getElementById('ratingInp').value=formRating;document.getElementById('ratingVal').textContent=formRating;}
-    document.getElementById('reviewDate').value=e.reviewDate||'';
-    selSubj=e.subject||'OTHER';selTime=e.time||'';
-  }else{addTitleRow();}
+function switchTab(tab, btn, direction) {
+  // Remove active class from all bodies and tabs
+  document.querySelectorAll('.m-body.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.m-tab').forEach(el => el.classList.remove('active'));
+  
+  const targetBody = document.getElementById('tab-' + tab);
+  targetBody.classList.add('active');
+  btn.classList.add('active');
+  
+  // Apply slide animation if direction is provided
+  if (direction && targetBody) {
+    targetBody.classList.add(direction === 'left' ? 'modal-tab-slide-left' : 'modal-tab-slide-right');
+    // Remove the animation class after it finishes to allow reuse
+    targetBody.addEventListener('animationend', function onAnimEnd() {
+      targetBody.classList.remove('modal-tab-slide-left', 'modal-tab-slide-right');
+      targetBody.removeEventListener('animationend', onAnimEnd);
+    });
+  }
+}
+function openModal(id = null, dateOverride = null) {
+  editId = id;
+  formYTs = [];
+  formFiles = [];
+  formTags = [];
+  formTodos = [];
+  formMood = '';
+  formRating = 7;
+  formRatingOn = false;
+  selSubj = 'OTHER';
+  selTime = '';
+
+  // Reset UI elements
+  document.getElementById('modalTitle').textContent = id ? 'Edit Entry' : 'New Entry';
+  document.getElementById('titlesList').innerHTML = '';
+  document.getElementById('ytFormRows').innerHTML = '';
+  document.getElementById('filePrevs').innerHTML = '';
+  document.getElementById('todoFormList').innerHTML = '';
+  document.getElementById('fNotes').value = '';
+  document.getElementById('notesStats').textContent = '0 words';
+  document.getElementById('tagInp').value = '';
+  document.getElementById('ratingInp').value = 7;
+  document.getElementById('ratingVal').textContent = '7';
+  document.getElementById('reviewDate').value = '';
+  document.getElementById('todoInp').value = '';
+  document.getElementById('todoDueInp').value = '';
+  document.getElementById('ratingChk').checked = false;
+  document.getElementById('ratingSliderWrap').classList.add('hidden');
+  document.querySelectorAll('[data-mood]').forEach(el => el.classList.remove('on'));
+  renderTags();
+  populateTagSuggestions();
+  switchTab('main', document.getElementById('tab-btn-main'));
+
+  const date = dateOverride || new Date().toISOString().split('T')[0];
+  document.getElementById('fDate').value = date;
+  const batch = document.getElementById('fBatch').value;
+
+  if (id) {
+    // Editing: load existing data
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+    document.getElementById('fDate').value = e.date;
+    document.getElementById('fBatch').value = e.batch || 'G1';
+    document.getElementById('fNotes').value = e.notes || '';
+    onNotesInput();
+    (e.titles || []).forEach(t => addTitleRow(t.text, t.url));
+    formYTs = [...(e.youtubes || [])];
+    formYTs.forEach(y => addYTPreview(y));
+    formFiles = (e.files || []).map(f => ({ ...f }));
+    renderFilePrevs();
+    formTags = [...(e.tags || [])];
+    renderTags();
+    populateTagSuggestions();
+    formTodos = (e.todos || []).map(t => ({ ...t }));
+    renderFormTodos();
+    formMood = e.mood || '';
+    setMood(formMood);
+    formRatingOn = !!e.rating;
+    formRating = e.rating || 7;
+    document.getElementById('ratingChk').checked = formRatingOn;
+    if (formRatingOn) {
+      document.getElementById('ratingSliderWrap').classList.remove('hidden');
+      document.getElementById('ratingInp').value = formRating;
+      document.getElementById('ratingVal').textContent = formRating;
+    }
+    document.getElementById('reviewDate').value = e.reviewDate || '';
+    selSubj = e.subject || 'OTHER';
+    selTime = e.time || '';
+  } else {
+    // New entry: auto‑select the next unused subject
+    const next = getNextSubjectForDate(date, batch);
+    if (next) {
+      selSubj = next.subj;
+      selTime = next.time;
+    } else {
+      selSubj = 'OTHER';
+      selTime = '';
+    }
+  }
+
+  // Render schedule picker (this will also highlight the selected card)
   onDateChange();
+
   document.getElementById('entryModal').classList.add('open');
-  setTimeout(()=>document.getElementById('fDate').focus(),80);
+  setTimeout(() => document.getElementById('fDate').focus(), 80);
 }
 function closeModal() {
   document.getElementById('entryModal').classList.remove('open');
@@ -3367,16 +3618,73 @@ function closeModal() {
 }
 function addTitleRow(text='',url=''){const row=document.createElement('div');row.className='t-row';row.innerHTML=`<input class="t-title" placeholder="Session title…" value="${esc(text)}"><input class="t-url" placeholder="https:// (optional)" value="${esc(url)}"><button class="t-del" onclick="this.closest('.t-row').remove()">✕</button>`;document.getElementById('titlesList').appendChild(row);}
 function onNotesInput(){const v=document.getElementById('fNotes').value;const wc=wCount(v);document.getElementById('notesStats').textContent=`${wc}w · ${v.length}c · ~${Math.max(1,Math.ceil(wc/200))}min`;}
-function onDateChange(){renderSchedPicker(document.getElementById('fDate').value,document.getElementById('fBatch').value);}
-function renderSchedPicker(dateStr,batch){
-  const wrap=document.getElementById('schedPicker');
-  if(!dateStr){wrap.innerHTML='<div class="sch-empty">Select a date</div>';return;}
-  const d=new Date(dateStr+'T00:00:00'),dow=d.getDay();
-  if(dow===0||dow===6){wrap.innerHTML=`<div class="sch-holiday"><strong>🏖 ${DAYSFULL[dow]} – Weekend</strong>No classes.</div>`;selSubj='OTHER';selTime='';document.getElementById('modalSubjHint').textContent='Other';return;}
-  const all=(SCHEDULE[String(dow)]||[]),slots=all.filter(s=>s.batch==='both'||s.batch===batch||batch==='both');
-  if(!slots.length){wrap.innerHTML=`<div class="sch-empty">No classes for ${DAYSFULL[dow]}</div>`;return;}
-  wrap.innerHTML=`<div class="sch-day-title">Schedule – <span class="sch-day-pill">${DAYSFULL[dow]}</span></div><div class="sch-grid">${slots.map((sl,i)=>{const sub=SUBJECTS.find(x=>x.id===sl.subj)||{color:'#8b92a8',id:sl.subj};return`<div class="sch-card" id="sch_${i}" onclick="selectSch(${i},'${sl.subj}','${sl.time}')"><div class="sch-time-col"><div class="sch-t-main">${sl.time.split('–')[0]}</div><div class="sch-t-end">–${sl.time.split('–')[1]||''}</div></div><div class="sch-info"><div class="sch-subj-id" style="color:${sub.color}">${sl.subj}</div><div class="sch-subj-name">${sl.note}</div>${sl.room?`<div class="sch-room">${sl.room}</div>`:''}</div><div class="sch-side">${sl.batch!=='both'?`<span class="sch-batch">${sl.batch}</span>`:''}<span class="sch-sel-ico">✓</span></div></div>`;}).join('')}</div>`;
-  if(slots.length)selectSch(0,slots[0].subj,slots[0].time);
+function onDateChange() {
+  const date = document.getElementById('fDate').value;
+  const batch = document.getElementById('fBatch').value;
+
+  if (!editId) {
+    const next = getNextSubjectForDate(date, batch);
+    if (next) {
+      selSubj = next.subj;
+      selTime = next.time;
+    } else {
+      selSubj = 'OTHER';
+      selTime = '';
+    }
+  }
+
+  renderSchedPicker(date, batch);
+}
+function renderSchedPicker(dateStr, batch) {
+  const wrap = document.getElementById('schedPicker');
+  if (!dateStr) {
+    wrap.innerHTML = '<div class="sch-empty">Select a date</div>';
+    return;
+  }
+
+  const d = new Date(dateStr + 'T00:00:00');
+  const dow = d.getDay();
+  if (dow === 0 || dow === 6) {
+    wrap.innerHTML = `<div class="sch-holiday"><strong>🏖 ${DAYSFULL[dow]} – Weekend</strong>No classes.</div>`;
+    selSubj = 'OTHER';
+    selTime = '';
+    document.getElementById('modalSubjHint').textContent = 'Other';
+    return;
+  }
+
+  const all = (SCHEDULE[String(dow)] || []);
+  const slots = all.filter(s => s.batch === 'both' || s.batch === batch || batch === 'both');
+  if (!slots.length) {
+    wrap.innerHTML = `<div class="sch-empty">No classes for ${DAYSFULL[dow]}</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<div class="sch-day-title">Schedule – <span class="sch-day-pill">${DAYSFULL[dow]}</span></div>
+    <div class="sch-grid">
+      ${slots.map((sl, i) => {
+        const sub = SUBJECTS.find(x => x.id === sl.subj) || { color: '#8b92a8', id: sl.subj };
+        return `<div class="sch-card" data-subj="${sl.subj}" data-time="${sl.time}" id="sch_${i}" onclick="selectSch(${i},'${sl.subj}','${sl.time}')">
+          <div class="sch-time-col"><div class="sch-t-main">${sl.time.split('–')[0]}</div><div class="sch-t-end">–${sl.time.split('–')[1] || ''}</div></div>
+          <div class="sch-info"><div class="sch-subj-id" style="color:${sub.color}">${sl.subj}</div><div class="sch-subj-name">${sl.note}</div>${sl.room ? `<div class="sch-room">${sl.room}</div>` : ''}</div>
+          <div class="sch-side">${sl.batch !== 'both' ? `<span class="sch-batch">${sl.batch}</span>` : ''}<span class="sch-sel-ico">✓</span></div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // Highlight the card that matches the current selSubj/selTime
+  const cards = wrap.querySelectorAll('.sch-card');
+  cards.forEach(card => {
+    const subj = card.dataset.subj;
+    const time = card.dataset.time;
+    if (subj === selSubj && time === selTime) {
+      card.classList.add('selected');
+    }
+  });
+
+  // Update the subject hint in the modal footer
+  const sub = SUBJECTS.find(x => x.id === selSubj);
+  const hint = sub ? sub.label : selSubj;
+  document.getElementById('modalSubjHint').textContent = hint + (selTime ? ' · ' + selTime : '');
 }
 function selectSch(idx,subj,time){selSubj=subj;selTime=time;document.getElementById('fSubj').value=subj;document.getElementById('fTime').value=time;document.querySelectorAll('.sch-card').forEach((el,i)=>el.classList.toggle('selected',i===idx));const sub=SUBJECTS.find(x=>x.id===subj)||{label:subj};document.getElementById('modalSubjHint').textContent=sub.label+(time?' · '+time:'');}
 
@@ -3500,7 +3808,11 @@ async function togglePinSel() {
   clearSel(); // clears selection and restores toolbar
 }
 
-function toggleSel(id){selIds.has(id)?selIds.delete(id):selIds.add(id);updateSelBar();render();}
+function toggleSel(id) {
+  selIds.has(id) ? selIds.delete(id) : selIds.add(id);
+  updateSelBar();
+  render();
+}
 function clearSel() {
   selIds.clear();
   updateSelBar();
@@ -3697,6 +4009,17 @@ async function viewFile(eid,idx){
 function closeFV(){document.getElementById('fvOverlay').classList.remove('open');document.getElementById('fvContent').innerHTML='';}
 
 /* ── CONTEXT MENU ── */
+function showContextForRow(row, x, y) {
+  if (!row) return;
+  const id = row.dataset.id;
+  if (!id) return;
+  const fakeEvent = {
+    clientX: x,
+    clientY: y,
+    preventDefault: () => {}
+  };
+  showCtx(fakeEvent, id);
+}
 function showCtx(e,id){ctxId=id;const en=entries.find(x=>x.id===id);document.getElementById('ctxPinLbl').textContent=en?.pinned?'Unpin':'Pin';const m=document.getElementById('ctxMenu');m.style.left=Math.min(e.clientX,window.innerWidth-190)+'px';m.style.top=Math.min(e.clientY,window.innerHeight-210)+'px';m.classList.add('open');}
 function hideCtx(){document.getElementById('ctxMenu').classList.remove('open');}
 async function ctxDo(a){hideCtx();const id=ctxId;if(!id)return;if(a==='edit')editEntry(id);else if(a==='pin')togglePin(id);else if(a==='dup')dupEntry(id);else if(a==='del')deleteEntry(id);else if(a==='export')expEntries([entries.find(e=>e.id===id)].filter(Boolean),'entry_'+id);}
@@ -3911,6 +4234,18 @@ let focMode=false;
 function toggleFocus(){focMode=!focMode;document.body.classList.toggle('focus-mode',focMode);toast(focMode?'Focus mode on':'Focus mode off','info');}
 function resetFilters(){activeSubjs=[];activeTagFilters=[];activeNav='all';document.getElementById('searchInp').value='';clearDates();buildSubjList();updateSideTagCloud();setNav('all');}
 
+function getNextSubjectForDate(dateStr, batch) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const dow = d.getDay();
+  // Weekend: no classes
+  if (dow === 0 || dow === 6) return null;
+
+  const slots = (SCHEDULE[String(dow)] || []).filter(s => s.batch === 'both' || s.batch === batch);
+  // Which subjects already have an entry on this date?
+  const usedSubjects = entries.filter(e => e.date === dateStr).map(e => e.subject);
+  const available = slots.filter(s => !usedSubjects.includes(s.subj));
+  return available.length ? available[0] : null;
+}
 /* ── STATS ── */
 function updateNavCounts(){const t=new Date().toISOString().split('T')[0],w=new Date(Date.now()-7*864e5).toISOString().split('T')[0];document.getElementById('navAllCnt').textContent=entries.length;document.getElementById('navPinCnt').textContent=entries.filter(e=>e.pinned).length;document.getElementById('navTodayCnt').textContent=entries.filter(e=>e.date===t).length;document.getElementById('navWeekCnt').textContent=entries.filter(e=>e.date>=w).length;}
 function updateStats(){
@@ -4493,46 +4828,78 @@ document.addEventListener('pointerdown',e=>{
 
 /* ── 3. LONG PRESS (short: context menu, long: selection mode) ── */
 (function(){
-  let touchTimer = null;
-  let longPressRow = null;
-  let startX = 0, startY = 0;
-  let pressed = false;
+  // Variables for long press
+let touchTimer = null;
+let longPressRow = null;
+let startX = 0, startY = 0;
+let pressed = false;
+const MOVE_TOLERANCE = 12;
+const CONTEXT_DELAY = 450;
+const SELECT_DELAY = 3200;
 
-  const MOVE_TOLERANCE = 12;        // px – cancel if moved too much
-  const CONTEXT_DELAY  = 450;       // ms – show context menu (only for .entry-row)
-  const SELECT_DELAY   = 3200;      // ms – enter selection mode (3.2 seconds)
+document.addEventListener('touchstart', e => {
+  const row = e.target.closest('.entry-row, .wf-entry');
+  if (!row) return;
+  if (e.target.closest('button, a, .todo-chk')) return;
 
-  function cancelPress() {
-    if (touchTimer) clearTimeout(touchTimer);
-    touchTimer = null;
-    if (longPressRow) longPressRow = null;
-    pressed = false;
+  // Only act if not already in selection mode (selIds empty)
+  if (selIds.size > 0) return;
+
+  longPressRow = row;
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  pressed = true;
+
+  const isEntryRow = row.classList.contains('entry-row');
+  if (isEntryRow) {
+    touchTimer = setTimeout(() => {
+      // context menu after 450ms
+      showContextForRow(longPressRow, startX, startY);
+      // schedule selection mode after additional delay
+      touchTimer = setTimeout(() => {
+        if (pressed && longPressRow) {
+          enterSelectionMode(longPressRow);
+          cancelPress();
+        }
+      }, SELECT_DELAY - CONTEXT_DELAY);
+    }, CONTEXT_DELAY);
+  } else {
+    // For grid entries, only enter selection mode after delay
+    touchTimer = setTimeout(() => {
+      if (pressed && longPressRow) {
+        enterSelectionMode(longPressRow);
+        cancelPress();
+      }
+    }, SELECT_DELAY);
   }
+}, { passive: true });
 
-  function showContextForRow(row, touchX, touchY) {
-    if (selIds.size > 0) return;          // don't show menu in selection mode
-    const id = row.dataset.id;
-    if (!id) return;
-    // use the finger's coordinates for positioning (offset slightly to avoid covering)
-    const fakeEvent = {
-      clientX: touchX,
-      clientY: touchY,
-      preventDefault: () => {}
-    };
-    showCtx(fakeEvent, id);
-    haptic('medium');
+// On touchmove, cancel if moved too much
+document.addEventListener('touchmove', e => {
+  if (!pressed || !longPressRow) return;
+  const dx = Math.abs(e.touches[0].clientX - startX);
+  const dy = Math.abs(e.touches[0].clientY - startY);
+  if (dx > MOVE_TOLERANCE || dy > MOVE_TOLERANCE) {
+    cancelPress();
   }
+}, { passive: true });
 
-  function enterSelectionMode(row) {
-    if (selIds.size > 0) return;           // already in selection mode
-    hideCtx();                             // close any open context menu
-    const id = row.dataset.id;
-    if (!id) return;
-    toggleSel(id);                         // selects the row
-    haptic('light');
-    row.classList.add('longpress-active');
-    setTimeout(() => row.classList.remove('longpress-active'), 300);
-  }
+function cancelPress() {
+  if (touchTimer) clearTimeout(touchTimer);
+  touchTimer = null;
+  longPressRow = null;
+  pressed = false;
+}
+
+function enterSelectionMode(row) {
+  if (selIds.size > 0) return;  // already in selection mode
+  const id = row.dataset.id;
+  if (!id) return;
+  toggleSel(id);
+  haptic('light');
+  row.classList.add('longpress-active');
+  setTimeout(() => row.classList.remove('longpress-active'), 300);
+}
 
   document.addEventListener('touchstart', e => {
     const row = e.target.closest('.entry-row, .wf-entry');
@@ -4750,6 +5117,19 @@ document.getElementById('entryModal')?.addEventListener('keydown',e=>{
     }
   };
 })();
+
+function getNextSubjectForDate(dateStr, batch) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const dow = d.getDay();
+  // Weekend: no classes
+  if (dow === 0 || dow === 6) return null;
+
+  const slots = (SCHEDULE[String(dow)] || []).filter(s => s.batch === 'both' || s.batch === batch);
+  // Which subjects already have an entry on this date?
+  const usedSubjects = entries.filter(e => e.date === dateStr).map(e => e.subject);
+  const available = slots.filter(s => !usedSubjects.includes(s.subj));
+  return available.length ? available[0] : null;
+}
 /* ── KICK OFF ── */
 init();
 
