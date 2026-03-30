@@ -447,8 +447,8 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 
 /* ▀▄▀▄ MAIN ▀▄▀▄ */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-#viewArea{flex:1;overflow-y:auto;padding:18px 22px;}
-@media(max-width:600px){#viewArea{padding:12px 12px}}
+#viewArea{flex:1;overflow-y:auto;padding:18px 22px;transition: transform 0.12s linear;}
+@media(max-width:600px){#viewArea{padding:12px 12px;transition: transform 0.12s linear;}}
 
 /* ▀▄▀▄ VIEW CTRL BAR ▀▄▀▄ */
 .view-ctrl-bar{display:flex;align-items:center;gap:6px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
@@ -987,17 +987,25 @@ input, textarea, [contenteditable] {
 }
 /* ▀▄▀▄ PULL TO REFRESH ▀▄▀▄ */
 #ptr-wrap {
-  position: fixed;
-  top: -72px;
+  position: absolute;
+  top: 0;
   left: 50%;
-  width: 56px; height: 56px;
-  transform: translate3d(-50%, 0, 0);
-  will-change: transform, opacity;
+  width: 40px;
+  height: 40px;
+  transform: translate3d(-50%, -100%, 0);   /* hidden above the viewport */
+  will-change: transform;
   z-index: 999;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.12s ease;
   opacity: 0;
 }
-#ptr-wrap.ptr-visible { opacity: 1; transition: opacity 0.12s ease; }
+
+#ptr-wrap.ptr-visible {
+  opacity: 1;
+}
 #ptr-wrap.ptr-snap-back {
   transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease;
   transform: translate3d(-50%, 0, 0) !important;
@@ -1073,7 +1081,7 @@ input, textarea, [contenteditable] {
 }
 
 /* ▀▄▀▄ SWIPE VIEW TRANSITIONS ▀▄▀▄ */
-#viewArea{overflow-x:hidden;}
+#viewArea{overflow-x:hidden;transition: transform 0.12s linear;}
 .view-slide-left{animation:slideFromRight .28s cubic-bezier(.4,0,.2,1) both}
 .view-slide-right{animation:slideFromLeft .28s cubic-bezier(.4,0,.2,1) both}
 @keyframes slideFromRight{from{opacity:0;transform:translateX(48px)}to{opacity:1;transform:none}}
@@ -1459,6 +1467,16 @@ input.date-inp,
   </aside>
 
   <main id="main">
+    <div id="ptr-wrap">
+  <div class="ptr-bg"></div>
+  <svg class="ptr-svg" viewBox="0 0 56 56">
+    <circle class="ptr-track" cx="28" cy="28" r="18"/>
+    <circle class="ptr-arc"   cx="28" cy="28" r="18" id="ptrArc"/>
+  </svg>
+  <div class="ptr-icon ptr-arrow"   id="ptrArrow">↓</div>
+  <div class="ptr-icon ptr-spinner" id="ptrSpinner">⟳</div>
+  <div class="ptr-done-ring" id="ptrDoneRing"></div>
+</div>
     <div id="viewArea">
       <div id="selBar" style="display:none"></div>
       <div class="empty-state" id="emptyState" style="display:none">
@@ -1706,16 +1724,8 @@ input.date-inp,
   <div class="dp-day-body" id="dayPanelBody"></div>
 </div>
 <!-- ▀▄▀▄ PULL TO REFRESH ▀▄▀▄ -->
-<div id="ptr-wrap">
-  <div class="ptr-bg"></div>
-  <svg class="ptr-svg" viewBox="0 0 56 56">
-    <circle class="ptr-track" cx="28" cy="28" r="18"/>
-    <circle class="ptr-arc"   cx="28" cy="28" r="18" id="ptrArc"/>
-  </svg>
-  <div class="ptr-icon ptr-arrow"   id="ptrArrow">↓</div>
-  <div class="ptr-icon ptr-spinner" id="ptrSpinner">⟳</div>
-  <div class="ptr-done-ring" id="ptrDoneRing"></div>
-</div>
+
+
 <div id="undoBar">
   <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
@@ -2598,19 +2608,19 @@ async function toggleCardTodo(eid,tid) {
 /* ══════════════════════════════════
    MOOD / RATING
 ══════════════════════════════════ */
-function setMood(m){formMood=formMood===m?'':m;document.querySelectorAll('[data-mood]').forEach(el=>el.classList.toggle('on',el.dataset.mood===formMood));}
-document.addEventListener('DOMContentLoaded',()=>{const ri=document.getElementById('ratingInp');if(ri)ri.oninput=function(){formRating=+this.value;document.getElementById('ratingVal').textContent=this.value;};});
-// Auto‑close sidebar when tapping workspace buttons (on mobile)
-document.querySelectorAll('.ws-ab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    // Only collapse if sidebar is in mobile mode
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar && sidebar.classList.contains('mobile-open')) {
-      closeMobileSidebar();
+function setMood(m) {
+  // Toggle selection: if already selected, clear it; otherwise set it.
+  formMood = formMood === m ? '' : m;
+
+  // Update all mood buttons: add 'on' class only to the currently selected mood.
+  document.querySelectorAll('[data-mood]').forEach(el => {
+    if (el.dataset.mood === formMood) {
+      el.classList.add('on');
+    } else {
+      el.classList.remove('on');
     }
   });
-});
-function toggleRatingSlider(){formRatingOn=document.getElementById('ratingChk').checked;document.getElementById('ratingSliderWrap').classList.toggle('hidden',!formRatingOn);}
+}
 
 /* ══════════════════════════════════
    SMART SEARCH
@@ -3733,7 +3743,7 @@ function hilight(t,q){if(!q)return esc(t);return esc(t).replace(new RegExp('('+q
 function runCmd(i){closeCmd();CMDS[i]?.fn();}
 function cmdKey(e){const items=document.querySelectorAll('.cmd-item');if(e.key==='ArrowDown'){e.preventDefault();cmdIdx=Math.min(cmdIdx+1,items.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();cmdIdx=Math.max(cmdIdx-1,0);}else if(e.key==='Enter'){e.preventDefault();items[cmdIdx]?.click();return;}else if(e.key==='Escape'){closeCmd();return;}items.forEach((el,i)=>el.classList.toggle('hi',i===cmdIdx));}
 
-function initDetailDrag() {
+  function initDetailDrag() {
   const overlay = document.getElementById('detailOverlay');
   const panel   = document.querySelector('.detail-panel');
   if (!panel || !overlay) return;
@@ -3744,8 +3754,10 @@ function initDetailDrag() {
   const dpBody  = () => document.getElementById('dpBody');
   const blocked = el => !!el.closest('button,a,input,select,textarea');
 
-  function resist(d) {
-    return d < 0 ? 0 : d / (1 + d * 0.012);
+  function resist(dy) {
+  if (dy <= 0) return 0;
+  // Spring-like: fast initial pull, then tapers off smoothly
+  return 30 * (1 - Math.exp(-dy / 40)) + dy * 0.3;
   }
 
   function hardReset() {
@@ -3841,14 +3853,27 @@ function initDetailDrag() {
   }
 
   function onEnd() {
-    if (!dragging) return;
-    dragging = false; tid = null;
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  if (!dragging) return;
+  dragging = false; tid = null;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  overlay.style.opacity = '';
+  if (dragY > 110) dismiss();
+  else springBack();
+
+  function springBack() {
+    panel.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.28s ease';
+    panel.style.transform = '';
+    panel.style.opacity = '';
+    overlay.style.transition = 'opacity 0.28s ease';
     overlay.style.opacity = '';
-    if (dragY > 110) dismiss();
-    else springBack();
-    dragY = 0;
+    setTimeout(() => {
+      panel.style.transition = '';
+      overlay.style.transition = '';
+    }, 450);
   }
+
+  dragY = 0;
+}
 
   // Touch
   panel.addEventListener('touchstart', e => {
@@ -3979,57 +4004,62 @@ document.addEventListener('touchend', e => {
   lastTap = now;
 }, { passive: false });
 /* ── PULL TO REFRESH ── */
-(function () {
-  // Element starts at CSS top:-72px, transform translateY(0) = fully hidden.
-  // rubberBand(dy) must reach ~72px at TRIGGER so indicator enters view.
-const TRIGGER  = 140;   // longer swipe needed
-  const MAX_DRAG = 140;   // finger travel ceiling
-  const HOLD_Y   = 90;    // translateY while syncing (top:-72+90 = 18px, nicely visible)
-  const CIRC     = 113.1; // 2π × 18
+(function() {
+  const TRIGGER = 120;        // distance needed to trigger refresh (pixels)
+  const MAX_DRAG = 140;       // maximum drag distance
+  const HOLD_Y   = 55;        // how far down the indicator stays during sync (px)
 
-  const wrap     = document.getElementById('ptr-wrap');
-  const arc      = document.getElementById('ptrArc');
-  const arrow    = document.getElementById('ptrArrow');
-  const spinner  = document.getElementById('ptrSpinner');
+  const CIRC = 113.1;          // 2π × 18 (circle circumference for the arc)
+  const wrap = document.getElementById('ptr-wrap');
+  const arc  = document.getElementById('ptrArc');
+  const arrow = document.getElementById('ptrArrow');
+  const spinner = document.getElementById('ptrSpinner');
   const doneRing = document.getElementById('ptrDoneRing');
+  const viewArea = document.getElementById('viewArea');
   if (!wrap) return;
 
   let startY = 0, curDY = 0;
   let pulling = false, locked = false, armed = false;
   let rafId = null;
 
-  // Rubber-band: grows fast at first, tapers off.
-  // At dy=68: returns ~80px → element top at -72+80=8px (visible).
-  // At dy=140: returns ~115px → element top at 43px (still controlled).
-  function rb(dy) {
-    return dy * 1.65 / (1 + dy * 0.0055);
+  // Rubber‑band function for the indicator movement
+  function resist(dy) {
+    if (dy <= 0) return 0;
+    // Quick initial response, then gradually slows
+    return Math.min(dy * 0.8, 45) + (dy > 60 ? (dy - 60) * 0.3 : 0);
   }
 
-  function setY(y) {
-    wrap.style.transform = `translate3d(-50%, ${y}px, 0)`;
-  }
-
-  function frame() {
-    rafId = null;
-    if (!pulling || locked) return;
-    const vis   = rb(curDY);
-    const ratio = Math.min(curDY / TRIGGER, 1);
-    setY(vis);
-    arc.style.strokeDashoffset = CIRC * (1 - ratio);
-    arrow.style.transform = `rotate(${ratio * 200}deg)`;
-    arc.classList.toggle('ptr-ready', ratio >= 1);
-    // Micro-bump when threshold crossed
-    if (ratio >= 1 && !armed) {
-      armed = true;
-      wrap.style.transform = `translate3d(-50%, ${vis}px, 0) scale(1.1)`;
-      setTimeout(() => {
-        if (pulling) wrap.style.transform = `translate3d(-50%, ${rb(curDY)}px, 0) scale(1)`;
-      }, 130);
+  function setY(dy) {
+    // dy is raw drag distance (0..MAX_DRAG)
+    const visibleY = resist(dy);
+    // Move indicator into the gap: start from -100% (hidden) up to visibleY px from top
+    const translateY = `calc(${visibleY}px - 100%)`;
+    wrap.style.transform = `translate3d(-50%, ${translateY}, 0)`;
+    // Stretch the content below
+    if (viewArea) {
+      const move = Math.min(dy * 0.7, 65);
+      viewArea.style.transform = `translateY(${move}px)`;
+      viewArea.style.transition = 'none';
     }
   }
 
   function startFrame() {
-    if (!rafId) rafId = requestAnimationFrame(frame);
+    if (!rafId) rafId = requestAnimationFrame(() => {
+      rafId = null;
+      if (!pulling || locked) return;
+      setY(curDY);
+      const ratio = Math.min(curDY / TRIGGER, 1);
+      arc.style.strokeDashoffset = CIRC * (1 - ratio);
+      arrow.style.transform = `rotate(${ratio * 200}deg)`;
+      arc.classList.toggle('ptr-ready', ratio >= 1);
+      if (ratio >= 1 && !armed) {
+        armed = true;
+        wrap.style.transform = `translate3d(-50%, calc(${resist(curDY)}px - 100%), 0) scale(1.05)`;
+        setTimeout(() => {
+          if (pulling) wrap.style.transform = `translate3d(-50%, calc(${resist(curDY)}px - 100%), 0) scale(1)`;
+        }, 130);
+      }
+    });
   }
 
   function snapBack() {
@@ -4037,19 +4067,39 @@ const TRIGGER  = 140;   // longer swipe needed
     cancelAnimationFrame(rafId); rafId = null;
     wrap.classList.add('ptr-snap-back');
     wrap.classList.remove('ptr-visible');
+    if (viewArea) {
+      viewArea.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+      viewArea.style.transform = '';
+      setTimeout(() => { viewArea.style.transition = ''; }, 450);
+    }
     setTimeout(() => {
       wrap.classList.remove('ptr-snap-back');
       resetVisuals();
     }, 480);
   }
 
+  function resetVisuals() {
+    arc.style.strokeDashoffset = CIRC;
+    arc.classList.remove('ptr-ready');
+    arrow.classList.remove('hide');
+    arrow.style.transform = '';
+    spinner.classList.remove('active');
+    doneRing.classList.remove('burst');
+    wrap.style.transform = 'translate3d(-50%, -100%, 0)';
+    if (viewArea) {
+      viewArea.style.transform = '';
+      viewArea.style.transition = '';
+    }
+    curDY = 0; armed = false;
+  }
+
   function doSync() {
     pulling = false; armed = false; locked = true;
     cancelAnimationFrame(rafId); rafId = null;
 
-    // Slide to hold position
     wrap.classList.add('ptr-hold');
-    setY(HOLD_Y);
+    // Position indicator at HOLD_Y (inside the gap)
+    wrap.style.transform = `translate3d(-50%, calc(${HOLD_Y}px - 100%), 0)`;
     arc.style.strokeDashoffset = 0;
     arc.classList.add('ptr-ready');
     arrow.classList.add('hide');
@@ -4057,7 +4107,6 @@ const TRIGGER  = 140;   // longer swipe needed
 
     const finish = () => {
       spinner.classList.remove('active');
-      // Burst ring feedback
       doneRing.classList.remove('burst');
       void doneRing.offsetWidth;
       doneRing.classList.add('burst');
@@ -4083,33 +4132,26 @@ const TRIGGER  = 140;   // longer swipe needed
     }
   }
 
-  function resetVisuals() {
-    arc.style.strokeDashoffset = CIRC;
-    arc.classList.remove('ptr-ready');
-    arrow.classList.remove('hide');
-    arrow.style.transform = '';
-    spinner.classList.remove('active');
-    doneRing.classList.remove('burst');
-    setY(0);
-    curDY = 0; armed = false;
-  }
-
+  // Touch event handlers
   document.addEventListener('touchstart', e => {
     if (locked) return;
-    const va = document.getElementById('viewArea');
+    const va = viewArea;
     if (!va || !va.contains(e.target)) return;
     if (va.scrollTop > 3) return;
-    startY  = e.touches[0].clientY;
-    curDY   = 0; armed = false; pulling = true;
+    startY = e.touches[0].clientY;
+    curDY = 0; armed = false; pulling = true;
     wrap.classList.remove('ptr-snap-back', 'ptr-hold');
   }, { passive: true });
 
   document.addEventListener('touchmove', e => {
     if (!pulling || locked) return;
-    const va = document.getElementById('viewArea');
+    const va = viewArea;
     if (va && va.scrollTop > 3) { pulling = false; return; }
     const raw = e.touches[0].clientY - startY;
-    if (raw <= 0) { wrap.classList.remove('ptr-visible'); return; }
+    if (raw <= 0) {
+      wrap.classList.remove('ptr-visible');
+      return;
+    }
     curDY = Math.min(raw, MAX_DRAG);
     wrap.classList.add('ptr-visible');
     startFrame();
@@ -4203,7 +4245,7 @@ const TRIGGER  = 140;   // longer swipe needed
 
 /* ── EDGE SWIPE TO OPEN SIDEBAR ── */
 (function(){
-  const EDGE_ZONE = 28;   // px width of trigger zone from left
+  const EDGE_ZONE = 32;   // px width of trigger zone from left
   const SAFE_PAD  = 12;   // dead band at absolute left edge (avoids system back)
   const OPEN_DIST = 55;   // px travel needed to commit open
   const MAX_VERT  = 65;   // cancel if vertical drift exceeds this
