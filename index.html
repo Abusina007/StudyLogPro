@@ -452,6 +452,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .ws-path{font-size:10.5px;font-family:var(--mono);color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;margin-top: 10px;}
 .ws-btns{display:flex;gap:5px;flex-wrap:wrap}
 .ws-ab{flex:1;min-width:50px;background:none;border:1px solid var(--border);border-radius:var(--rs);padding:5px 4px;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all var(--tr);font-family:var(--font);text-align:center;white-space:nowrap}
+.cont{flex:1; background:none;border:1px solid var(--border);border-radius:var(--rs);padding:5px 4px;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all var(--tr);font-family:var(--font);text-align:center;white-space:nowrap;width: 100%;}
 .ws-ab:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim2)}
 .ws-ab.logout{color:var(--red);border-color:rgba(239,68,68,.25)}
 .ws-ab.logout:hover{background:var(--red-bg);border-color:var(--red)}
@@ -1495,7 +1496,7 @@ input.date-inp,
       </div>
     </div>
 <div class="sb-sec sb-sec-sub" style="flex-shrink:0">
-  <div class="sb-lbl" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="subjToggle">
+  <div class="sb-lbl" style="display: flex; align-items: center; justify-content: space-between;height: 15px;cursor: pointer;" id="subjToggle">
     <span>Subjects</span>
     <div style="display: flex; gap: 8px; align-items: center;">
       <span class="sb-lbl-a" onclick="clearSubjFilter(); event.stopPropagation();">Clear</span>
@@ -1509,15 +1510,6 @@ input.date-inp,
   </div>
 </div>
     <div class="sb-sec">
-      <div class="sb-lbl">Date Range <span class="sb-lbl-a" onclick="clearDates()">Clear</span></div>
-      <div class="date-row"><label>From</label><input class="date-inp" type="date" id="dateFrom" onchange="applyFilters()"></div>
-      <div class="date-row"><label>To</label><input class="date-inp" type="date" id="dateTo" onchange="applyFilters()"></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-lbl">Tags</div>
-      <div class="tag-cloud" id="sideTagCloud"><span style="font-size:10.5px;color:var(--text4)">No tags yet</span></div>
-    </div>
-    <div class="sb-sec">
       <div class="sb-lbl">Sort</div>
       <select class="sort-sel" id="sortSel" onchange="applyFilters()">
         <option value="desc">Newest first</option>
@@ -1527,6 +1519,16 @@ input.date-inp,
         <option value="rating">By rating</option>
       </select>
     </div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Date Range <span style="margin-right: 12px;" class="sb-lbl-a" onclick="clearDates()">Clear</span></div>
+      <div class="date-row"><label>From</label><input class="date-inp" type="date" id="dateFrom" onchange="applyFilters()"></div>
+      <div class="date-row"><label>To</label><input class="date-inp" type="date" id="dateTo" onchange="applyFilters()"></div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Tags</div>
+      <div class="tag-cloud" id="sideTagCloud"><span style="font-size:10.5px;color:var(--text4)">No tags yet</span></div>
+    </div>
+
 <div class="sb-sec">
   <div class="sb-lbl">Workspace</div>
   <div class="ws-info">
@@ -1537,9 +1539,11 @@ input.date-inp,
     
     <div class="ws-path" id="wsPathFull">Browser (localStorage)</div>
     <div id="ghUser" style="display:none;font-size:11px;color:var(--text2);padding:5px 0;border-top:1px solid var(--border);margin-top:6px"></div>
+    <div class="cont-dd">
+    <button id="ghConnectBtn" class="cont" onclick="openGHConnectModal()">👤 Connect</button>
+    <button id="ghDisconnectBtn" class="cont logout" style="display:none" onclick="disconnectGitHub()">↩ Disconnect</button>
+    </div>
     <div class="ws-btns" style="margin-top:7px">
-      <button id="ghConnectBtn" class="ws-ab" onclick="openGHConnectModal()">👤 Sync</button>
-      <button id="ghDisconnectBtn" class="ws-ab logout" style="display:none" onclick="disconnectGitHub()">↩ Unsync</button>
       <button class="ws-ab" onclick="loadRoutineFile()">⏏ Routine</button>
       <button class="ws-ab logout" onclick="logoutSemester()">↹ Sem</button>
     </div>
@@ -4502,7 +4506,7 @@ document.addEventListener('touchend', e => {
 /* ── SWIPE LEFT/RIGHT TO SWITCH VIEWS ── */
 (function(){
   const VIEWS = ['list','grid','calendar','stats'];
-  const THRESHOLD = 85;      // min px horizontal travel to trigger
+  const THRESHOLD = 55;      // min px horizontal travel to trigger
   const MAX_VERT = 100;      // max px vertical drift allowed
   let x0 = 0, y0 = 0, t0 = 0, swiping = false;
 
