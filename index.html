@@ -125,8 +125,30 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .tb-btn.primary{background:var(--accent);color:#fff;padding:6px 14px;border:none}
 .tb-btn.primary:hover{background:var(--accent-h);box-shadow:0 3px 12px rgba(79,142,247,.3)}
 .tb-btn svg{width:14px;height:14px;flex-shrink:0}
-.theme-toggle{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:var(--rs);border:1px solid var(--border);background:none;cursor:pointer;font-size:15px;transition:all var(--tr);color:var(--text2);flex-shrink:0}
-.theme-toggle:hover{background:var(--panel2);border-color:var(--border2)}
+.theme-toggle{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:10px;border:1px solid var(--border);background:none;cursor:pointer;font-size:14px;transition:all var(--tr);color:var(--text2);flex-shrink:0;position:relative}
+.theme-toggle:hover{background:var(--panel2);border-color:var(--border2);color:var(--text)}
+
+/* squircle tooltip — no native title clipping */
+/* .{
+  content:attr(data-tip);
+  position:absolute;
+  bottom:calc(100% + 8px);
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--panel2);
+  border:1px solid var(--border2);
+  color:var(--text);
+  font-size:10.5px;
+  padding:4px 9px;
+  border-radius:8px;
+  white-space:nowrap;
+  pointer-events:none;
+  z-index:9999;
+  box-shadow:var(--shadow-sm);
+  font-family:var(--font);
+  font-weight:500;
+} */
+.tb-btn[data-tip],.theme-toggle[data-tip],.sb-icon-btn[data-tip]{position:relative;}
 @media(max-width:1077px){.tb-ws{display: none;}}
 @media(max-width:950px){.tb-v-lbl{display:none}.tb-v{padding:5px 8px}}
 @media(max-width:900px){.tb-ws-name{max-width:75px}.tb-name small{display:none}}
@@ -147,12 +169,12 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
   backdrop-filter:blur(16px) saturate(160%);
   -webkit-backdrop-filter:blur(16px) saturate(160%);
   border-right:1px solid var(--glass-border);
-  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;flex-shrink:0;
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:clip;flex-shrink:0;
   transition:width .25s cubic-bezier(.4,0,.2,1),transform .25s cubic-bezier(.4,0,.2,1),background .3s;
   scrollbar-width:thin;scrollbar-color:var(--panel4) transparent;
 }
 #sidebar.collapsed{width:0;overflow:hidden}
-.sb-sec{padding:10px 13px;border-bottom: 1.2px solid color-mix(in srgb, var(--border) 80%, transparent);flex-shrink:0}
+.sb-sec{padding:10px 13px;border-bottom:1.2px solid color-mix(in srgb,var(--border) 80%,transparent);flex-shrink:0;overflow:visible}
 .sb-sec-sub .subj-list-container {
   max-height: auto;      /* adjust as needed */
   transition: max-height 0.2s ease-out;
@@ -436,13 +458,13 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .sb-search::placeholder{color:var(--text3)}
 .sh-hint{font-size:9px;color:var(--text4);margin-top:4px;padding:0 1px;line-height:1.6}
 .sh-hint span{background:var(--panel3);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-family:var(--mono);font-size:8.5px;color:var(--text3)}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rs);cursor:pointer;color:var(--text2);font-size:13px;transition:all var(--tr);user-select:none}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rs);cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all var(--tr);user-select:none}
 .nav-item:hover{background:var(--panel2);color:var(--text)}
-.nav-item.active{background:var(--accent-dim);color:var(--accent)}
-.nav-item svg{width:14px;height:14px;flex-shrink:0;opacity:.7}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:600}
+.nav-item svg{width:14px;height:14px;flex-shrink:0;opacity:.65}
 .nav-item.active svg{opacity:1}
-.nav-badge{margin-left:auto;font-size:10.5px;font-family:var(--mono);color:var(--text3);background:var(--panel3);padding:1px 7px;border-radius:20px}
-.nav-item.active .nav-badge{background:var(--accent-dim);color:var(--accent)}
+.nav-badge{margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--text3);background:var(--panel3);padding:1px 8px;border-radius:20px;min-width:20px;text-align:center}
+.nav-item.active .nav-badge{background:rgba(47,129,247,.2);color:var(--accent)}
 .subj-list{display:flex;flex-direction:column;gap:1px}
 .subj-item{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--rs);cursor:pointer;font-size:12px;color:var(--text3);transition:all var(--tr);user-select:none}
 .subj-item:hover{background:var(--panel2);color:var(--text2)}
@@ -463,10 +485,11 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .sort-sel{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;color:var(--text);font-size:12px;outline:none;cursor:pointer;transition:border-color var(--tr)}
 .sort-sel:focus{border-color:var(--accent)}
 .sort-sel option{background:var(--panel2)}
-.sb-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.sb-stat{background:var(--panel2);border-radius:var(--rs);padding:8px 10px}
-.sb-stat-n{font-size:20px;font-weight:700;color:var(--accent);line-height:1;font-family:var(--mono)}
-.sb-stat-l{font-size:9px;color:var(--text3);margin-top:2px}
+.sb-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sb-stat{background:var(--panel2);border-radius:var(--rs);padding:10px 12px;text-align:center;transition:background var(--tr)}
+.sb-stat:hover{background:var(--panel3)}
+.sb-stat-n{font-size:22px;font-weight:700;color:var(--accent);line-height:1;font-family:var(--mono)}
+.sb-stat-l{font-size:9.5px;color:var(--text3);margin-top:3px;letter-spacing:.2px}
 .ws-info{background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;}
 .ws-pl{font-size:9px;color:var(--text4);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
 .ws-path{font-size:10.5px;font-family:var(--mono);color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;margin-top: 10px;}
@@ -476,7 +499,73 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .ws-ab:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim2)}
 .ws-ab.logout{color:var(--red);border-color:rgba(239,68,68,.25)}
 .ws-ab.logout:hover{background:var(--red-bg);border-color:var(--red)}
-
+/* ▀▄▀▄ WORKSPACE ROW BUTTONS ▀▄▀▄ */
+.ws-row-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 8px 11px;
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--tr);
+}
+.ws-row-btn:hover {
+  border-color: var(--border3);
+  color: var(--text);
+  background: var(--panel2);
+}
+.git-h-c:hover {
+  color: var(--accent);
+}
+.git-h-c:hover {
+  border-color: var(--accent);
+}
+.ws-row-btn.ws-row-btn-danger {
+  color: var(--red);
+  border-color: rgba(248,81,73,.2);
+}
+.ws-row-btn.ws-row-btn-danger:hover {
+  background: var(--red-bg);
+  border-color: var(--red);
+}
+.ws-row-ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.ws-row-btn:hover .ws-row-ico { opacity: 1; }
+/* ▀▄▀▄ SIDEBAR TOP ICON BUTTONS (squircle) ▀▄▀▄ */
+.sb-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all var(--tr);
+  flex-shrink: 0;
+  position: relative;
+}
+.sb-icon-btn:hover {
+  background: var(--panel2);
+  border-color: var(--border2);
+  color: var(--text);
+}
+.sb-icon-btn:active { transform: scale(.93); }
 /* ▀▄▀▄ MOBILE SIDEBAR ▀▄▀▄ */
 @media(max-width:768px){
   #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);width:min(var(--sidebar),85vw)!important;box-shadow:var(--shadow);transition:transform .26s cubic-bezier(.4,0,.2,1)}
@@ -514,9 +603,9 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 
 /* ▀▄▀▄ ENTRY CARDS ▀▄▀▄ */
 .entry-list{display:flex;flex-direction:column;gap:9px}
-.entry-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color var(--tr-fast),box-shadow var(--tr-fast),background .25s;animation:cardIn .18s ease;will-change:transform}
-@keyframes cardIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.entry-card:hover{border-color:var(--border2);box-shadow:var(--shadow-sm)}
+.entry-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .15s,box-shadow .15s,transform .15s,background .25s;animation:cardIn .22s cubic-bezier(.4,0,.2,1);will-change:transform}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.entry-card:hover{border-color:var(--border2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
 .entry-card.pinned{border-left:3px solid var(--amber)}
 .entry-card.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
 .card-top{padding:13px 15px 10px;display:flex;align-items:flex-start;gap:11px}
@@ -645,7 +734,15 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .search-token{background:var(--accent-dim);color:var(--accent);padding:1px 7px;border-radius:20px;font-size:10px;font-weight:500}
 
 /* ▀▄▀▄ STATUS BAR ▀▄▀▄ */
-#statusbar{height:var(--status);background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 13px;gap:11px;flex-shrink:0;user-select:none;transition:background .25s;overflow-x:auto;scrollbar-width:none}
+#statusbar{
+  height:var(--status);
+  background:var(--glass-bg);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--glass-border);
+  display:flex;align-items:center;padding:0 13px;gap:11px;
+  flex-shrink:0;user-select:none;transition:background .3s;
+  overflow-x:auto;scrollbar-width:none;
+}
 #statusbar::-webkit-scrollbar{display:none}
 .sb-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap;flex-shrink:0}
 .sb-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
@@ -832,14 +929,21 @@ kbd{background:var(--panel2);border:1px solid var(--border2);color:var(--text);p
 #fvContent{max-width:90vw;max-height:calc(100vh - 76px);margin-top:44px;overflow:auto;border-radius:var(--r)}
 
 /* ▀▄▀▄ TOASTS ▀▄▀▄ */
-#toast{position:fixed;bottom:32px;right:16px;background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:9px 14px;border-radius:var(--rs);font-size:12.5px;z-index:1000;transform:translateY(12px) scale(.97);opacity:0;transition:all .22s cubic-bezier(.4,0,.2,1);pointer-events:none;max-width:300px;box-shadow:var(--shadow-sm)}
-#toast.show{transform:none;opacity:1}
-#toast.ok{border-color:var(--green);background:#0f1f14;color:var(--green)}
-#toast.err{border-color:var(--red);background:#200a10;color:#ff7a90}
-#toast.info{border-color:var(--accent);background:var(--accent-dim2);color:var(--accent-h)}
-[data-theme="light"] #toast.ok{background:#f0fdf4;color:var(--green)}
-[data-theme="light"] #toast.err{background:#fff1f2;color:var(--red)}
-[data-theme="light"] #toast.info{background:#eff6ff;color:var(--accent)}
+#toast{
+  position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(16px) scale(.96);
+  background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border2);color:var(--text);padding:10px 18px;
+  border-radius:14px;font-size:13px;font-weight:500;z-index:1000;
+  opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;max-width:320px;box-shadow:var(--shadow);white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%);opacity:1}
+#toast.ok{border-color:rgba(63,185,80,.4);background:rgba(15,31,20,.9);color:var(--green)}
+#toast.err{border-color:rgba(248,81,73,.4);background:rgba(32,10,16,.9);color:#ff8a85}
+#toast.info{border-color:var(--accent-dim);background:var(--accent-dim2);color:var(--accent-h)}
+[data-theme="light"] #toast.ok{background:rgba(240,253,244,.95);color:var(--green)}
+[data-theme="light"] #toast.err{background:rgba(255,241,242,.95);color:var(--red)}
+[data-theme="light"] #toast.info{background:rgba(239,246,255,.95);color:var(--accent)}
 #undoBar{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:9px 16px;border-radius:var(--rs);font-size:12.5px;z-index:1000;opacity:0;transition:all .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm);pointer-events: none; transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);}
 #undoBar.show{transform:translateX(-50%);opacity:1;pointer-events: auto;}
 #undoBar button{background:var(--accent);border:none;color:#fff;padding:4px 12px;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font)}
@@ -870,11 +974,10 @@ input[type=date]{color-scheme:dark}
 [data-theme="light"] input[type=date]{color-scheme:light}
 
 /* ▀▄▀▄ ENTRY ROWS ▀▄▀▄ */
-.entry-rows-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.entry-rows{display:flex;flex-direction:column}
-.entry-row{display:flex;align-items:center;gap:0;cursor:pointer;border-bottom:1px solid var(--border);background:var(--panel);transition:background var(--tr-fast);position:relative}
-.entry-row:last-child{border-bottom:none}
-.entry-row:hover{background:var(--panel2)}
+.entry-rows-wrap{background:transparent;border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;gap:5px}
+.entry-rows{display:flex;flex-direction:column;gap:5px}
+.entry-row{display:flex;align-items:center;gap:0;cursor:pointer;border:1px solid var(--border);border-radius:var(--r);background:var(--panel);transition:background .12s,border-color .12s,box-shadow .15s,transform .15s;position:relative;overflow:hidden}
+.entry-row:hover{background:var(--panel2);border-color:var(--border2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
 .entry-row.selected {
   background: rgba(47,129,247,.12) !important;
   border-left: 4px solid var(--accent) !important;
@@ -1250,22 +1353,20 @@ input, textarea, [contenteditable] {
   right: 16px;
   width: 56px;
   height: 56px;
-  border-radius: 32%;
+  border-radius: 18px;
   background: var(--accent);
-  opacity: 80%;
   color: white;
   border: none;
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(47,129,247,.4);
   z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s;
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), opacity 0.2s ease, background 0.2s, box-shadow 0.2s;
   font-family: var(--font);
-    box-shadow:0 4px 6px rgba(27, 75, 143, 0.2);
 }
 
 .fab-add:hover {
@@ -1409,6 +1510,69 @@ input.date-inp,
 .wf-entry.selected .wf-e-dot {
   background: var(--accent) !important;
 }
+/* ▀▄▀▄ SQUIRCLE ALL BUTTONS ▀▄▀▄ */
+.tb-btn, .tb-hamburger, .theme-toggle, .sb-icon-btn,
+.nav-item, .vc-btn, .tag-pill, .ws-row-btn,
+.su-btn, .su-btn-sec, .m-tab, .m-close,
+.c-btn, .dp-act, .sel-btn, .rb-btn,
+button, select, input[type="date"] {
+  border-radius: 10px !important;
+}
+
+/* pill-shaped exceptions stay pill */
+.nav-badge, .tb-ws-badge, .dg-today, .dg-cnt,
+.wg-cnt, .er-badge, .ctag, .tag-pill,
+.gc-subj, .card-subj-badge, .overdue-badge,
+.su-dot, .sb-dot {
+  border-radius: 20px !important;
+}
+
+/* ▀▄▀▄ TOOLTIP — appears BELOW, works on hover + long-press ▀▄▀▄ */
+.tb-btn[data-tip],
+.theme-toggle[data-tip],
+.sb-icon-btn[data-tip] {
+  position: relative;
+}
+
+.tb-btn[data-tip]::after,
+.theme-toggle[data-tip]::after,
+.sb-icon-btn[data-tip]::after {
+  content: attr(data-tip);
+  position: fixed;          /* fixed avoids ALL overflow clipping */
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-size: 10.5px;
+  font-family: var(--font);
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transition: opacity .15s;
+  /* position below via margin trick with fixed */
+  margin-top: 0;
+}
+
+/* show on hover */
+.tb-btn[data-tip]:hover::after,
+.theme-toggle[data-tip]:hover::after,
+.sb-icon-btn[data-tip]:hover::after {
+  opacity: 1;
+}
+
+/* show on long-press (JS adds this class) */
+.tb-btn[data-tip].tip-show::after,
+.theme-toggle[data-tip].tip-show::after,
+.sb-icon-btn[data-tip].tip-show::after {
+  opacity: 1;
+}
 </style>
 </head>
 <body>
@@ -1432,21 +1596,26 @@ input.date-inp,
 
 <!-- ▀▄▀▄ TOOLBAR ▀▄▀▄ -->
 <div id="toolbar">
-  <button class="tb-hamburger" id="hamburgerBtn" onclick="toggleMobileSidebar()">
+  <!-- Hamburger (mobile) -->
+  <button class="tb-hamburger" id="hamburgerBtn" onclick="toggleMobileSidebar()" style="margin-right:6px">
     <span></span><span></span><span></span>
   </button>
-  <div class="tb-brand for-small">
-    <div class="tb-logo">SL</div>
-    <div class="tb-name focus-btn mpxx" id="tbName">StudyLog Pro<small id="tbSub">AIML · 1A</small></div>
+
+  <!-- Brand -->
+  <div class="tb-brand for-small" style="padding-left:4px">
+    <div class="tb-logo" style="background:#001e36;border-radius:8px;font-size:14px">SL</div>
+    <div class="tb-name focus-btn" id="tbName">StudyLog Pro<small id="tbSub">AIML · 1A</small></div>
   </div>
 
-  <div class="tb-ws" id="wsChip" onclick="changeWorkspace()">
-    <span class="tb-ws-ico">📂</span>
-    <span class="tb-ws-name" id="wsName">No workspace</span>
+  <!-- Workspace badge (hidden on small screens) -->
+  <div class="tb-ws" id="wsChip" onclick="changeWorkspace()" style="display:none" id="wsChipDesktop">
+    <span class="tb-ws-ico" style="font-size:10px">●</span>
+    <span class="tb-ws-name" id="wsName">Browser Only</span>
     <span class="tb-ws-badge local" id="wsBadge">local</span>
   </div>
 
-  <div class="tb-views">
+  <!-- View switcher -->
+  <div class="tb-views" style="margin-left:8px">
     <button class="tb-v active" id="vList" onclick="switchView('list')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2.5" rx="1"/><rect x="1" y="7" width="14" height="2.5" rx="1"/><rect x="1" y="12" width="14" height="2.5" rx="1"/></svg><span class="tb-v-lbl">List</span>
     </button>
@@ -1457,23 +1626,45 @@ input.date-inp,
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="12" rx="2"/><line x1="5" y1="1" x2="5" y2="5"/><line x1="11" y1="1" x2="11" y2="5"/><line x1="1" y1="7" x2="15" y2="7"/></svg><span class="tb-v-lbl">Cal</span>
     </button>
     <button class="tb-v" id="vStats" onclick="switchView('stats')">
-      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="10" width="3" height="5" rx="1"/><rect x="6.5" y="6" width="3" height="9" rx="1"/><rect x="12" y="2" width="3" height="13" rx="1"/></svg><span class="tb-v-lbl">Stats</span>
+      <svg id="Chart-Column--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="3" width="5">
+  <defs></defs>
+  <path d="M13.5 14V3h-4v11h-2V7H3.5v7H2V1H1v13a1 1 0 0 0 1 1h13v-1Zm-7 0H4.5V8h2Zm6 0h-2V4h2Z" fill="currentColor" stroke-width="1.5"></path>
+  <path id="_Transparent_Rectangle_" d="M0 0h16v16H0Z" fill="none" stroke-width="0.5"></path>
+</svg><span class="tb-v-lbl">Stats</span>
     </button>
   </div>
-      <div class="tb-sep"></div>
-  
-  <!-- Always visible search input -->
-  <div class="tb-search-container" style="flex:1; max-width: 280px; margin: 0 10px;">
-    <input class="tb-search-input" id="searchInp" placeholder="Search…" autocomplete="off" oninput="applyFilters()" style="width: 100%;">
-  </div>
-  
-  <div class="tb-spacer"></div>
-  <div class="tb-actions">
-    <button class="tb-btn focus-btn mpxx" onclick="toggleFocus()" title="F10"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 5V2h3M12 2h3v3M1 11v3h3M12 14h3v-3"/></svg></button>
 
-    <button class="tb-btn focus-btn mpxx" onclick="openHelp()" title="F1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M6 6c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2v1.5"/><circle cx="8" cy="12" r=".8" fill="currentColor" stroke="none"/></svg></button>
-    <!-- New button – hidden on mobile, visible on PC -->
-    <button class="tb-btn primary newbtn" id="desktopNewBtn" onclick="openModal()"><span class="plusbtn">+</span><span class="mpx nnewbt"> New </span><span class="focus-btn mpx" style="font-size:9.5px;opacity:.55;font-family:var(--mono);margin-left:2px">Alt+N</span></button>
+  <div class="tb-spacer"></div>
+
+  <!-- Search -->
+  <div class="tb-search-container" style="flex:1;max-width:240px;margin:0 8px;position:relative;">
+    <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+    </span>
+    <input class="tb-search-input" id="searchInp" placeholder="Search…" autocomplete="off" oninput="applyFilters()" style="width:100%;padding-left:30px;">
+  </div>
+
+  <!-- Actions -->
+  <div class="tb-actions" style="gap:4px">
+    <!-- Command palette hint (desktop) -->
+    <button class="tb-btn focus-btn mpxx" onclick="openCmd()" title="⌘K" style="gap:3px;font-size:11px">
+      <span class="mpxx" style="font-size:10px;opacity:.6">⌘K</span>
+    </button>
+
+    <!-- Sync -->
+    <button class="tb-btn mpxx" id="syncBtn" onclick="syncNow()" title="Sync" style="display:none">
+      <svg id="syncIcon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M13.5 8A5.5 5.5 0 118 2.5"/><polyline points="12,1 14,3.5 11.5,5"/></svg>
+    </button>
+
+    <!-- Theme toggle -->
+
+
+    <!-- New Entry (desktop) -->
+    <button class="tb-btn primary newbtn" id="desktopNewBtn" onclick="openModal()" style="gap:5px">
+      <span style="font-size:16px;line-height:1;margin-top:-1px">+</span>
+      <span class="nnewbt">New</span>
+      <span class="focus-btn mpxx" style="font-size:9px;opacity:.5;font-family:var(--mono)">Alt+N</span>
+    </button>
   </div>
 </div>
 
@@ -1486,93 +1677,185 @@ input.date-inp,
     document.getElementById('sidebar').classList.add('collapsed');
   }
 </script>
-    <div class="sb-sec tb-actions acc-btn">
-      <div class="tb-brand forpc">
-      <div class="tb-logo">SL</div>
-      <div class="tb-name" id="tbName">StudyLog Pro</div>
-      </div>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alt+T">🌙</button>
-    <div style="display: grid; grid-template-columns: 1fr 1fr;">
-    <button class="tb-btn" onclick="exportAll()" title="Ctrl+E"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg></button>
-    <button class="tb-btn" onclick="importData()" title="Import"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v4h10v-4M8 12V4M5 7L8 4l3 3"/></svg></button>
-    </div>
 
-</div>
-    <div class="sb-sec">
-      <div class="sb-lbl">Navigate</div>
-      <div class="nav-item active" id="nav-all" onclick="setNav('all')">
-        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v1.5H2zm0 3.5h12V9H2zm0 3.5h8v1.5H2z"/></svg>All Entries<span class="nav-badge" id="navAllCnt">0</span>
+<!-- Sidebar top header -->
+  <div class="sb-sec" style="padding:10px 12px;border-bottom:1px solid var(--border);overflow:visible">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <!-- Brand -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;background:#001e36;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">SL</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.2px" id="tbName2">StudyLog Pro</div>
       </div>
-      <div class="nav-item" id="nav-pinned" onclick="setNav('pinned')">
-        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/20/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M6.5 5C6.5 4.44772 6.94772 4 7.5 4H9H15H16.5C17.0523 4 17.5 4.44772 17.5 5C17.5 5.55228 17.0523 6 16.5 6H16.095L16.9132 15H19C19.5523 15 20 15.4477 20 16C20 16.5523 19.5523 17 19 17H16H13V22C13 22.5523 12.5523 23 12 23C11.4477 23 11 22.5523 11 22V17H8H5C4.44772 17 4 16.5523 4 16C4 15.4477 4.44772 15 5 15H7.08679L7.90497 6H7.5C6.94772 6 6.5 5.55228 6.5 5ZM9.91321 6L9.09503 15H12H14.905L14.0868 6H9.91321Z" fill="currentColor"></path>
-</svg>Pinned<span class="nav-badge" id="navPinCnt">0</span>
-      </div>
-      <div class="nav-item" id="nav-today" onclick="setNav('today')">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="12" rx="2"/><line x1="1" y1="7" x2="15" y2="7"/><line x1="5" y1="1" x2="5" y2="5"/><line x1="11" y1="1" x2="11" y2="5"/></svg>Today<span class="nav-badge" id="navTodayCnt">0</span>
-      </div>
-      <div class="nav-item" id="nav-week" onclick="setNav('week')">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><polyline points="8,4 8,8 11,10"/></svg>This Week<span class="nav-badge" id="navWeekCnt">0</span>
-      </div>
-    </div>
-<div class="sb-sec sb-sec-sub" style="flex-shrink:0">
-  <div class="sb-lbl" style="display: flex; align-items: center; justify-content: space-between;height: 15px;cursor: pointer;" id="subjToggle">
-    <span>Subjects</span>
-    <div style="display: flex; gap: 8px; align-items: center;">
-      <span class="sb-lbl-a" onclick="clearSubjFilter(); event.stopPropagation();">Clear</span>
-      <span class="toggle-icon" id="subjIcon">
-        <svg fill="currentColor" height="48" viewBox="0 0 9 48" width="4" xmlns="http://www.w3.org/2000/svg"><path d="m1.5618 24.0621 6.5581-6.4238c.2368-.2319.2407-.6118.0088-.8486-.2324-.2373-.6123-.2407-.8486-.0088l-7 6.8569c-.1157.1138-.1807.2695-.1802.4316.001.1621.0674.3174.1846.4297l7 6.7241c.1162.1118.2661.1675.4155.1675.1577 0 .3149-.062.4326-.1846.2295-.2388.2222-.6187-.0171-.8481z"></path></svg>
-      </span>
-    </div>
-  </div>
-  <div class="subj-list-container" id="subjListContainer" style="overflow: hidden; transition: max-height 0.2s ease-out;">
-    <div class="subj-list" id="subjList"></div>
-  </div>
-</div>
-    <div class="sb-sec">
-      <div class="sb-lbl">Sort</div>
-      <select class="sort-sel" id="sortSel" onchange="applyFilters()">
-        <option value="desc">Newest first</option>
-        <option value="asc">Oldest first</option>
-        <option value="subj">By subject</option>
-        <option value="updated">Last edited</option>
-        <option value="rating">By rating</option>
-      </select>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-lbl">Date Range <span style="margin-right: 12px;" class="sb-lbl-a" onclick="clearDates()">Clear</span></div>
-      <div class="date-row"><label>From</label><input class="date-inp" type="date" id="dateFrom" onchange="applyFilters()"></div>
-      <div class="date-row"><label>To</label><input class="date-inp" type="date" id="dateTo" onchange="applyFilters()"></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-lbl">Tags</div>
-      <div class="tag-cloud" id="sideTagCloud"><span style="font-size:10.5px;color:var(--text4)">No tags yet</span></div>
-    </div>
+      <!-- Icon buttons -->
+      <div style="display:flex;gap:5px;align-items:center;overflow:visible">
 
-<div class="sb-sec">
-  <div class="sb-lbl">Workspace</div>
-  <div class="ws-info">
-    <div style="display: grid;grid-template-columns: 1.8fr 1.2fr;">
-      <div class="ws-pl">Storage path</div>
-      <button class="ws-ab" onclick="syncNow()">🔄 Sync now</button>
+        <!-- Theme toggle -->
+        <button class="sb-icon-btn" id="themeToggleSidebar" onclick="toggleTheme(event)">
+          <!-- moon icon -->
+          <svg viewBox="0 0 490.792 528.557" fill="currentColor" stroke="none" width="14" height="14" id="sideThemeIcon">
+  <path d="M372.641,438.892c-108.465,0-196.855-85.948-200.781-193.454c-4.172-114.261,88.698-209.623,203.028-208.366c9.529,0.105,18.899,0.874,28.066,2.262c0.023,0.004,0.035-0.028,0.015-0.04C362.774,14.462,315.436,0.087,264.74,0C117.196-0.252-2.602,121.591,0.043,269.112c2.578,143.727,119.893,259.446,264.235,259.446c96.094,0,180.201-51.292,226.458-127.986c0.012-0.02-0.012-0.043-0.031-0.029C457.56,424.656,416.766,438.892,372.641,438.892z"/>
+</svg>
+        </button>
+
+        <!-- Export -->
+        <button class="sb-icon-btn" onclick="exportAll()" data-tip="Export Markdown">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+            <path d="M3 11v3h10v-3"/>
+            <line x1="8" y1="2" x2="8" y2="10"/>
+            <polyline points="5,7 8,10 11,7"/>
+          </svg>
+        </button>
+
+        <!-- Import -->
+        <button class="sb-icon-btn" onclick="importData()" data-tip="Import JSON">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+            <path d="M3 11v3h10v-3"/>
+            <line x1="8" y1="9" x2="8" y2="1"/>
+            <polyline points="5,4 8,1 11,4"/>
+          </svg>
+        </button>
+
+      </div>
+    </div>
   </div>
-    
-    <div class="ws-path" id="wsPathFull">Browser (localStorage)</div>
-    <div id="ghUser" style="display:none;font-size:11px;color:var(--text2);padding:5px 0;border-top:1px solid var(--border);margin-top:6px"></div>
-    <div class="cont-dd">
-    <button id="ghConnectBtn" class="cont" onclick="openGHConnectModal()">👤 Connect</button>
-    <button id="ghDisconnectBtn" class="cont logout" style="display:none" onclick="disconnectGitHub()">↩ Disconnect</button>
+
+  <!-- Navigate -->
+  <div class="sb-sec" style="padding:10px 12px">
+    <div class="sb-lbl" style="margin-bottom:6px">Navigate</div>
+    <div class="nav-item active" id="nav-all" onclick="setNav('all')">
+      <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M2 4h12v1.5H2zm0 3.5h12V9H2zm0 3.5h8v1.5H2z"/></svg>
+      All Entries<span class="nav-badge" id="navAllCnt">0</span>
     </div>
-    <div class="ws-btns" style="margin-top:7px">
-      <button class="ws-ab" onclick="loadRoutineFile()">⏏ Routine</button>
-      <button class="ws-ab logout" onclick="logoutSemester()">↹ Sem</button>
+    <div class="nav-item" id="nav-pinned" onclick="setNav('pinned')">
+      <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M9 1a1 1 0 011 1v1.586l2.707 2.707A1 1 0 0113 7v1a1 1 0 01-1 1H9v5l-1 1-1-1V9H4a1 1 0 01-1-1V7a1 1 0 01.293-.707L6 3.586V2a1 1 0 011-1h2z"/></svg>
+      Pinned<span class="nav-badge" id="navPinCnt">0</span>
+    </div>
+    <div class="nav-item" id="nav-today" onclick="setNav('today')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="1" y="3" width="14" height="12" rx="2"/><line x1="1" y1="7" x2="15" y2="7"/><line x1="5" y1="1" x2="5" y2="5"/><line x1="11" y1="1" x2="11" y2="5"/></svg>
+      Today<span class="nav-badge" id="navTodayCnt">0</span>
+    </div>
+    <div class="nav-item" id="nav-week" onclick="setNav('week')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><circle cx="8" cy="8" r="7"/><polyline points="8,4 8,8 11,10"/></svg>
+      This Week<span class="nav-badge" id="navWeekCnt">0</span>
     </div>
   </div>
-</div>
-    <div class="sb-sec">
-      <div class="sb-stats" id="sideStats"></div>
+
+  <!-- Subjects -->
+  <div class="sb-sec sb-sec-sub" style="padding:10px 12px;flex-shrink:0">
+    <div class="sb-lbl" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:6px" id="subjToggle">
+      <span>Subjects</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="sb-lbl-a" onclick="clearSubjFilter();event.stopPropagation()">Clear</span>
+        <span class="toggle-icon" id="subjIcon" style="font-size:10px;color:var(--text3)">
+          <svg fill="currentColor" height="10" viewBox="0 0 10 10" width="10"><path d="M5 7L1 3h8z"/></svg>
+        </span>
+      </div>
     </div>
-  </aside>
+    <div class="subj-list-container" id="subjListContainer" style="overflow:hidden;transition:max-height .22s ease-out">
+      <div class="subj-list" id="subjList"></div>
+    </div>
+  </div>
+
+  <!-- Sort -->
+  <div class="sb-sec" style="padding:10px 12px">
+    <div class="sb-lbl" style="margin-bottom:6px">Sort</div>
+    <select class="sort-sel" id="sortSel" onchange="applyFilters()">
+      <option value="desc">Newest first</option>
+      <option value="asc">Oldest first</option>
+      <option value="subj">By subject</option>
+      <option value="updated">Last edited</option>
+      <option value="rating">By rating</option>
+    </select>
+  </div>
+
+  <!-- Date Range -->
+  <div class="sb-sec" style="padding:10px 12px">
+    <div class="sb-lbl" style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <span>Date Range</span>
+      <span class="sb-lbl-a" onclick="clearDates()">Clear</span>
+    </div>
+    <div class="date-row"><label>From</label><input class="date-inp" type="date" id="dateFrom" onchange="applyFilters()"></div>
+    <div class="date-row"><label>To</label><input class="date-inp" type="date" id="dateTo" onchange="applyFilters()"></div>
+  </div>
+
+  <!-- Tags -->
+  <div class="sb-sec" style="padding:10px 12px">
+    <div class="sb-lbl" style="margin-bottom:6px">Tags</div>
+    <div class="tag-cloud" id="sideTagCloud"><span style="font-size:10.5px;color:var(--text4)">No tags yet</span></div>
+  </div>
+
+  <!-- Workspace -->
+  <div class="sb-sec" style="padding:10px 12px">
+    <div class="sb-lbl" style="margin-bottom:8px">Workspace</div>
+
+    <!-- Storage path line -->
+    <div class="ws-path" id="wsPathFull" style="font-size:11px;font-family:var(--mono);color:var(--text2);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">localStorage (browser)</div>
+    <div id="ghUser" style="display:none;font-size:11px;color:var(--text2);margin-bottom:8px"></div>
+
+    <!-- Workspace action buttons -->
+    <div style="display:flex;flex-direction:column;gap:4px">
+
+      <!-- Connect / Disconnect GitHub -->
+      <button id="ghConnectBtn" class="ws-row-btn git-h-c" onclick="openGHConnectModal()">
+        <span class="ws-row-ico">
+          <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        </span>
+        Connect GitHub Sync
+      </button>
+      <button id="ghDisconnectBtn" class="ws-row-btn ws-row-btn-danger" style="display:none" onclick="disconnectGitHub()">
+        <span class="ws-row-ico">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M10 8H6M3 8a5 5 0 1010 0A5 5 0 003 8z"/></svg>
+        </span>
+        Disconnect GitHub
+      </button>
+
+      <!-- Import JSON -->
+      <button class="ws-row-btn" onclick="importData()">
+        <span class="ws-row-ico">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 12V4M5 7L8 4l3 3"/></svg>
+        </span>
+        Import JSON
+      </button>
+
+      <!-- Export Markdown -->
+      <button class="ws-row-btn" onclick="exportAll()">
+        <span class="ws-row-ico">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg>
+        </span>
+        Export Markdown
+      </button>
+
+      <!-- Load Routine -->
+      <button class="ws-row-btn" onclick="loadRoutineFile()">
+        <span class="ws-row-ico">
+          <svg id="Settings--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="13" width="13">
+          <defs></defs>
+          <title>settings</title>
+          <path d="m13.5 8.38 0 -0.38 0 -0.385 0.96 -0.84A1 1 0 0 0 14.65 5.5l-1.18 -2a1 1 0 0 0 -0.865 -0.5 1 1 0 0 0 -0.32 0.05l-1.215 0.41a5.675 5.675 0 0 0 -0.655 -0.375l-0.255 -1.26a1 1 0 0 0 -1 -0.805h-2.34a1 1 0 0 0 -1 0.805l-0.255 1.26a5.74 5.74 0 0 0 -0.66 0.375l-1.19 -0.43A1 1 0 0 0 3.395 3a1 1 0 0 0 -0.865 0.5L1.35 5.5a1 1 0 0 0 0.205 1.255L2.5 7.62 2.5 8l0 0.385 -0.945 0.84A1 1 0 0 0 1.35 10.5l1.18 2a1 1 0 0 0 0.865 0.5 1 1 0 0 0 0.32 -0.05l1.215 -0.41a5.675 5.675 0 0 0 0.655 0.375l0.255 1.26a1 1 0 0 0 1 0.805h2.36a1 1 0 0 0 1 -0.805l0.255 -1.26a5.74 5.74 0 0 0 0.66 -0.375l1.21 0.41a1 1 0 0 0 0.32 0.05 1 1 0 0 0 0.865 -0.5l1.14 -2a1 1 0 0 0 -0.205 -1.255ZM12.605 12l-1.715 -0.58a4.43 4.43 0 0 1 -1.355 0.785L9.18 14h-2.36l-0.355 -1.775a4.68 4.68 0 0 1 -1.35 -0.785L3.395 12l-1.18 -2 1.36 -1.2a4.45 4.45 0 0 1 0 -1.565L2.215 6l1.18 -2 1.715 0.58a4.43 4.43 0 0 1 1.355 -0.785L6.82 2h2.36l0.355 1.775a4.68 4.68 0 0 1 1.35 0.785L12.605 4l1.18 2 -1.36 1.2a4.45 4.45 0 0 1 0 1.565L13.785 10Z" fill="currentColor" stroke-width="0.5"></path>
+          <path d="M8 11a3 3 0 1 1 3 -3 2.97 2.97 0 0 1 -3 3Zm0 -5a1.955 1.955 0 0 0 -2 2 1.955 1.955 0 0 0 2 2 1.955 1.955 0 0 0 2 -2 1.955 1.955 0 0 0 -2 -2Z" fill="currentColor" stroke-width="0.5"></path>
+          <path id="_Transparent_Rectangle_" d="M0 0h16v16H0Z" fill="none" stroke-width="0.5"></path>
+        </svg>
+        </span>
+        Load Routine
+      </button>
+
+      <!-- New Semester -->
+      <button class="ws-row-btn" onclick="logoutSemester()">
+        <span class="ws-row-ico">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M2 8h9M8 5l3 3-3 3"/><path d="M12 3v-.5A1.5 1.5 0 0013.5 1v0A1.5 1.5 0 0115 2.5v11a1.5 1.5 0 01-1.5 1.5v0A1.5 1.5 0 0112 13.5V13"/></svg>
+        </span>
+        New Semester
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="sb-sec" style="padding:10px 12px 16px">
+    <div class="sb-stats" id="sideStats"></div>
+  </div>
+
+</aside>
 
   <main id="main">
     <div id="ptr-wrap">
@@ -2355,9 +2638,31 @@ function loadRoutineFile() {
 function applyTheme(dark) {
   darkMode = dark;
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.textContent = dark ? '🌙' : '☀️';
   localStorage.setItem('slp_theme', dark ? 'dark' : 'light');
+
+const moonPath = `<path style="fill:currentColor" d="M372.641,438.892c-108.465,0-196.855-85.948-200.781-193.454c-4.172-114.261,88.698-209.623,203.028-208.366c9.529,0.105,18.899,0.874,28.066,2.262c0.023,0.004,0.035-0.028,0.015-0.04C362.774,14.462,315.436,0.087,264.74,0C117.196-0.252-2.602,121.591,0.043,269.112c2.578,143.727,119.893,259.446,264.235,259.446c96.094,0,180.201-51.292,226.458-127.986c0.012-0.02-0.012-0.043-0.031-0.029C457.56,424.656,416.766,438.892,372.641,438.892z"/>`;
+const sunPath  = `<circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/><line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/><line x1="3.2" y1="3.2" x2="4.2" y2="4.2"/><line x1="11.8" y1="11.8" x2="12.8" y2="12.8"/><line x1="12.8" y1="3.2" x2="11.8" y2="4.2"/><line x1="4.2" y1="11.8" x2="3.2" y2="12.8"/>`;
+
+  ['sideThemeIcon','toolbarThemeIcon'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (dark) {
+      el.setAttribute('viewBox','0 0 490.792 528.557');
+      el.setAttribute('fill','currentColor');
+      el.setAttribute('stroke','none');
+      el.innerHTML = `<path d="M372.641,438.892c-108.465,0-196.855-85.948-200.781-193.454c-4.172-114.261,88.698-209.623,203.028-208.366c9.529,0.105,18.899,0.874,28.066,2.262c0.023,0.004,0.035-0.028,0.015-0.04C362.774,14.462,315.436,0.087,264.74,0C117.196-0.252-2.602,121.591,0.043,269.112c2.578,143.727,119.893,259.446,264.235,259.446c96.094,0,180.201-51.292,226.458-127.986c0.012-0.02-0.012-0.043-0.031-0.029C457.56,424.656,416.766,438.892,372.641,438.892z"/>`;
+    } else {
+      el.setAttribute('viewBox','0 0 16 16');
+      el.setAttribute('fill','none');
+      el.setAttribute('stroke','currentColor');
+      el.setAttribute('stroke-width','1.5');
+      el.innerHTML = `<circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/><line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/><line x1="3.2" y1="3.2" x2="4.2" y2="4.2"/><line x1="11.8" y1="11.8" x2="12.8" y2="12.8"/><line x1="12.8" y1="3.2" x2="11.8" y2="4.2"/><line x1="4.2" y1="11.8" x2="3.2" y2="12.8"/>`;
+    }
+  });
+
+  // update side icon specifically
+  const si = document.getElementById('sideThemeIcon');
+  if (si) si.innerHTML = dark ? moonPath : sunPath;
 }
 
 function toggleTheme(e) {
@@ -5162,6 +5467,7 @@ function getNextSubjectForDate(dateStr, batch) {
   const available = slots.filter(s => !usedSubjects.includes(s.subj));
   return available.length ? available[0] : null;
 }
+
 /* ── KICK OFF ── */
 init();
 
