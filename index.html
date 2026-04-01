@@ -92,7 +92,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
   -webkit-backdrop-filter:blur(20px) saturate(180%);
   border-bottom:1px solid var(--glass-border);
   display:flex;align-items:center;padding:0 12px;gap:0;flex-shrink:0;
-  user-select:none;overflow-x:auto;overflow-y:hidden;
+  user-select:none;overflow-x:auto;overflow-y:visible;
   transition:background .3s,border-color .3s;
   position:sticky;top:0;z-index:100;scrollbar-width:none;
 }
@@ -123,7 +123,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .tb-btn{background:none;border:1px solid transparent;color:var(--text3);padding:6px 8px;border-radius:var(--rs);cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;white-space:nowrap;flex-shrink:0}
 .tb-btn:hover{color:var(--text);background:var(--panel2);border-color:var(--border)}
 .tb-btn.primary{background:var(--accent);color:#fff;padding:6px 14px;border:none}
-.tb-btn.primary:hover{background:var(--accent-h);box-shadow:0 3px 12px rgba(79,142,247,.3)}
+.tb-btn.primary:hover{background:var(--accent-h);box-shadow:0 3px 9px rgba(79,142,247,.1)}
 .tb-btn svg{width:14px;height:14px;flex-shrink:0}
 .theme-toggle{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:10px;border:1px solid var(--border);background:none;cursor:pointer;font-size:14px;transition:all var(--tr);color:var(--text2);flex-shrink:0;position:relative}
 .theme-toggle:hover{background:var(--panel2);border-color:var(--border2);color:var(--text)}
@@ -153,9 +153,10 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 @media(max-width:950px){.tb-v-lbl{display:none}.tb-v{padding:5px 8px}}
 @media(max-width:900px){.tb-ws-name{max-width:75px}.tb-name small{display:none}}
 @media(max-width:850px){.mpxx{display:none};}
+@media(max-width:768px){.tb-hamburger{display:flex}}
 @media(max-width:700px){.tb-ws{max-width:95px}.tb-btn:not(.primary){padding:6px 7px}}
 @media(max-width:600px){.focus-btn{display: none;}.weeks-52{grid-template-columns:repeat(23,12px);}}
-@media(max-width:540px){.tb-hamburger{display:flex}.tb-sep:not(:first-of-type){display:none}.tb-ws{display:none}.focus-btn{display:none}.for-small{width:25px}.newbtn{width:35px;display:flex;align-items:center;justify-content:center;}.nnewbt{display:none}.plusbtn{font-size:16px};}
+@media(max-width:540px){.tb-sep:not(:first-of-type){display:none}.tb-ws{display:none}.focus-btn{display:none}.for-small{width:25px}.newbtn{width:35px;display:flex;align-items:center;justify-content:center;}.nnewbt{display:none}.plusbtn{font-size:16px};}
 @media (min-width: 768px){.forpc{display: none;}}
 /* ▀▄▀▄ LAYOUT ▀▄▀▄ */
 #body{display:flex;flex:1;overflow:hidden;position:relative;}
@@ -467,6 +468,12 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .nav-item.active .nav-badge{background:rgba(47,129,247,.2);color:var(--accent)}
 .subj-list{display:flex;flex-direction:column;gap:1px}
 .subj-item{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:var(--rs);cursor:pointer;font-size:12px;color:var(--text3);transition:all var(--tr);user-select:none}
+.subj-list-container.collapsed .subj-item{opacity:0;transform:translateX(-14px)}
+.subj-list.animating .subj-item{
+  animation:subjReveal .3s cubic-bezier(.2,.8,.2,1) both;
+  animation-delay:calc(var(--si,0)*35ms);
+}
+@keyframes subjReveal{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
 .subj-item:hover{background:var(--panel2);color:var(--text2)}
 .subj-item.on{color:var(--text);background:var(--panel2)}
 .subj-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -566,6 +573,18 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
   color: var(--text);
 }
 .sb-icon-btn:active { transform: scale(.93); }
+.tb-mobile-hide{display:flex}
+.sb-mobile-brand{display:none}
+.sb-top-head{display:flex;align-items:center;justify-content:flex-start}
+.sb-top-actions{display:flex;align-items:center;justify-content:flex-start;gap:6px}
+.sb-top-spacer{display:none}
+@media(max-width:768px){
+  .tb-mobile-hide{display:none}
+  .sb-mobile-brand{display:flex}
+  .sb-top-head{display:flex;align-items:center;justify-content:space-between}
+  .sb-top-actions{justify-content:flex-end;margin-left:auto}
+  .sb-top-spacer{display:none}
+}
 /* ▀▄▀▄ MOBILE SIDEBAR ▀▄▀▄ */
 @media(max-width:768px){
   #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:500;transform:translateX(-100%);width:min(var(--sidebar),85vw)!important;box-shadow:var(--shadow);transition:transform .26s cubic-bezier(.4,0,.2,1)}
@@ -603,11 +622,15 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 
 /* ▀▄▀▄ ENTRY CARDS ▀▄▀▄ */
 .entry-list{display:flex;flex-direction:column;gap:9px}
-.entry-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .15s,box-shadow .15s,transform .15s,background .25s;animation:cardIn .22s cubic-bezier(.4,0,.2,1);will-change:transform}
+.entry-card{background:var(--panel);
+  position: relative !important;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .15s,box-shadow .15s,transform .15s,background .25s;animation:cardIn .22s cubic-bezier(.4,0,.2,1);will-change:transform}
 @keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .entry-card:hover{border-color:var(--border2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
 .entry-card.pinned{border-left:3px solid var(--amber)}
-.entry-card.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
+.entry-card.selected {
+  border: 2px solid var(--accent) !important;
+  background: rgba(47, 129, 247, 0.1) !important;
+}
 .card-top{padding:13px 15px 10px;display:flex;align-items:flex-start;gap:11px}
 .date-col{flex-shrink:0;text-align:center;background:var(--panel2);border-radius:var(--rs);padding:6px 9px;min-width:46px;border:1px solid var(--border)}
 .dc-d{font-size:21px;font-weight:700;color:var(--accent);line-height:1;font-family:var(--mono)}
@@ -979,9 +1002,9 @@ input[type=date]{color-scheme:dark}
 .entry-row{display:flex;align-items:center;gap:0;cursor:pointer;border:1px solid var(--border);border-radius:var(--r);background:var(--panel);transition:background .12s,border-color .12s,box-shadow .15s,transform .15s;position:relative;overflow:hidden}
 .entry-row:hover{background:var(--panel2);border-color:var(--border2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
 .entry-row.selected {
-  background: rgba(47,129,247,.12) !important;
   border-left: 4px solid var(--accent) !important;
-  position: relative;
+  background: rgba(47, 129, 247, 0.2) !important;
+  box-shadow: inset 0 0 0 1px rgba(47, 129, 247, 0.6) !important;
 }
 .entry-row.pinned .er-accent{background:var(--amber)!important}
 .er-accent{width:3px;align-self:stretch;flex-shrink:0}
@@ -990,10 +1013,22 @@ input[type=date]{color-scheme:dark}
 .er-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
 .er-title{font-size:13.5px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .er-date{font-size:10.5px;color:var(--text3);font-family:var(--mono);flex-shrink:0}
-.er-bottom{display:flex;align-items:center;gap:6px}
-.er-preview{font-size:12px;color:var(--text3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.er-bottom{display:flex;align-items:flex-start;gap:6px}
+.er-preview-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.er-preview{font-size:12px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.er-preview-task{font-size:11px;color:var(--amber);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.er-preview-task.done{color:var(--text3);text-decoration:line-through;opacity:.85}
 .er-badges{display:flex;gap:3px;align-items:center;flex-shrink:0}
 .er-badge{font-size:10px;padding:1px 6px;border-radius:20px;font-weight:500;line-height:1.6}
+.entry-rows .entry-row.selected{
+  background: rgba(47,129,247,.24) !important;
+  border-color: var(--accent) !important;
+  border-left: 4px solid var(--accent) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(47,129,247,.55) !important;
+}
+[data-theme="light"] .entry-rows .entry-row.selected{
+  background: rgba(37,99,235,.16) !important;
+}
 
 /* ▀▄▀▄ DETAIL PANEL ▀▄▀▄ */
 .detail-overlay{position:fixed;inset:0;z-index:700;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
@@ -1286,12 +1321,12 @@ input, textarea, [contenteditable] {
 /* tooltip on toolbar buttons (PC) */
 .tb-btn[title]:hover::after,.theme-toggle[title]:hover::after{
   content:attr(title);
-  position:absolute;bottom:calc(100% + 7px);left:50%;
+  position:absolute;top:calc(100% + 7px);left:50%;
   transform:translateX(-50%);
   background:var(--panel2);border:1px solid var(--border2);
   color:var(--text);font-size:10.5px;padding:3px 8px;
   border-radius:var(--rs);white-space:nowrap;
-  pointer-events:none;z-index:500;
+  pointer-events:none;z-index:20000;
   box-shadow:var(--shadow-sm);
 }
 .tb-btn[title],.theme-toggle[title]{position:relative;}
@@ -1360,7 +1395,7 @@ input, textarea, [contenteditable] {
   font-size: 26px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(47,129,247,.4);
+  box-shadow: 0 4px 12px rgba(47,129,247,.15);
   z-index: 200;
   display: flex;
   align-items: center;
@@ -1503,7 +1538,7 @@ input.date-inp,
 
 /* ─── Week Folder Entry Selection ─────────────────────────── */
 .wf-entry.selected {
-  background: rgba(47,129,247,.12) !important;
+  background: rgba(47, 129, 247, 0.15) !important;
   border-left: 4px solid var(--accent) !important;
 }
 
@@ -1538,8 +1573,8 @@ button, select, input[type="date"] {
 .theme-toggle[data-tip]::after,
 .sb-icon-btn[data-tip]::after {
   content: attr(data-tip);
-  position: fixed;          /* fixed avoids ALL overflow clipping */
-  top: auto;
+  position: absolute;
+  top: calc(100% + 7px);
   left: 50%;
   transform: translateX(-50%);
   background: var(--panel2);
@@ -1552,13 +1587,12 @@ button, select, input[type="date"] {
   border-radius: 8px;
   white-space: nowrap;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 20000;
   box-shadow: var(--shadow-sm);
   opacity: 0;
   transition: opacity .15s;
-  /* position below via margin trick with fixed */
-  margin-top: 0;
 }
+.sb-icon-btn.tip-shift-right[data-tip]::after{left:10px;transform:none;}
 
 /* show on hover */
 .tb-btn[data-tip]:hover::after,
@@ -1572,6 +1606,19 @@ button, select, input[type="date"] {
 .theme-toggle[data-tip].tip-show::after,
 .sb-icon-btn[data-tip].tip-show::after {
   opacity: 1;
+}
+/* Force list‑view selection highlight */
+/* FORCE list selection highlight – HIGH VISIBILITY */
+/* FORCE list selection highlight – most specific possible */
+#listCont .entry-row.selected {
+  border-left: 2px solid --accent!important;
+  background: rgba(47, 129, 247, 0.25) !important;
+  box-shadow: inset 0 0 0 2px var(--accent) !important;
+}
+#listCont .entry-row.selected .er-icon {
+  background: var(--accent) !important;
+  color: white !important;
+  transform: scale(1.02);
 }
 </style>
 </head>
@@ -1602,7 +1649,7 @@ button, select, input[type="date"] {
   </button>
 
   <!-- Brand -->
-  <div class="tb-brand for-small" style="padding-left:4px">
+  <div class="tb-brand for-small tb-mobile-hide" style="padding-left:4px">
     <div class="tb-logo" style="background:#001e36;border-radius:8px;font-size:14px">SL</div>
     <div class="tb-name focus-btn" id="tbName">StudyLog Pro<small id="tbSub">AIML · 1A</small></div>
   </div>
@@ -1647,7 +1694,7 @@ button, select, input[type="date"] {
   <!-- Actions -->
   <div class="tb-actions" style="gap:4px">
     <!-- Command palette hint (desktop) -->
-    <button class="tb-btn focus-btn mpxx" onclick="openCmd()" title="⌘K" style="gap:3px;font-size:11px">
+    <button class="tb-btn focus-btn mpxx" onclick="openCmd()" style="gap:3px;font-size:11px">
       <span class="mpxx" style="font-size:10px;opacity:.6">⌘K</span>
     </button>
 
@@ -1680,42 +1727,23 @@ button, select, input[type="date"] {
 
 <!-- Sidebar top header -->
   <div class="sb-sec" style="padding:10px 12px;border-bottom:1px solid var(--border);overflow:visible">
-    <div style="display:flex;align-items:center;justify-content:space-between">
+    <div class="sb-top-head">
       <!-- Brand -->
-      <div style="display:flex;align-items:center;gap:8px">
+      <div class="sb-mobile-brand" style="align-items:center;gap:8px">
         <div style="width:28px;height:28px;background:#001e36;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">SL</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.2px" id="tbName2">StudyLog Pro</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.2px">StudyLog Pro</div>
       </div>
-      <!-- Icon buttons -->
-      <div style="display:flex;gap:5px;align-items:center;overflow:visible">
-
-        <!-- Theme toggle -->
-        <button class="sb-icon-btn" id="themeToggleSidebar" onclick="toggleTheme(event)">
-          <!-- moon icon -->
+      <div class="sb-top-actions">
+        <button class="sb-icon-btn tip-shift-right" onclick="openCmd()" data-tip="Command palette">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="1.5" y="2.5" width="13" height="11" rx="2"></rect><path d="M5 6l2 2-2 2M8.5 10h2.5"></path></svg>
+        </button>
+        <button class="sb-icon-btn" id="themeToggleSidebar" onclick="toggleTheme(event)" data-tip="Toggle theme">
           <svg viewBox="0 0 490.792 528.557" fill="currentColor" stroke="none" width="14" height="14" id="sideThemeIcon">
-  <path d="M372.641,438.892c-108.465,0-196.855-85.948-200.781-193.454c-4.172-114.261,88.698-209.623,203.028-208.366c9.529,0.105,18.899,0.874,28.066,2.262c0.023,0.004,0.035-0.028,0.015-0.04C362.774,14.462,315.436,0.087,264.74,0C117.196-0.252-2.602,121.591,0.043,269.112c2.578,143.727,119.893,259.446,264.235,259.446c96.094,0,180.201-51.292,226.458-127.986c0.012-0.02-0.012-0.043-0.031-0.029C457.56,424.656,416.766,438.892,372.641,438.892z"/>
-</svg>
-        </button>
-
-        <!-- Export -->
-        <button class="sb-icon-btn" onclick="exportAll()" data-tip="Export Markdown">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
-            <path d="M3 11v3h10v-3"/>
-            <line x1="8" y1="2" x2="8" y2="10"/>
-            <polyline points="5,7 8,10 11,7"/>
+            <path d="M372.641,438.892c-108.465,0-196.855-85.948-200.781-193.454c-4.172-114.261,88.698-209.623,203.028-208.366c9.529,0.105,18.899,0.874,28.066,2.262c0.023,0.004,0.035-0.028,0.015-0.04C362.774,14.462,315.436,0.087,264.74,0C117.196-0.252-2.602,121.591,0.043,269.112c2.578,143.727,119.893,259.446,264.235,259.446c96.094,0,180.201-51.292,226.458-127.986c0.012-0.02-0.012-0.043-0.031-0.029C457.56,424.656,416.766,438.892,372.641,438.892z"/>
           </svg>
         </button>
-
-        <!-- Import -->
-        <button class="sb-icon-btn" onclick="importData()" data-tip="Import JSON">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
-            <path d="M3 11v3h10v-3"/>
-            <line x1="8" y1="9" x2="8" y2="1"/>
-            <polyline points="5,4 8,1 11,4"/>
-          </svg>
-        </button>
-
       </div>
+      <div class="sb-top-spacer" aria-hidden="true"></div>
     </div>
   </div>
 
@@ -1817,12 +1845,12 @@ button, select, input[type="date"] {
         Import JSON
       </button>
 
-      <!-- Export Markdown -->
+      <!-- Export JSON -->
       <button class="ws-row-btn" onclick="exportAll()">
         <span class="ws-row-ico">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg>
         </span>
-        Export Markdown
+        Export JSON
       </button>
 
       <!-- Load Routine -->
@@ -1832,8 +1860,8 @@ button, select, input[type="date"] {
           <defs></defs>
           <title>settings</title>
           <path d="m13.5 8.38 0 -0.38 0 -0.385 0.96 -0.84A1 1 0 0 0 14.65 5.5l-1.18 -2a1 1 0 0 0 -0.865 -0.5 1 1 0 0 0 -0.32 0.05l-1.215 0.41a5.675 5.675 0 0 0 -0.655 -0.375l-0.255 -1.26a1 1 0 0 0 -1 -0.805h-2.34a1 1 0 0 0 -1 0.805l-0.255 1.26a5.74 5.74 0 0 0 -0.66 0.375l-1.19 -0.43A1 1 0 0 0 3.395 3a1 1 0 0 0 -0.865 0.5L1.35 5.5a1 1 0 0 0 0.205 1.255L2.5 7.62 2.5 8l0 0.385 -0.945 0.84A1 1 0 0 0 1.35 10.5l1.18 2a1 1 0 0 0 0.865 0.5 1 1 0 0 0 0.32 -0.05l1.215 -0.41a5.675 5.675 0 0 0 0.655 0.375l0.255 1.26a1 1 0 0 0 1 0.805h2.36a1 1 0 0 0 1 -0.805l0.255 -1.26a5.74 5.74 0 0 0 0.66 -0.375l1.21 0.41a1 1 0 0 0 0.32 0.05 1 1 0 0 0 0.865 -0.5l1.14 -2a1 1 0 0 0 -0.205 -1.255ZM12.605 12l-1.715 -0.58a4.43 4.43 0 0 1 -1.355 0.785L9.18 14h-2.36l-0.355 -1.775a4.68 4.68 0 0 1 -1.35 -0.785L3.395 12l-1.18 -2 1.36 -1.2a4.45 4.45 0 0 1 0 -1.565L2.215 6l1.18 -2 1.715 0.58a4.43 4.43 0 0 1 1.355 -0.785L6.82 2h2.36l0.355 1.775a4.68 4.68 0 0 1 1.35 0.785L12.605 4l1.18 2 -1.36 1.2a4.45 4.45 0 0 1 0 1.565L13.785 10Z" fill="currentColor" stroke-width="0.5"></path>
-          <path d="M8 11a3 3 0 1 1 3 -3 2.97 2.97 0 0 1 -3 3Zm0 -5a1.955 1.955 0 0 0 -2 2 1.955 1.955 0 0 0 2 2 1.955 1.955 0 0 0 2 -2 1.955 1.955 0 0 0 -2 -2Z" fill="currentColor" stroke-width="0.5"></path>
-          <path id="_Transparent_Rectangle_" d="M0 0h16v16H0Z" fill="none" stroke-width="0.5"></path>
+          <path d="M8 11a3 3 0 1 1 3 -3 2.97 2.97 0 0 1 -3 3Zm0 -5a1.955 1.955 0 0 0 -2 2 1.955 1.955 0 0 0 2 2 1.955 1.955 0 0 0 2 -2 1.955 1.955 0 0 0 -2 -2Z" fill="currentColor" stroke-width="1.5"></path>
+          <path id="_Transparent_Rectangle_" d="M0 0h16v16H0Z" fill="none" stroke-width="1.5"></path>
         </svg>
         </span>
         Load Routine
@@ -1971,7 +1999,7 @@ button, select, input[type="date"] {
         <div class="rating-row">
           <label class="rating-chk-wrap"><input type="checkbox" id="ratingChk" onchange="toggleRatingSlider()"><span class="rating-chk-label">Enable rating</span></label>
           <div id="ratingSliderWrap" class="hidden">
-            <input type="range" id="ratingInp" min="1" max="10" value="7" style="flex:1;accent-color:var(--accent)">
+            <input type="range" id="ratingInp" min="1" max="10" value="7" oninput="onRatingInput(this.value)" style="flex:1;accent-color:var(--accent)">
             <span id="ratingVal" style="font-size:17px;font-family:var(--mono);color:var(--accent);min-width:24px;font-weight:700">7</span>
             <span style="font-size:11.5px;color:var(--text3)">/10</span>
           </div>
@@ -3033,8 +3061,10 @@ const subjIcon = document.getElementById('subjIcon');
 if (subjToggle && subjContainer) {
   subjToggle.addEventListener('click', (e) => {
     if (e.target.classList.contains('sb-lbl-a')) return;
+    const wasCollapsed = subjContainer.classList.contains('collapsed');
     subjContainer.classList.toggle('collapsed');
     subjIcon.classList.toggle('rotated');
+    if (wasCollapsed) animateSubjectListReveal();
     // optional: save state
     localStorage.setItem('subjListCollapsed', subjContainer.classList.contains('collapsed'));
   });
@@ -3050,7 +3080,18 @@ if (subjContainer && localStorage.getItem('subjListCollapsed') === 'true') {
 function buildSubjList() {
   const cnt = {}; entries.forEach(e => cnt[e.subject] = (cnt[e.subject]||0)+1);
   const el = document.getElementById('subjList'); if (!el) return;
-  el.innerHTML = SUBJECTS.map(s => `<div class="subj-item${activeSubjs.includes(s.id)?' on':''}" onclick="toggleSubj('${s.id}')"><div class="subj-dot" style="background:${s.color}"></div><span class="subj-name">${s.label}</span><span class="subj-cnt">${cnt[s.id]||0}</span></div>`).join('');
+  el.innerHTML = SUBJECTS.map((s,i) => `<div class="subj-item${activeSubjs.includes(s.id)?' on':''}" style="--si:${i}" onclick="toggleSubj('${s.id}')"><div class="subj-dot" style="background:${s.color}"></div><span class="subj-name">${s.label}</span><span class="subj-cnt">${cnt[s.id]||0}</span></div>`).join('');
+}
+function animateSubjectListReveal(){
+  const container = document.getElementById('subjListContainer');
+  const list = document.getElementById('subjList');
+  if(!container || !list || container.classList.contains('collapsed')) return;
+  list.classList.remove('animating');
+  // restart animation reliably on each expand
+  void list.offsetWidth;
+  list.classList.add('animating');
+  const total = Math.min(SUBJECTS.length, 20) * 35 + 340;
+  setTimeout(() => list.classList.remove('animating'), total);
 }
 function toggleSubj(id) { const i=activeSubjs.indexOf(id); i>-1?activeSubjs.splice(i,1):activeSubjs.push(id); buildSubjList(); applyFilters(); }
 function clearSubjFilter() { activeSubjs=[]; buildSubjList(); applyFilters(); }
@@ -3099,6 +3140,7 @@ async function toggleCardTodo(eid,tid) {
   await saveData();
   const el=document.getElementById('todo_'+tid);
   if(el){ el.classList.toggle('done',todo.done); const chk=el.querySelector('.todo-chk'); if(chk){chk.classList.toggle('done',todo.done);chk.textContent=todo.done?'✓':'';} }
+  if(currentView==='list') applyFilters();
   updateStats();
 }
 
@@ -3128,10 +3170,20 @@ function toggleRatingSlider() {
   if (wrap) {
     if (formRatingOn) {
       wrap.classList.remove('hidden');
+      onRatingInput(document.getElementById('ratingInp')?.value ?? formRating);
     } else {
       wrap.classList.add('hidden');
     }
   }
+}
+
+function onRatingInput(v){
+  const n = Math.max(1, Math.min(10, Number(v) || 7));
+  formRating = n;
+  const inp = document.getElementById('ratingInp');
+  const out = document.getElementById('ratingVal');
+  if (inp && Number(inp.value) !== n) inp.value = String(n);
+  if (out) out.textContent = String(n);
 }
 /* ══════════════════════════════════
    SMART SEARCH
@@ -3460,29 +3512,27 @@ el.addEventListener('click', ev => {
 function buildEntryRow(e){
   const s=SUBJECTS.find(x=>x.id===e.subject)||{label:e.subject,color:'#8b92a8',bg:'rgba(139,146,168,.14)'};
   const d=new Date(e.date+'T00:00:00');
-  const isSel=selIds.has(e.id);
+  const isSel=selIds.has(String(e.id));
   const title=(e.titles||[]).find(t=>t.text)?.text||'Untitled session';
   const today=new Date().toISOString().split('T')[0];
   const isToday=e.date===today;
 const todos = e.todos || [];
 const pendingCount = todos.filter(t => !t.done).length;
-let preview = '';
-let isTodoPreview = false;
-if (e.notes) {
-  preview = e.notes.replace(/\n/g,' ').substring(0,80);
-} else if (todos.length) {
-  isTodoPreview = true;
+const notesPreview = e.notes ? e.notes.replace(/\n/g,' ').substring(0,80) : 'No notes';
+let taskPreview = '';
+let taskPreviewDone = false;
+if (todos.length) {
   const doneCount = todos.filter(t => t.done).length;
   const firstTask = todos[0];
   if (firstTask) {
     const taskText = firstTask.text.length > 50 ? firstTask.text.substring(0,47)+'…' : firstTask.text;
-    preview = firstTask.done ? `<span style="text-decoration:line-through;opacity:0.7">✓ ${esc(taskText)}</span>` : `${esc(taskText)}`;
-    if (todos.length > 1) preview += ` +${todos.length-1} more`;
+    taskPreviewDone = !!firstTask.done;
+    taskPreview = firstTask.done ? `✓ ${esc(taskText)}` : `${esc(taskText)}`;
+    if (todos.length > 1) taskPreview += ` +${todos.length-1} more`;
+    taskPreview += ` · ${doneCount}/${todos.length} done`;
   } else {
-    preview = `${todos.length} task${todos.length!==1?'s':''} · ${doneCount} done`;
+    taskPreview = `${todos.length} task${todos.length!==1?'s':''} · ${doneCount} done`;
   }
-} else {
-  preview = 'No notes';
 }
 let badges='';
 if(e.pinned) badges+=`<span style="font-size:11px">📌</span>`;
@@ -3496,7 +3546,7 @@ if((e.files||[]).length) badges+=`<span class="er-badge" style="background:var(-
 const iconHTML = `<div class="er-icon" style="background:${isSel ? 'var(--accent)' : s.bg}; color:${isSel ? '#fff' : s.color}">
   ${isSel ? '✓' : e.subject.slice(0,4)}
 </div>`;
-  return `<div class="entry-row${e.pinned?' pinned':''}${isSel?' selected':''}" data-id="${e.id}" style="${isSel?'background:rgba(47,129,247,.25)!important;border-left:3px solid var(--accent);box-shadow:inset 0 0 0 1.5px rgba(47,129,247,.5);':''}">
+  return `<div class="entry-row${e.pinned?' pinned':''}${isSel?' selected':''}" data-id="${e.id}">
     <div class="er-accent" style="background:${s.color}"></div>
     ${iconHTML}
     <div class="er-content">
@@ -3506,7 +3556,10 @@ const iconHTML = `<div class="er-icon" style="background:${isSel ? 'var(--accent
       </div>
       <div style="font-size:11px;font-weight:600;color:${s.color};margin-bottom:2px;letter-spacing:.1px;line-height:1.3">${esc(s.label)}${e.time?` <span style="font-weight:400;color:var(--text3);font-size:10px">· ${esc(e.time)}</span>`:''}</div>
       <div class="er-bottom">
-        <span class="er-preview">${isTodoPreview ? preview : esc(preview)}</span>
+        <div class="er-preview-wrap">
+          <span class="er-preview">${esc(notesPreview)}</span>
+          ${taskPreview?`<span class="er-preview-task${taskPreviewDone?' done':''}">${taskPreview}</span>`:''}
+        </div>
         <div class="er-badges">${badges}</div>
       </div>
     </div>
@@ -3658,7 +3711,7 @@ function buildCard(e){
   const todosH=todos.length?`<div class="sec-lbl">Tasks (${todos.filter(t=>t.done).length}/${todos.length} done)</div><div class="card-todos">${todos.map(t=>{const isOD=t.due&&!t.done&&t.due<new Date().toISOString().split('T')[0];return`<div class="card-todo-item${t.done?' done':''}" id="todo_${t.id}"><button class="todo-chk${t.done?' done':''}" onclick="event.stopPropagation();toggleCardTodo('${e.id}','${t.id}')">${t.done?'✓':''}</button><span class="todo-txt">${esc(t.text)}</span>${t.due?`<span class="todo-due${isOD?' overdue':''}">${t.due}</span>`:''}</div>`;}).join('')}</div>`:'';
   const ytH=(e.youtubes||[]).length?`<div class="sec-lbl">Videos</div><div class="yt-grid">${e.youtubes.map(y=>`<div class="yt-card" onclick="openYTPopup('${y}')"><img src="https://img.youtube.com/vi/${y}/mqdefault.jpg" alt="" onerror="this.style.display='none'"><div class="yt-play-ov"><div class="yt-play-ico">▶</div></div><div class="yt-cap">▶ ${y}</div></div>`).join('')}</div>`:'';
   const filesH=(e.files||[]).length?`<div class="sec-lbl">Attachments</div><div class="files-row">${e.files.map((f,i)=>`<div class="file-chip" onclick="viewFile('${e.id}',${i})">${fIco(f.type)}<span>${esc(f.name)}</span></div>`).join('')}</div>`:'';
-  return`<div class="entry-card${e.pinned?' pinned':''}${selIds.has(e.id)?' selected':''}" data-id="${e.id}" id="card_${e.id}">
+  return`<div class="entry-card${e.pinned?' pinned':''}${selIds.has(String(e.id))?' selected':''}" data-id="${e.id}" id="card_${e.id}">
   <div class="card-top">
     <div class="date-col"><div class="dc-d">${d.getDate()}</div><div class="dc-m">${MSHORT[d.getMonth()]}</div><div class="dc-w">${DAYS[d.getDay()]}</div></div>
     <div class="card-info"><span class="card-subj-badge" style="background:${s.bg};color:${s.color}">${s.label}${e.time?`<span class="card-subj-time">· ${esc(e.time)}</span>`:''}</span><div class="card-title-list">${titlesH||'<div class="card-t" style="color:var(--text3);font-style:italic;font-size:13px">Untitled session</div>'}</div>${tagsH}</div>
@@ -3693,7 +3746,7 @@ function renderGrid(items){
     const sublabel=isThisWeek?`${MSHORT[start.getMonth()]} ${start.getDate()} – ${MSHORT[end.getMonth()]} ${end.getDate()}, ${start.getFullYear()}`:`${start.getFullYear()} · ${subjSet.length} subject${subjSet.length!==1?'s':''}`;
     const fid='wf'+wk.replace(/-/g,'');
 const rows = weekItems.map(e=>{
-  const selectedClass = selIds.has(e.id) ? ' selected' : '';
+  const selectedClass = selIds.has(String(e.id)) ? ' selected' : '';
   const s=SUBJECTS.find(x=>x.id===e.subject)||{color:'#8b92a8'};
   const dt=new Date(e.date+'T00:00:00');
   const title=(e.titles||[]).find(t=>t.text)?.text||'Untitled';
@@ -3798,12 +3851,12 @@ function renderStats(){
   const svgRing=`<svg width="80" height="80" viewBox="0 0 80 80" class="comp-ring"><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--panel3)" stroke-width="8"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--green)" stroke-width="8" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-dashoffset="${circ/4}" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="44" text-anchor="middle" font-size="14" font-weight="800" fill="var(--green)" font-family="var(--mono)">${compRate}%</text></svg>`;
   c.innerHTML=`<div>
   <div class="stat-top-grid">
-    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${entries.length}</div><div class="stc-l">Total Entries</div></div>
-    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${st}</div><div class="stc-l">Day Streak</div></div>
-    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${totalWords>=1000?(totalWords/1000).toFixed(1)+'k':totalWords}</div><div class="stc-l">Words Written</div></div>
-    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${tw}</div><div class="stc-l">This Week</div></div>
-    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${dT}</div><div class="stc-l">Tasks Done</div><div class="stc-s">${tT} total</div></div>
-    <div class="stc"><div class="stc-ico"></div><div class="stc-n">${avgRating||'—'}</div><div class="stc-l">Avg Rating</div><div class="stc-s">${avgRated.length} rated</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${entries.length}" data-stat-format="int">0</div><div class="stc-l">Total Entries</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${st}" data-stat-format="int">0</div><div class="stc-l">Day Streak</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${totalWords}" data-stat-format="compactk1">0</div><div class="stc-l">Words Written</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${tw}" data-stat-format="int">0</div><div class="stc-l">This Week</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${dT}" data-stat-format="int">0</div><div class="stc-l">Tasks Done</div><div class="stc-s">${tT} total</div></div>
+    <div class="stc"><div class="stc-ico"></div><div class="stc-n"${avgRated.length?` data-stat-value="${avgRating}" data-stat-format="decimal1"`:''}>${avgRated.length?'0.0':'—'}</div><div class="stc-l">Avg Rating</div><div class="stc-s">${avgRated.length} rated</div></div>
   </div>
   <div class="chart-sec"><div class="chart-title">Activity — Last 52 Weeks</div>
     <div style="display:flex;gap:5px;align-items:center;margin-bottom:7px;font-size:9.5px;color:var(--text4)"><span>Less</span><div style="display:flex;gap:2px">${[0,1,2,3,4].map(l=>`<div class="hmc hml${l}" style="width:11px;height:11px"></div>`).join('')}</div><span>More</span></div>
@@ -3832,6 +3885,37 @@ function renderStats(){
   ${Object.keys(mc).length?`<div class="chart-sec"><div class="chart-title">Mood Distribution</div><div style="display:flex;gap:8px;flex-wrap:wrap">${Object.entries(mc).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px"><span style="font-size:26px">${moodEmo(m)}</span><span style="font-size:13px;font-weight:700;color:var(--text)">${n}</span><span style="font-size:10px;color:var(--text3)">${m}</span></div>`).join('')}</div></div>`:''}
   ${topTags.length?`<div class="chart-sec"><div class="chart-title">Top Tags</div><div class="top-tags-wrap">${topTags.map(([t,n])=>`<span class="ttag">#${esc(t)}<span class="ttag-cnt">${n}</span></span>`).join('')}</div></div>`:''}
   </div>`;
+  animateStatsPanelNumbers();
+}
+
+function animateStatsPanelNumbers(){
+  const root=document.getElementById('statsCont');
+  if(!root)return;
+  const items=[...root.querySelectorAll('[data-stat-value]')];
+  if(!items.length)return;
+  const dur=800;
+  const ease=t=>1-Math.pow(1-t,3);
+  const formatValue=(v,fmt)=>{
+    if(fmt==='decimal1')return Number(v).toFixed(1);
+    if(fmt==='compactk1'){
+      const n=Number(v);
+      return n>=1000?(n/1000).toFixed(1)+'k':String(Math.round(n));
+    }
+    return String(Math.round(Number(v)));
+  };
+  items.forEach(el=>{
+    const target=Number(el.dataset.statValue||0);
+    const fmt=el.dataset.statFormat||'int';
+    if(!Number.isFinite(target))return;
+    const start=performance.now();
+    const tick=(now)=>{
+      const p=Math.min(1,(now-start)/dur);
+      el.textContent=formatValue(target*ease(p),fmt);
+      if(p<1)requestAnimationFrame(tick);
+      else el.textContent=formatValue(target,fmt);
+    };
+    requestAnimationFrame(tick);
+  });
 }
 
 /* ══════════════════════════════════
@@ -4146,9 +4230,18 @@ async function togglePinSel() {
 }
 
 function toggleSel(id) {
-  selIds.has(id) ? selIds.delete(id) : selIds.add(id);
+  const sid = String(id);
+  selIds.has(sid) ? selIds.delete(sid) : selIds.add(sid);
+  
+  // Immediately update the row's class for instant visual feedback
+  const row = document.querySelector(`.entry-row[data-id="${sid}"]`);
+  if (row) {
+    if (selIds.has(sid)) row.classList.add('selected');
+    else row.classList.remove('selected');
+  }
+  
   updateSelBar();
-  render();
+  render();  // full re‑render ensures consistency
 }
 function clearSel() {
   selIds.clear();
@@ -4196,7 +4289,7 @@ function updateSelBar() {
     originalToolbarHTML = toolbar.innerHTML;
   }
 
-  const allPinned = Array.from(selIds).every(id => entries.find(e => e.id === id)?.pinned);
+  const allPinned = Array.from(selIds).every(id => entries.find(e => String(e.id) === id)?.pinned);
   const pinLabel = allPinned ? 'Unpin' : 'Pin';
 
   toolbar.innerHTML = `
@@ -4217,9 +4310,9 @@ function updateSelBar() {
 
 async function togglePinSel() {
   if (!selIds.size) return;
-  const allPinned = Array.from(selIds).every(id => entries.find(e=>e.id===id)?.pinned);
+  const allPinned = Array.from(selIds).every(id => entries.find(e=>String(e.id)===id)?.pinned);
   for (const id of selIds) {
-    const e = entries.find(x => x.id === id);
+    const e = entries.find(x => String(x.id) === id);
     if (e) e.pinned = !allPinned;
   }
   await saveData();
@@ -4230,9 +4323,9 @@ async function togglePinSel() {
 
 async function togglePinSel() {
   if (!selIds.size) return;
-  const allPinned = Array.from(selIds).every(id => entries.find(e=>e.id===id)?.pinned);
+  const allPinned = Array.from(selIds).every(id => entries.find(e=>String(e.id)===id)?.pinned);
   for (const id of selIds) {
-    const e = entries.find(x => x.id === id);
+    const e = entries.find(x => String(x.id) === id);
     if (e) e.pinned = !allPinned;
   }
   await saveData();
@@ -4245,17 +4338,17 @@ async function delSel() {
   const now = Date.now();
   for (const id of selIds) { deletedIds[id] = now; }
   saveDeletedIds();
-  entries = entries.filter(e => !selIds.has(e.id));
+  entries = entries.filter(e => !selIds.has(String(e.id)));
   await saveData();
   clearSel();
   buildSubjList();
   updateSideTagCloud();
   toast('Deleted', 'ok');
 }
-async function pinSel(){entries.forEach(e=>{if(selIds.has(e.id))e.pinned=true;});await saveData();render();}
+async function pinSel(){entries.forEach(e=>{if(selIds.has(String(e.id)))e.pinned=true;});await saveData();render();}
 function expSel() {
   if (!selIds.size) return;
-  const selectedEntries = entries.filter(e => selIds.has(e.id));
+  const selectedEntries = entries.filter(e => selIds.has(String(e.id)));
   expEntries(selectedEntries, 'studylog_selected');
   clearSel(); // clears selection after export
 }
@@ -4375,7 +4468,7 @@ const CMDS=[
   {l:'Group by week',i:'📅',fn:()=>setGroupMode('week')},
   {l:'No grouping',i:'≡',fn:()=>setGroupMode('none')},
   {l:'Focus mode',i:'⛶',k:'F10',fn:()=>toggleFocus()},
-  {l:'Export Markdown',i:'⬇',k:'Ctrl+E',fn:()=>exportAll()},
+  {l:'Export JSON',i:'⬇',k:'Ctrl+E',fn:()=>exportAll()},
   {l:'Import JSON',i:'⬆',fn:()=>importData()},
   {l:'Load Routine JSON',i:'⚙',fn:()=>loadRoutineFile()},
   {l:'Connect GitHub Sync',s:'Sync across all devices',i:'🐙',fn:()=>openGHConnectModal()},
