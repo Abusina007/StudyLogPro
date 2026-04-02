@@ -15,12 +15,31 @@
 }
 
 /* ── Directional View Transitions ── */
-[data-theme-dir="expand"]::view-transition-old(root){animation:none;z-index:-1}
-[data-theme-dir="expand"]::view-transition-new(root){animation:theme-expand 600ms cubic-bezier(.4,0,.2,1) forwards;z-index:1}
-[data-theme-dir="contract"]::view-transition-old(root){animation:theme-contract 600ms cubic-bezier(.4,0,.2,1) forwards;z-index:1}
-[data-theme-dir="contract"]::view-transition-new(root){animation:none;z-index:-1}
-@keyframes theme-expand{from{clip-path:circle(0px at var(--tx) var(--ty))}to{clip-path:circle(var(--tr) at var(--tx) var(--ty))}}
-@keyframes theme-contract{from{clip-path:circle(var(--tr) at var(--tx) var(--ty))}to{clip-path:circle(0px at var(--tx) var(--ty))}}
+[data-theme-dir="expand"]::view-transition-old(root) {
+  animation: none; z-index: -1;
+}
+[data-theme-dir="expand"]::view-transition-new(root) {
+  animation: theme-expand 500ms cubic-bezier(.4,0,.2,1) forwards;
+  z-index: 1;
+  will-change: clip-path;
+}
+[data-theme-dir="contract"]::view-transition-old(root) {
+  animation: theme-contract 500ms cubic-bezier(.4,0,.2,1) forwards;
+  z-index: 1;
+  will-change: clip-path;
+}
+[data-theme-dir="contract"]::view-transition-new(root) {
+  animation: none; z-index: -1;
+}
+@keyframes theme-expand {
+  from { clip-path: circle(0px at var(--tx) var(--ty)); }
+  to   { clip-path: circle(var(--tr) at var(--tx) var(--ty)); }
+}
+@keyframes theme-contract {
+  from { clip-path: circle(var(--tr) at var(--tx) var(--ty)); }
+  to   { clip-path: circle(0px at var(--tx) var(--ty)); }
+}
+
 [data-theme="dark"]{
 --bg:#0d1117;--panel:#0d1117;--panel2:#161b22;--panel3:#1f2937;--panel4:#30363d;
 --border:#30363d;--border2:#21262d;--border3:#484f58;
@@ -1620,6 +1639,96 @@ button, select, input[type="date"] {
   color: white !important;
   transform: scale(1.02);
 }
+/* ─── GENERAL SMOOTHNESS ─────────────────────────────── */
+#viewArea { overscroll-behavior-y: contain; }
+#sidebar, .dp-body, .m-body, .cmd-list {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.entry-row, .grid-card, .wf-entry, .entry-card {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.detail-panel, #sidebar {
+  backface-visibility: hidden;
+  contain: layout;
+}
+
+/* ─── NO BACKDROP TRANSITION DURING DRAG ────────────── */
+.detail-overlay.dp-dragging::before { transition: none !important; }
+.cal-sheet-ov.dp-dragging::before   { transition: none !important; }
+
+/* ─── CALENDAR BOTTOM SHEET ─────────────────────────── */
+.cal-sheet-ov {
+  position: fixed; inset: 0; z-index: 680;
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.cal-sheet-ov::before {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(0,0,0,.58);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: background .25s ease;
+}
+.cal-sheet-ov.open { opacity: 1; visibility: visible; }
+.cal-sheet-panel {
+  position: relative;
+  background: var(--panel);
+  width: 100%; max-width: 700px;
+  max-height: 62vh;
+  border-radius: 20px 20px 0 0;
+  display: flex; flex-direction: column;
+  transform: translateY(70px);
+  transition: transform .34s cubic-bezier(.22,1,.36,1);
+  will-change: transform;
+  overflow: hidden;
+}
+@media(min-width:720px){
+  .cal-sheet-ov { align-items: center; }
+  .cal-sheet-panel {
+    border-radius: 18px; max-height: 78vh; margin: 20px;
+  }
+}
+.cal-sheet-ov.open .cal-sheet-panel { transform: none; }
+.cal-sheet-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px 11px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.cal-sheet-head-info { flex: 1; min-width: 0; }
+.cal-sheet-head-date {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  letter-spacing: -.3px; line-height: 1.2;
+}
+.cal-sheet-head-sub {
+  font-size: 11px; color: var(--text3);
+  margin-top: 2px; font-family: var(--mono);
+}
+.cal-sheet-btn {
+  background: var(--panel2); border: 1px solid var(--border);
+  color: var(--text2); padding: 6px 12px; border-radius: 10px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  font-family: var(--font); transition: all var(--tr);
+  white-space: nowrap; flex-shrink: 0;
+}
+.cal-sheet-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cal-sheet-btn.primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.cal-sheet-btn.primary:hover { background: var(--accent-h); }
+.cal-sheet-body {
+  flex: 1; overflow-y: auto; padding: 10px 12px 14px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.cal-sheet-empty {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 36px 20px; gap: 10px; text-align: center;
+}
+.cal-sheet-empty .cse-ico { font-size: 38px; opacity: .18; }
+.cal-sheet-empty p { font-size: 13px; color: var(--text3); }
 </style>
 </head>
 <body>
@@ -1685,7 +1794,7 @@ button, select, input[type="date"] {
 
   <!-- Search -->
   <div class="tb-search-container" style="flex:1;max-width:240px;margin:0 8px;position:relative;">
-    <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none">
+    <span style="position:absolute;left:9px;top:58%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
     </span>
     <input class="tb-search-input" id="searchInp" placeholder="Search…" autocomplete="off" oninput="applyFilters()" style="width:100%;padding-left:30px;">
@@ -2093,7 +2202,21 @@ button, select, input[type="date"] {
     </div>
   </div>
 </div>
-
+<!-- ▀▄▀▄ CALENDAR BOTTOM SHEET ▀▄▀▄ -->
+<div id="calSheetOv" class="cal-sheet-ov" onclick="if(event.target===this)closeCalSheet()">
+  <div class="cal-sheet-panel" id="calSheetPanel">
+    <div class="dp-handle"></div>
+    <div class="cal-sheet-head">
+      <div class="cal-sheet-head-info">
+        <div class="cal-sheet-head-date" id="calSheetDateLbl"></div>
+        <div class="cal-sheet-head-sub" id="calSheetSubLbl"></div>
+      </div>
+      <button class="cal-sheet-btn" onclick="calSheetViewDay()">Full day →</button>
+      <button class="cal-sheet-btn primary" onclick="calSheetAdd()">+ Add</button>
+    </div>
+    <div class="cal-sheet-body" id="calSheetBody"></div>
+  </div>
+</div>
 <!-- ▀▄▀▄ CALENDAR TOOLTIP ▀▄▀▄ -->
 <div id="calTip"></div>
 
@@ -2778,12 +2901,22 @@ const sunPath  = `<circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="2.
 }
 
 function toggleTheme(e) {
-  const btn = document.getElementById('themeToggle');
-  const src = (e && e.currentTarget) ? e.currentTarget : btn;
-  const rect = src ? src.getBoundingClientRect() : {left:window.innerWidth/2, top:window.innerHeight/2, width:0, height:0};
-  const x = rect.left + rect.width / 2;
-  const y = rect.top + rect.height / 2;
-  const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  const src = (e && e.currentTarget) ? e.currentTarget : null;
+
+  let x, y;
+  if (src) {
+    const rect = src.getBoundingClientRect();
+    // Add visualViewport offset — fixes the "starts above button" bug on mobile
+    const vvX = (window.visualViewport ? window.visualViewport.offsetLeft : 0);
+    const vvY = (window.visualViewport ? window.visualViewport.offsetTop  : 0);
+    x = rect.left + rect.width  / 2 + vvX;
+    y = rect.top  + rect.height / 2 + vvY;
+  } else {
+    x = window.innerWidth  / 2;
+    y = window.innerHeight / 2;
+  }
+
+  const radius  = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
   const nextDark = !darkMode;
 
   document.documentElement.style.setProperty('--tx', `${x}px`);
@@ -2795,7 +2928,14 @@ function toggleTheme(e) {
     applyTheme(nextDark);
     return;
   }
-  document.startViewTransition(() => applyTheme(nextDark));
+
+  // Brief delay: lets the browser flush the CSS var writes before
+  // starting the transition, which eliminates the mobile jitter
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.startViewTransition(() => applyTheme(nextDark));
+    });
+  });
 }
 
 
@@ -3873,10 +4013,11 @@ function renderCal(){
     const dow=new Date(ds+'T00:00:00').getDay(),isHol=dow===0||dow===6;
     const de=byDate[ds]||[],pendTodos=(todoByDate[ds]||[]).filter(t=>!t.done);
     const dots=de.slice(0,6).map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{color:'#8b92a8'};return`<div class="cal-dot" style="background:${s.color}"></div>`;}).join('');
-    cells+=`<div class="cal-cell${ds===today?' today':''}${isHol?' holiday':''}" onclick="openDayPanel('${ds}')" onmouseenter="showCalTip(event,'${ds}')" onmouseleave="hideCalTip()"><div class="cal-num">${d}</div>${isHol?'<div class="cal-hday">Wknd</div>':''}<div class="cal-dots">${dots}</div>${de.length?`<div class="cal-count">${de.length}</div>`:''}${pendTodos.length?`<div class="cal-todo-badge">${pendTodos.length}</div>`:''}</div>`;
+    cells+=`<div class="cal-cell${ds===today?' today':''}${isHol?' holiday':''}" data-date="${ds}" onclick="calCellClick('${ds}')" onmouseenter="showCalTip(event,'${ds}')" onmouseleave="hideCalTip()"><div class="cal-num">${d}</div>${isHol?'<div class="cal-hday">Wknd</div>':''}<div class="cal-dots">${dots}</div>${de.length?`<div class="cal-count">${de.length}</div>`:''}${pendTodos.length?`<div class="cal-todo-badge">${pendTodos.length}</div>`:''}</div>`;
   }
   const tot=Math.ceil((fd+dm)/7)*7;for(let d=1;d<=tot-(fd+dm);d++)cells+=`<div class="cal-cell other-m"><div class="cal-num">${d}</div></div>`;
   c.innerHTML=`<div class="cal-wrap"><div class="cal-nav"><button class="cal-nav-btn" onclick="calNav(-1)">◀</button><h2>${MONTHS[calMonth]} ${calYear}</h2><button class="cal-nav-btn" onclick="calNav(1)">▶</button><button class="cal-nav-btn" onclick="calToday()">Today</button></div><div class="cal-grid">${DAYS.map(d=>`<div class="cal-dh">${d}</div>`).join('')}${cells}</div></div>`;
+  setupCalLongPress();
 }
 function calNav(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCal();}
 function calToday(){calMonth=new Date().getMonth();calYear=new Date().getFullYear();renderCal();}
@@ -4592,58 +4733,112 @@ function hilight(t,q){if(!q)return esc(t);return esc(t).replace(new RegExp('('+q
 function runCmd(i){closeCmd();CMDS[i]?.fn();}
 function cmdKey(e){const items=document.querySelectorAll('.cmd-item');if(e.key==='ArrowDown'){e.preventDefault();cmdIdx=Math.min(cmdIdx+1,items.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();cmdIdx=Math.max(cmdIdx-1,0);}else if(e.key==='Enter'){e.preventDefault();items[cmdIdx]?.click();return;}else if(e.key==='Escape'){closeCmd();return;}items.forEach((el,i)=>el.classList.toggle('hi',i===cmdIdx));}
 
-  function initDetailDrag() {
+function initDetailDrag() {
   const overlay = document.getElementById('detailOverlay');
   const panel   = document.querySelector('.detail-panel');
   if (!panel || !overlay) return;
 
-  let startY = 0, dragY = 0, dragging = false;
-  let tid = null, rafId = null;
+  const S = {
+    active: false, touchId: null,
+    startY: 0, currentY: 0,
+    lastY: 0, lastT: 0, vel: 0,
+    raf: null
+  };
 
-  const dpBody  = () => document.getElementById('dpBody');
-  const blocked = el => !!el.closest('button,a,input,select,textarea');
+  const DISMISS_VEL  = 0.45;   // px/ms — flick threshold
+  const DISMISS_DIST = 110;    // px   — drag-distance threshold
 
-  function resist(dy) {
-  if (dy <= 0) return 0;
-  // Spring-like: fast initial pull, then tapers off smoothly
-  return 30 * (1 - Math.exp(-dy / 40)) + dy * 0.3;
+  function scrollBody()  { return document.getElementById('dpBody'); }
+
+  function canStart(el) {
+    if (el.closest('button,a,input,select,textarea,[role="button"]')) return false;
+    if (el.closest('.dp-handle,.dp-header,.dp-close-strip')) return true;
+    const b = scrollBody();
+    if (b && b.contains(el) && b.scrollTop > 6) return false;
+    return true;
   }
 
-  function hardReset() {
-    dragging = false; dragY = 0; startY = 0; tid = null;
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    panel.style.transition = '';
-    panel.style.transform  = '';
-    panel.style.opacity    = '';
-    overlay.style.transition = '';
-    overlay.style.opacity  = '';
+  /* 1-to-1 tracking with a gentle rubber-band when pulling UP */
+  function applyY(dy) {
+    const y = dy < 0 ? dy * 0.1 : dy;          // resist upward drag
+    const progress = Math.max(0, y) / 360;
+    panel.style.transform = `translateY(${y}px)`;
+    panel.style.opacity   = String(Math.max(0.35, 1 - progress * 0.55));
+    overlay.style.setProperty('--ov-alpha',
+      String(Math.max(0.02, 0.65 - progress * 0.63)));
   }
 
-  new MutationObserver(() => {
-    if (!overlay.classList.contains('open')) hardReset();
-  }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
+  function begin(y) {
+    S.active = true;
+    S.startY = S.lastY = y;
+    S.lastT  = performance.now();
+    S.vel    = 0; S.currentY = 0;
+    panel.style.transition   = 'none';
+    overlay.style.transition = 'none';
+    overlay.classList.add('dp-dragging');
+    if (S.raf) cancelAnimationFrame(S.raf);
+  }
 
-  function springBack() {
-    panel.style.transition   = 'transform .42s cubic-bezier(.34,1.4,.64,1), opacity .28s ease';
+  function move(y) {
+    if (!S.active) return;
+    const now = performance.now();
+    const dt  = now - S.lastT;
+    if (dt > 0) {
+      /* exponential moving average — smooths micro-jitter */
+      S.vel = S.vel * 0.55 + ((y - S.lastY) / dt) * 0.45;
+    }
+    S.lastY = y; S.lastT = now;
+
+    const b  = scrollBody();
+    const dy = y - S.startY;
+    if (b && b.scrollTop > 6 && dy < 0) { finish(); return; }
+
+    S.currentY = dy;
+    if (S.raf) cancelAnimationFrame(S.raf);
+    S.raf = requestAnimationFrame(() => { if (S.active) applyY(S.currentY); });
+  }
+
+  function finish() {
+    if (!S.active) return;
+    S.active = false;
+    overlay.classList.remove('dp-dragging');
+    if (S.raf) cancelAnimationFrame(S.raf);
+
+    if (S.vel > DISMISS_VEL || S.currentY > DISMISS_DIST) {
+      dismissNow();
+    } else {
+      snapBack();
+    }
+  }
+
+  function snapBack() {
+    /* spring overshoot — same feel as YouTube's bottom sheet snap */
+    panel.style.transition   = 'transform .44s cubic-bezier(.22,1,.36,1), opacity .3s ease';
+    overlay.style.transition = 'opacity .3s ease';
     panel.style.transform    = '';
     panel.style.opacity      = '';
-    overlay.style.transition = 'opacity .28s ease';
-    overlay.style.opacity    = '';
+    overlay.style.setProperty('--ov-alpha', '0.65');
     setTimeout(() => {
       panel.style.transition   = '';
       overlay.style.transition = '';
-    }, 450);
+    }, 460);
+    S.currentY = 0;
   }
 
-  function dismiss() {
-    const row = detailId ? document.querySelector(`.entry-row[data-id="${detailId}"]`) : null;
-    panel.style.transition   = 'transform .26s cubic-bezier(.4,0,1,1), opacity .2s ease';
-    panel.style.transform    = 'translateY(110%)';
+  function dismissNow() {
+    const row = detailId
+      ? document.querySelector(`.entry-row[data-id="${detailId}"]`)
+      : null;
+    /* project exit point using velocity for a natural flyaway */
+    const exitY = Math.max(S.currentY + S.vel * 180, window.innerHeight * 0.45);
+    panel.style.transition   = 'transform .28s cubic-bezier(.4,0,1,1), opacity .2s ease';
+    overlay.style.transition = 'opacity .2s ease';
+    panel.style.transform    = `translateY(${exitY}px)`;
     panel.style.opacity      = '0';
-    overlay.style.transition = 'opacity .22s ease';
     overlay.style.opacity    = '0';
     setTimeout(() => {
-      hardReset();
+      panel.style.cssText  = '';
+      overlay.style.cssText = '';
       closeDetailPanel();
       if (row) {
         row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -4652,105 +4847,43 @@ function cmdKey(e){const items=document.querySelectorAll('.cmd-item');if(e.key==
         row.classList.add('dp-land-flash');
         setTimeout(() => row.classList.remove('dp-land-flash'), 900);
       }
-    }, 270);
+    }, 290);
+    S.currentY = 0;
   }
 
-  function canStart(el) {
-    if (blocked(el)) return false;
-    const b = dpBody();
-    if (b && b.contains(el) && b.scrollTop > 4
-        && !el.closest('.dp-handle,.dp-header,.dp-close-strip')) return false;
-    return true;
-  }
-
-  function onStart(y, touchId = null) {
-    tid = touchId; startY = y; dragY = 0; dragging = true;
-    panel.style.transition   = 'none';
-    overlay.style.transition = 'none';
-  }
-
-  function onMove(y) {
-    if (!dragging) return;
-    const dy  = y - startY;
-    const b   = dpBody();
-    const atTop = !b || b.scrollTop <= 2;
-
-    // Only allow downward drag; ignore upward
-    if (dy <= 0) {
-      if (dragY > 0) {
-        dragY = 0;
-        panel.style.transform = '';
-        panel.style.opacity   = '';
-      }
-      return;
-    }
-
-    // If body is scrolled, only allow drag from handle/header
-    if (!atTop) { dragging = false; return; }
-
-    dragY = dy;
-
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(() => {
-      rafId = null;
-      const vis = resist(dragY);
-      const r   = Math.min(dragY / 160, 1);
-      panel.style.transform    = `translateY(${vis}px)`;
-      panel.style.opacity      = String(Math.max(0.55, 1 - r * 0.45));
-      overlay.style.opacity    = String(Math.max(0.05, 0.65 - r * 0.60));
-    });
-  }
-
-  function onEnd() {
-  if (!dragging) return;
-  dragging = false; tid = null;
-  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  overlay.style.opacity = '';
-  if (dragY > 110) dismiss();
-  else springBack();
-
-  function springBack() {
-    panel.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.28s ease';
-    panel.style.transform = '';
-    panel.style.opacity = '';
-    overlay.style.transition = 'opacity 0.28s ease';
-    overlay.style.opacity = '';
-    setTimeout(() => {
-      panel.style.transition = '';
-      overlay.style.transition = '';
-    }, 450);
-  }
-
-  dragY = 0;
-}
-
-  // Touch
+  /* ── Touch ── */
   panel.addEventListener('touchstart', e => {
     if (!canStart(e.target)) return;
-    onStart(e.touches[0].clientY, e.touches[0].identifier);
+    S.touchId = e.touches[0].identifier;
+    begin(e.touches[0].clientY);
   }, { passive: true });
 
   panel.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    const t = [...e.touches].find(x => x.identifier === tid);
+    if (!S.active) return;
+    const t = [...e.touches].find(x => x.identifier === S.touchId);
     if (!t) return;
-    const dy = t.clientY - startY;
-    if (dy > 8) e.preventDefault();
-    onMove(t.clientY);
+    if (t.clientY - S.startY > 5) e.preventDefault(); // block scroll while dragging
+    move(t.clientY);
   }, { passive: false });
 
-  panel.addEventListener('touchend',    onEnd, { passive: true });
-  panel.addEventListener('touchcancel', onEnd, { passive: true });
-  window.addEventListener('touchend', () => { if (dragging) onEnd(); }, { passive: true });
+  panel.addEventListener('touchend',    finish, { passive: true });
+  panel.addEventListener('touchcancel', () => { if (S.active) snapBack(); S.active = false; }, { passive: true });
 
-  // Mouse (desktop)
+  /* ── Mouse (desktop) ── */
   panel.addEventListener('mousedown', e => {
     if (!canStart(e.target)) return;
-    onStart(e.clientY);
-    e.preventDefault();
+    begin(e.clientY); e.preventDefault();
   });
-  window.addEventListener('mousemove', e => { if (dragging) onMove(e.clientY); });
-  window.addEventListener('mouseup',   () => { if (dragging) onEnd(); });
+  window.addEventListener('mousemove', e => { if (S.active) move(e.clientY); });
+  window.addEventListener('mouseup',   () => { if (S.active) finish(); });
+
+  /* Reset visuals when panel closes without a gesture */
+  new MutationObserver(() => {
+    if (!overlay.classList.contains('open') && !S.active) {
+      panel.style.cssText  = '';
+      S.currentY = 0;
+    }
+  }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
 }
 
 /* ── MISC ── */
@@ -5656,7 +5789,186 @@ function getNextSubjectForDate(dateStr, batch) {
   const available = slots.filter(s => !usedSubjects.includes(s.subj));
   return available.length ? available[0] : null;
 }
+/* ═══════════════════════════════════════════════════════
+   CALENDAR BOTTOM SHEET  (click = sheet, long-press = day panel)
+═══════════════════════════════════════════════════════ */
+let _csDate = '';
 
+function openCalSheet(dateStr) {
+  _csDate = dateStr;
+  const ov    = document.getElementById('calSheetOv');
+  const panel = document.getElementById('calSheetPanel');
+  if (!ov) return;
+
+  const d       = new Date(dateStr + 'T00:00:00');
+  const isToday = dateStr === new Date().toISOString().split('T')[0];
+  const list    = entries.filter(e => e.date === dateStr);
+
+  document.getElementById('calSheetDateLbl').textContent =
+    (isToday ? 'Today — ' : '') +
+    DAYSFULL[d.getDay()] + ', ' +
+    d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+
+  document.getElementById('calSheetSubLbl').textContent =
+    list.length ? `${list.length} entr${list.length !== 1 ? 'ies' : 'y'}` : 'No entries';
+
+  _renderCalSheet(dateStr);
+  ov.classList.add('open');
+
+  /* init drag-to-dismiss once */
+  if (!panel._csDrag) { panel._csDrag = true; _initCalSheetDrag(); }
+}
+
+function closeCalSheet() {
+  const ov    = document.getElementById('calSheetOv');
+  const panel = document.getElementById('calSheetPanel');
+  if (!ov) return;
+  panel.style.transition = 'transform .26s cubic-bezier(.4,0,1,1)';
+  panel.style.transform  = 'translateY(100%)';
+  ov.style.transition    = 'opacity .24s ease';
+  ov.style.opacity       = '0';
+  setTimeout(() => {
+    ov.classList.remove('open');
+    panel.style.cssText = '';
+    ov.style.cssText    = '';
+  }, 280);
+}
+
+function calSheetViewDay() {
+  const d = _csDate; closeCalSheet();
+  setTimeout(() => openDayPanel(d), 230);
+}
+
+function calSheetAdd() {
+  const d = _csDate; closeCalSheet();
+  setTimeout(() => openModal(null, d), 230);
+}
+
+function _renderCalSheet(dateStr) {
+  const body = document.getElementById('calSheetBody');
+  if (!body) return;
+  const list = entries
+    .filter(e => e.date === dateStr)
+    .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+
+  if (!list.length) {
+    body.innerHTML = `<div class="cal-sheet-empty">
+      <div class="cse-ico">📅</div>
+      <p>Nothing logged for this day yet.</p>
+    </div>`;
+    return;
+  }
+  body.innerHTML = `<div class="entry-rows-wrap">
+    <div class="entry-rows">${list.map(buildEntryRow).join('')}</div>
+  </div>`;
+  body.querySelectorAll('.entry-row').forEach(el => {
+    el.addEventListener('click', () => {
+      closeCalSheet();
+      setTimeout(() => openDetailPanel(el.dataset.id), 230);
+    });
+    el.addEventListener('contextmenu', ev => {
+      ev.preventDefault(); showCtx(ev, el.dataset.id);
+    });
+  });
+}
+
+/* YouTube-style drag-to-dismiss for the cal sheet */
+function _initCalSheetDrag() {
+  const ov    = document.getElementById('calSheetOv');
+  const panel = document.getElementById('calSheetPanel');
+  const S = { active: false, touchId: null,
+              startY: 0, currentY: 0,
+              lastY: 0, lastT: 0, vel: 0 };
+
+  function scrollBody() { return document.getElementById('calSheetBody'); }
+  function canStart(el) {
+    if (el.closest('button,a,input')) return false;
+    const b = scrollBody();
+    if (b && b.contains(el) && b.scrollTop > 6) return false;
+    return true;
+  }
+
+  panel.addEventListener('touchstart', e => {
+    if (!canStart(e.target)) return;
+    S.touchId  = e.touches[0].identifier;
+    S.startY   = S.lastY = e.touches[0].clientY;
+    S.lastT    = performance.now(); S.vel = 0; S.currentY = 0;
+    S.active   = true;
+    panel.style.transition = 'none';
+    ov.classList.add('dp-dragging');
+  }, { passive: true });
+
+  panel.addEventListener('touchmove', e => {
+    if (!S.active) return;
+    const t = [...e.touches].find(x => x.identifier === S.touchId);
+    if (!t) return;
+    const now = performance.now(), dt = now - S.lastT;
+    if (dt > 0) S.vel = S.vel * 0.55 + ((t.clientY - S.lastY) / dt) * 0.45;
+    S.lastY = t.clientY; S.lastT = now;
+    S.currentY = Math.max(0, t.clientY - S.startY);
+    if (S.currentY > 4) e.preventDefault();
+    requestAnimationFrame(() => {
+      if (S.active) panel.style.transform = `translateY(${S.currentY}px)`;
+    });
+  }, { passive: false });
+
+  function end() {
+    if (!S.active) return;
+    S.active = false;
+    ov.classList.remove('dp-dragging');
+    if (S.vel > 0.45 || S.currentY > 100) {
+      closeCalSheet();
+    } else {
+      panel.style.transition = 'transform .44s cubic-bezier(.22,1,.36,1)';
+      panel.style.transform  = '';
+      setTimeout(() => { panel.style.transition = ''; }, 460);
+    }
+  }
+  panel.addEventListener('touchend',    end, { passive: true });
+  panel.addEventListener('touchcancel', end, { passive: true });
+}
+
+/* calendar cell: click → sheet   long-press (500ms) → full day panel */
+function calCellClick(dateStr) { openCalSheet(dateStr); }
+
+function setupCalLongPress() {
+  const c = document.getElementById('calCont');
+  if (!c || c._lpOk) return;
+  c._lpOk = true;
+
+  let timer = null, fired = false;
+
+  function cancel() { clearTimeout(timer); timer = null; }
+
+  c.addEventListener('touchstart', e => {
+    const cell = e.target.closest('.cal-cell:not(.other-m)');
+    if (!cell) return;
+    const ds = cell.dataset.date; if (!ds) return;
+    fired = false;
+    timer = setTimeout(() => {
+      fired = true;
+      haptic('medium');
+      if (document.getElementById('calSheetOv')?.classList.contains('open')) {
+        closeCalSheet();
+        setTimeout(() => openDayPanel(ds), 240);
+      } else {
+        openDayPanel(ds);
+      }
+    }, 500);
+  }, { passive: true });
+
+  c.addEventListener('touchmove',   cancel, { passive: true });
+  c.addEventListener('touchend',    cancel, { passive: true });
+  c.addEventListener('touchcancel', cancel, { passive: true });
+
+  /* right-click on desktop opens full day panel */
+  c.addEventListener('contextmenu', e => {
+    const cell = e.target.closest('.cal-cell:not(.other-m)');
+    if (!cell) return;
+    e.preventDefault();
+    openDayPanel(cell.dataset.date);
+  });
+}
 /* ── KICK OFF ── */
 init();
 
