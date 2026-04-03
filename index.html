@@ -1591,7 +1591,7 @@ input.date-inp,
   animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
 }
 .entry-row.selected .er-icon::before {
-  content: "✓";
+  content: "";
   font-size: 20px;
   font-weight: bold;
 }
@@ -1604,7 +1604,7 @@ input.date-inp,
 }
 
 .entry-card.selected::after {
-  content: "✓";
+  content: "";
   position: absolute;
   top: 8px;
   right: 8px;
@@ -2758,7 +2758,7 @@ async function connectGitHub(token) {
   setSyncStatus('ok', 'Synced ');
   updateSyncUI();
   render(); buildSubjList(); updateSideTagCloud();
-  toast('Connected to GitHub ✓ Syncing across devices!', 'ok');
+  toast('Connected to GitHub  Syncing across devices!', 'ok');
   
   // Start background polling
   startBackgroundSync();
@@ -3093,7 +3093,7 @@ async function finishSetup() {
   render(); buildSubjList(); updateSideTagCloud();
   const gm = localStorage.getItem('slp_group'); if (gm) groupMode = gm;
   updateSyncUI();
-  toast('All set! ' + (ghToken ? 'Syncing with GitHub ✓' : 'Running offline'), 'ok');
+  toast('All set! ' + (ghToken ? 'Syncing with GitHub ' : 'Running offline'), 'ok');
 }
 
 function logoutSemester() {
@@ -3418,7 +3418,7 @@ function removeFormTodo(idx) { formTodos.splice(idx,1); renderFormTodos(); }
 function renderFormTodos() {
   document.getElementById('todoFormList').innerHTML=formTodos.map((t,i)=>`
     <div class="todo-form-item${t.done?' done':''}">
-      <button class="todo-form-chk${t.done?' done':''}" onclick="toggleFormTodo(${i})">${t.done?'✓':''}</button>
+      <button class="todo-form-chk${t.done?' done':''}" onclick="toggleFormTodo(${i})">${t.done?'':''}</button>
       <span class="todo-form-txt">${esc(t.text)}</span>
       ${t.due?`<span class="todo-form-due">${t.due}</span>`:''}
       <button class="todo-form-del" onclick="removeFormTodo(${i})">✕</button>
@@ -3430,7 +3430,7 @@ async function toggleCardTodo(eid,tid) {
   todo.done=!todo.done; entry.updatedAt=Date.now();
   await saveData();
   const el=document.getElementById('todo_'+tid);
-  if(el){ el.classList.toggle('done',todo.done); const chk=el.querySelector('.todo-chk'); if(chk){chk.classList.toggle('done',todo.done);chk.textContent=todo.done?'✓':'';} }
+  if(el){ el.classList.toggle('done',todo.done); const chk=el.querySelector('.todo-chk'); if(chk){chk.classList.toggle('done',todo.done);chk.textContent=todo.done?'':'';} }
   if(currentView==='list') applyFilters();
   updateStats();
 }
@@ -3818,7 +3818,7 @@ if (todos.length) {
   if (firstTask) {
     const taskText = firstTask.text.length > 50 ? firstTask.text.substring(0,47)+'…' : firstTask.text;
     taskPreviewDone = !!firstTask.done;
-    taskPreview = firstTask.done ? `✓ ${esc(taskText)}` : `${esc(taskText)}`;
+    taskPreview = firstTask.done ? ` ${esc(taskText)}` : `${esc(taskText)}`;
     if (todos.length > 1) taskPreview += ` +${todos.length-1} more`;
     taskPreview += ` · ${doneCount}/${todos.length} done`;
   } else {
@@ -3835,7 +3835,7 @@ if((e.youtubes||[]).length) badges+=`<span class="er-badge" style="background:va
 if((e.files||[]).length) badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">📎${e.files.length}</span>`;
   const dateLabel=isToday?'Today':`${d.getDate()} ${MSHORT[d.getMonth()]}`;
 const iconHTML = `<div class="er-icon" style="background:${isSel ? 'var(--accent)' : s.bg}; color:${isSel ? '#fff' : s.color}">
-  ${isSel ? '✓' : e.subject.slice(0,4)}
+  ${isSel ? '' : e.subject.slice(0,4)}
 </div>`;
   return `<div class="entry-row${e.pinned?' pinned':''}${isSel?' selected':''}" data-id="${e.id}">
     <div class="er-accent" style="background:${s.color}"></div>
@@ -3881,7 +3881,7 @@ function openDetailPanel(id){
   if(todos.length){
     const done=todos.filter(t=>t.done).length;
     html+=`<div class="dp-sec"><div class="dp-sec-lbl">Tasks &nbsp;<span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">${done}/${todos.length} done</span></div>`;
-    todos.forEach(t=>{const isOD=t.due&&!t.done&&t.due<new Date().toISOString().split('T')[0];html+=`<div class="dp-todo${t.done?' done':''}"><button class="dp-todo-chk${t.done?' done':''}" onclick="dpToggleTodo('${e.id}','${t.id}')">${t.done?'✓':''}</button><span class="dp-todo-txt">${esc(t.text)}</span>${t.due?`<span style="font-size:10px;font-family:var(--mono);color:${isOD?'var(--red)':'var(--text4)'}">${t.due}</span>`:''}</div>`;});
+    todos.forEach(t=>{const isOD=t.due&&!t.done&&t.due<new Date().toISOString().split('T')[0];html+=`<div class="dp-todo${t.done?' done':''}"><button class="dp-todo-chk${t.done?' done':''}" onclick="dpToggleTodo('${e.id}','${t.id}')">${t.done?'':''}</button><span class="dp-todo-txt">${esc(t.text)}</span>${t.due?`<span style="font-size:10px;font-family:var(--mono);color:${isOD?'var(--red)':'var(--text4)'}">${t.due}</span>`:''}</div>`;});
     html+=`</div>`;
   }
   if((e.youtubes||[]).length){html+=`<div class="dp-sec"><div class="dp-sec-lbl">Videos</div><div class="yt-grid">`;e.youtubes.forEach(y=>html+=`<div class="yt-card" onclick="openYTPopup('${y}')"><img src="https://img.youtube.com/vi/${y}/mqdefault.jpg" alt=""><div class="yt-play-ov"><div class="yt-play-ico">▶</div></div></div>`);html+=`</div></div>`;}
@@ -3999,7 +3999,7 @@ function buildCard(e){
   const wc=wCount(e.notes||'');
   const notesH=e.notes?`<div class="card-notes-wrap"><div class="card-notes" id="cn_${e.id}">${esc(e.notes)}</div><div class="notes-fade" id="nf_${e.id}"></div></div><span class="expand-btn" id="eb_${e.id}" ${e.notes.length<160?'style="display:none"':''} onclick="toggleNotes('${e.id}')">Read more ▾</span>`:'';
   const todos=e.todos||[];
-  const todosH=todos.length?`<div class="sec-lbl">Tasks (${todos.filter(t=>t.done).length}/${todos.length} done)</div><div class="card-todos">${todos.map(t=>{const isOD=t.due&&!t.done&&t.due<new Date().toISOString().split('T')[0];return`<div class="card-todo-item${t.done?' done':''}" id="todo_${t.id}"><button class="todo-chk${t.done?' done':''}" onclick="event.stopPropagation();toggleCardTodo('${e.id}','${t.id}')">${t.done?'✓':''}</button><span class="todo-txt">${esc(t.text)}</span>${t.due?`<span class="todo-due${isOD?' overdue':''}">${t.due}</span>`:''}</div>`;}).join('')}</div>`:'';
+  const todosH=todos.length?`<div class="sec-lbl">Tasks (${todos.filter(t=>t.done).length}/${todos.length} done)</div><div class="card-todos">${todos.map(t=>{const isOD=t.due&&!t.done&&t.due<new Date().toISOString().split('T')[0];return`<div class="card-todo-item${t.done?' done':''}" id="todo_${t.id}"><button class="todo-chk${t.done?' done':''}" onclick="event.stopPropagation();toggleCardTodo('${e.id}','${t.id}')">${t.done?'':''}</button><span class="todo-txt">${esc(t.text)}</span>${t.due?`<span class="todo-due${isOD?' overdue':''}">${t.due}</span>`:''}</div>`;}).join('')}</div>`:'';
   const ytH=(e.youtubes||[]).length?`<div class="sec-lbl">Videos</div><div class="yt-grid">${e.youtubes.map(y=>`<div class="yt-card" onclick="openYTPopup('${y}')"><img src="https://img.youtube.com/vi/${y}/mqdefault.jpg" alt="" onerror="this.style.display='none'"><div class="yt-play-ov"><div class="yt-play-ico">▶</div></div><div class="yt-cap">▶ ${y}</div></div>`).join('')}</div>`:'';
   const filesH=(e.files||[]).length?`<div class="sec-lbl">Attachments</div><div class="files-row">${e.files.map((f,i)=>`<div class="file-chip" onclick="viewFile('${e.id}',${i})">${fIco(f.type)}<span>${esc(f.name)}</span></div>`).join('')}</div>`:'';
   return`<div class="entry-card${e.pinned?' pinned':''}${selIds.has(String(e.id))?' selected':''}" data-id="${e.id}" id="card_${e.id}">
@@ -4380,7 +4380,7 @@ function renderSchedPicker(dateStr, batch) {
         return `<div class="sch-card" data-subj="${sl.subj}" data-time="${sl.time}" id="sch_${i}" onclick="selectSch(${i},'${sl.subj}','${sl.time}')">
           <div class="sch-time-col"><div class="sch-t-main">${sl.time.split('–')[0]}</div><div class="sch-t-end">–${sl.time.split('–')[1] || ''}</div></div>
           <div class="sch-info"><div class="sch-subj-id" style="color:${sub.color}">${sl.subj}</div><div class="sch-subj-name">${sl.note}</div>${sl.room ? `<div class="sch-room">${sl.room}</div>` : ''}</div>
-          <div class="sch-side">${sl.batch !== 'both' ? `<span class="sch-batch">${sl.batch}</span>` : ''}<span class="sch-sel-ico">✓</span></div>
+          <div class="sch-side">${sl.batch !== 'both' ? `<span class="sch-batch">${sl.batch}</span>` : ''}<span class="sch-sel-ico"></span></div>
         </div>`;
       }).join('')}
     </div>`;
@@ -4492,7 +4492,7 @@ async function saveEntry() {
   buildSubjList();
   updateSideTagCloud();
   refreshDayPanel();
-  toast(editId ? 'Updated ✓' : 'Saved ✓', 'ok');
+  toast(editId ? 'Updated ' : 'Saved ', 'ok');
 
   // Re-enable button and reset flag
   if (saveBtn) {
@@ -4504,9 +4504,9 @@ async function saveEntry() {
 function editEntry(id){openModal(id);}
 async function deleteEntry(id){const idx=entries.findIndex(e=>e.id===id);if(idx<0)return;lastDel={entry:{...entries[idx]},idx};deletedIds[id]=Date.now();entries.splice(idx,1);if(detailId===id)closeDetailPanel();await saveData();render();buildSubjList();updateSideTagCloud();refreshDayPanel();showUndo();}
 function showUndo(){clearTimeout(undoTmr);document.getElementById('undoBar').classList.add('show');undoTmr=setTimeout(()=>document.getElementById('undoBar').classList.remove('show'),5500);}
-async function undoDelete(){if(!lastDel)return;delete deletedIds[lastDel.entry.id];saveDeletedIds();entries.splice(lastDel.idx,0,lastDel.entry);await saveData();render();buildSubjList();updateSideTagCloud();document.getElementById('undoBar').classList.remove('show');toast('Restored ✓','ok');lastDel=null;}
+async function undoDelete(){if(!lastDel)return;delete deletedIds[lastDel.entry.id];saveDeletedIds();entries.splice(lastDel.idx,0,lastDel.entry);await saveData();render();buildSubjList();updateSideTagCloud();document.getElementById('undoBar').classList.remove('show');toast('Restored ','ok');lastDel=null;}
 async function togglePin(id){const e=entries.find(x=>x.id===id);if(!e)return;e.pinned=!e.pinned;e.updatedAt=Date.now();await saveData();render();toast(e.pinned?'📌 Pinned':'Unpinned','info');}
-async function dupEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;const cv={...JSON.parse(JSON.stringify(e)),id:Date.now().toString(),createdAt:Date.now(),updatedAt:Date.now(),pinned:false,todos:(e.todos||[]).map(t=>({...t,id:Date.now().toString()+Math.random().toString(36).slice(2),done:false}))};entries.unshift(cv);await saveData();render();toast('Duplicated ✓','ok');}
+async function dupEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;const cv={...JSON.parse(JSON.stringify(e)),id:Date.now().toString(),createdAt:Date.now(),updatedAt:Date.now(),pinned:false,todos:(e.todos||[]).map(t=>({...t,id:Date.now().toString()+Math.random().toString(36).slice(2),done:false}))};entries.unshift(cv);await saveData();render();toast('Duplicated ','ok');}
 
 /* ── SELECTION ── */
 async function togglePinSel() {
@@ -4653,7 +4653,7 @@ function expSel() {
   a.download = `studylog_selected_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
-  toast(`Exported ${selectedEntries.length} selected entries as JSON ✓`, 'ok');
+  toast(`Exported ${selectedEntries.length} selected entries as JSON `, 'ok');
   clearSel();
 }
 
@@ -4670,11 +4670,11 @@ function exportAll() {
   a.download = `studylog_export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('Exported JSON ✓', 'ok');
+  toast('Exported JSON ', 'ok');
 }
 function expEntries(list,fname){
   const md=list.map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{label:e.subject};const d=new Date(e.date+'T00:00:00');let o=`# ${e.date} – ${s.label}${e.time?' ('+e.time+')':''}\n\n**Date:** ${d.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;if(e.mood)o+=`**Mood:** ${moodEmo(e.mood)}\n`;if(e.rating)o+=`**Rating:** ${e.rating}/10\n`;o+='\n';if((e.titles||[]).length){o+='## Topics\n\n';e.titles.forEach(t=>{o+=t.url?`- [${t.text}](${t.url})\n`:`- ${t.text}\n`;});o+='\n';}if(e.notes)o+=`## Notes\n\n${e.notes}\n\n`;if((e.todos||[]).length){o+='## Tasks\n\n';e.todos.forEach(t=>{o+=`- [${t.done?'x':' '}] ${t.text}${t.due?' (due '+t.due+')':''}\n`;});o+='\n';}if((e.tags||[]).length)o+=`**Tags:** ${e.tags.map(t=>'#'+t).join(' ')}\n\n`;if((e.youtubes||[]).length){o+='## Videos\n\n';e.youtubes.forEach(y=>o+=`- https://youtube.com/watch?v=${y}\n`);}return o+'---\n';}).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download=fname+'.md';a.click();toast('Exported ✓','ok');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download=fname+'.md';a.click();toast('Exported ','ok');
 }
 async function importData() {
   const inp = document.createElement('input');
@@ -5034,7 +5034,7 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 function fIco(t){if(!t)return'📄';if(t.startsWith('image/'))return'🖼';if(t==='application/pdf')return'📋';if(t.includes('word'))return'📝';if(t.includes('sheet')||t.includes('excel'))return'📊';if(t.includes('zip'))return'📦';return'📎';}
 function moodEmo(m){return{great:'😄',good:'😊',okay:'😐',tired:'😪',confused:'🤔'}[m]||'';}
 let tToast;
-const _toastIco = { ok: '✓', err: '✕', info: 'i' };
+const _toastIco = { ok: '', err: '✕', info: 'i' };
 function toast(msg, type = '') {
   clearTimeout(tToast);
   const t = document.getElementById('toast');
@@ -5196,7 +5196,7 @@ document.addEventListener('touchend', e => {
       if (typeof render === 'function') render();
       if (typeof buildSubjList === 'function') buildSubjList();
       if (typeof updateSideTagCloud === 'function') updateSideTagCloud();
-      if (typeof toast === 'function') toast('Refreshed ✓', 'ok');
+      if (typeof toast === 'function') toast('Refreshed ', 'ok');
       setTimeout(finish, 750);
     }
   }
