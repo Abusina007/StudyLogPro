@@ -5034,7 +5034,7 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 function fIco(t){if(!t)return'📄';if(t.startsWith('image/'))return'🖼';if(t==='application/pdf')return'📋';if(t.includes('word'))return'📝';if(t.includes('sheet')||t.includes('excel'))return'📊';if(t.includes('zip'))return'📦';return'📎';}
 function moodEmo(m){return{great:'😄',good:'😊',okay:'😐',tired:'😪',confused:'🤔'}[m]||'';}
 let tToast;
-const _toastIco = { ok: '', err: '✕', info: 'i' };
+const _toastIco = { ok: '✔️', err: '❌', info: 'i' };
 function toast(msg, type = '') {
   clearTimeout(tToast);
   const t = document.getElementById('toast');
