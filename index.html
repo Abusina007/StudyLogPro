@@ -2016,7 +2016,7 @@ button, select, input[type="date"] {
       <!-- Import JSON -->
       <button class="ws-row-btn" onclick="importData()">
         <span class="ws-row-ico">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 12V4M5 7L8 4l3 3"/></svg>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg>
         </span>
         Import JSON
       </button>
@@ -2024,7 +2024,7 @@ button, select, input[type="date"] {
       <!-- Export JSON -->
       <button class="ws-row-btn" onclick="exportAll()">
         <span class="ws-row-ico">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 12V4M5 7L8 4l3 3"/></svg>
         </span>
         Export JSON
       </button>
@@ -4772,8 +4772,8 @@ const CMDS=[
   {l:'Group by week',i:'📅',fn:()=>setGroupMode('week')},
   {l:'No grouping',i:'≡',fn:()=>setGroupMode('none')},
   {l:'Focus mode',i:'⛶',k:'F10',fn:()=>toggleFocus()},
-  {l:'Export JSON',i:'⬇',k:'Ctrl+E',fn:()=>exportAll()},
-  {l:'Import JSON',i:'⬆',fn:()=>importData()},
+  {l:'Export JSON',i:'⬆',k:'Ctrl+E',fn:()=>exportAll()},
+  {l:'Import JSON',i:'⬇',fn:()=>importData()},
   {l:'Load Routine JSON',i:'⚙',fn:()=>loadRoutineFile()},
   {l:'Connect GitHub Sync',s:'Sync across all devices',i:'🐙',fn:()=>openGHConnectModal()},
   {l:'Disconnect GitHub',i:'↩',fn:()=>disconnectGitHub()},
