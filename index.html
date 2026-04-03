@@ -2755,7 +2755,7 @@ async function connectGitHub(token) {
   } else {
     await saveToGist({ version: 7, entries, saved: new Date().toISOString() });
   }
-  setSyncStatus('ok', 'Synced ✓');
+  setSyncStatus('ok', 'Synced ');
   updateSyncUI();
   render(); buildSubjList(); updateSideTagCloud();
   toast('Connected to GitHub ✓ Syncing across devices!', 'ok');
@@ -2790,7 +2790,7 @@ async function saveData() {
   if (ghToken) {
     setSyncStatus('syncing', 'Saving…');
     const ok = await saveToGist(data);
-    setSyncStatus('ok', ok ? 'Synced ✓' : 'Saved locally');
+    setSyncStatus('ok', ok ? 'Synced ' : 'Saved locally');
     return ok;
   }
   setSyncStatus('ok', 'Saved');
@@ -2841,8 +2841,8 @@ const afterTombstone = applyTombstones(Object.values(merged));
   updateSideTagCloud();
 
   if (pushOk) {
-    toast('Synced ✓', 'ok');
-    setSyncStatus('ok', 'Synced ✓');
+    toast('Synced ', 'ok');
+    setSyncStatus('ok', 'Synced ');
   } else {
     toast('Pull done, push failed — check token', 'err');
     setSyncStatus('ok', 'Partial sync');
@@ -2926,7 +2926,7 @@ function loadRoutineFile() {
       if (ghToken) {
         setSyncStatus('syncing', 'Uploading routine…');
         await saveToGist({ version: 7, entries, saved: new Date().toISOString() }, r);
-        setSyncStatus('ok', 'Routine synced ✓');
+        setSyncStatus('ok', 'Routine synced ');
       }
       await loadData(); render(); buildSubjList(); updateSideTagCloud();
     } catch (err) { toast('Routine load failed: ' + err.message, 'err'); }
@@ -3068,7 +3068,7 @@ async function suLoadRoutine() {
       if (ghToken) {
         setSyncStatus('syncing', 'Uploading routine…');
         await saveToGist({ version: 7, entries, saved: new Date().toISOString() }, r);
-        setSyncStatus('ok', 'Routine synced ✓');
+        setSyncStatus('ok', 'Routine synced ');
       }
       await finishSetup();
     } catch (err) { toast('Load failed: ' + err.message, 'err'); }
@@ -3240,7 +3240,7 @@ if (ghToken) {
       } catch(e) {
         console.warn('Background sync failed silently', e);
       }
-      setSyncStatus('ok', 'Synced ✓');
+      setSyncStatus('ok', 'Synced ');
     }
 } else {
     showSetup();
@@ -4717,7 +4717,7 @@ saveDeletedIds();
       updateSideTagCloud();
 
       if (syncOk) {
-        toast(`Imported ${newEntries.length} new entries and synced ✓`, 'ok');
+        toast(`Imported ${newEntries.length} new entries and synced `, 'ok');
       } else {
         toast(`Imported ${newEntries.length} new entries but sync failed. Data saved locally.`, 'err');
       }
