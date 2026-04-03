@@ -971,21 +971,88 @@ kbd{background:var(--panel2);border:1px solid var(--border2);color:var(--text);p
 #fvContent{max-width:90vw;max-height:calc(100vh - 76px);margin-top:44px;overflow:auto;border-radius:var(--r)}
 
 /* ▀▄▀▄ TOASTS ▀▄▀▄ */
-#toast{
-  position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(16px) scale(.96);
-  background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--border2);color:var(--text);padding:10px 18px;
-  border-radius:14px;font-size:13px;font-weight:500;z-index:1000;
-  opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);
-  pointer-events:none;max-width:320px;box-shadow:var(--shadow);white-space:nowrap;
+#toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(18px) scale(.92);
+  background: #1c1c1e;
+  color: #fff;
+  padding: 11px 18px 11px 14px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 88vw;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.28), 0 2px 8px rgba(0,0,0,.18);
+  transition: opacity .22s cubic-bezier(.4,0,.2,1),
+              transform .28s cubic-bezier(.34,1.4,.64,1);
+  will-change: transform, opacity;
 }
-#toast.show{transform:translateX(-50%);opacity:1}
-#toast.ok{border-color:rgba(63,185,80,.4);background:rgba(15,31,20,.9);color:var(--green)}
-#toast.err{border-color:rgba(248,81,73,.4);background:rgba(32,10,16,.9);color:#ff8a85}
-#toast.info{border-color:var(--accent-dim);background:var(--accent-dim2);color:var(--accent-h)}
-[data-theme="light"] #toast.ok{background:rgba(240,253,244,.95);color:var(--green)}
-[data-theme="light"] #toast.err{background:rgba(255,241,242,.95);color:var(--red)}
-[data-theme="light"] #toast.info{background:rgba(239,246,255,.95);color:var(--accent)}
+[data-theme="light"] #toast { box-shadow: 0 6px 24px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.1); }
+#toast.show {
+  transform: translateX(-50%) translateY(0) scale(1);
+  opacity: 1;
+}
+#toast .t-ico {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; flex-shrink: 0;
+  background: rgba(255,255,255,.2);
+}
+#toast .t-msg { flex: 1; line-height: 1.4; }
+
+/* ── ok ── */
+#toast.ok  { background: #1a7f37; }
+[data-theme="light"] #toast.ok { background: #1a7f37; }
+
+/* ── err ── */
+#toast.err { background: #c0392b; }
+[data-theme="light"] #toast.err { background: #c0392b; }
+
+/* ── info ── */
+#toast.info { background: #1a56db; }
+[data-theme="light"] #toast.info { background: #1a56db; }
+
+/* ── default (no type) ── */
+#toast:not(.ok):not(.err):not(.info) { background: #1c1c1e; }
+[data-theme="light"] #toast:not(.ok):not(.err):not(.info) { background: #2c2c2e; }
+
+/* ── undo bar ── */
+#undoBar {
+  position: fixed; bottom: 40px; left: 50%;
+  transform: translateX(-50%) translateY(14px);
+  background: #2c2c2e;
+  color: #fff;
+  padding: 10px 10px 10px 16px;
+  border-radius: 50px;
+  font-size: 12.5px; font-weight: 500;
+  z-index: 9998;
+  opacity: 0;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.28);
+  pointer-events: none;
+  transition: opacity .22s cubic-bezier(.4,0,.2,1),
+              transform .28s cubic-bezier(.34,1.4,.64,1);
+  white-space: nowrap;
+}
+[data-theme="light"] #undoBar { background: #2c2c2e; }
+#undoBar.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+#undoBar button {
+  background: rgba(255,255,255,.15);
+  border: none; color: #fff;
+  padding: 5px 14px; border-radius: 50px;
+  cursor: pointer; font-size: 12px; font-weight: 600;
+  font-family: var(--font);
+  transition: background .15s;
+}
+#undoBar button:hover { background: rgba(255,255,255,.25); }
 #undoBar{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:9px 16px;border-radius:var(--rs);font-size:12.5px;z-index:1000;opacity:0;transition:all .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm);pointer-events: none; transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);}
 #undoBar.show{transform:translateX(-50%);opacity:1;pointer-events: auto;}
 #undoBar button{background:var(--accent);border:none;color:#fff;padding:4px 12px;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font)}
@@ -2273,7 +2340,7 @@ button, select, input[type="date"] {
 
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 <svg width = "18px" height = "18px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path stroke="#f85149" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.12 4.623a1 1 0 011.76 0l11.32 20.9A1 1 0 0127.321 27H4.679a1 1 0 01-.88-1.476l11.322-20.9zM16 18v-6"></path> <path fill="#f85149" d="M17.5 22.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path> </g></svg>
-  Deleted.<button onclick="undoDelete()">Undo <span class="mpxx">(Ctrl+Z)</span></button></div>
+  <span style="opacity:.8">Entry deleted</span><button onclick="undoDelete()">Undo <span class="mpxx">(Ctrl+Z)</span></button></div>
 <div id="toast"></div>
 <!-- scroll to top -->
 <button id="scrollTopBtn" onclick="viewArea.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
@@ -4967,7 +5034,15 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 function fIco(t){if(!t)return'📄';if(t.startsWith('image/'))return'🖼';if(t==='application/pdf')return'📋';if(t.includes('word'))return'📝';if(t.includes('sheet')||t.includes('excel'))return'📊';if(t.includes('zip'))return'📦';return'📎';}
 function moodEmo(m){return{great:'😄',good:'😊',okay:'😐',tired:'😪',confused:'🤔'}[m]||'';}
 let tToast;
-function toast(msg,type=''){clearTimeout(tToast);const t=document.getElementById('toast');t.textContent=msg;t.className='show'+(type?' '+type:'');tToast=setTimeout(()=>t.classList.remove('show'),3200);}
+const _toastIco = { ok: '✓', err: '✕', info: 'i' };
+function toast(msg, type = '') {
+  clearTimeout(tToast);
+  const t = document.getElementById('toast');
+  const ico = _toastIco[type] || '●';
+  t.innerHTML = `<span class="t-ico">${ico}</span><span class="t-msg">${msg}</span>`;
+  t.className = 'show' + (type ? ' ' + type : '');
+  tToast = setTimeout(() => t.classList.remove('show'), 3200);
+}
 
 /* ── APP-LIKE LOCKS ── */
 // Block long-press context menu on mobile
