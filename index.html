@@ -1405,16 +1405,7 @@ input, textarea, [contenteditable] {
 #draftDot.show{opacity:1;}
 
 /* tooltip on toolbar buttons (PC) */
-.tb-btn[title]:hover::after,.theme-toggle[title]:hover::after{
-  content:attr(title);
-  position:absolute;top:calc(100% + 7px);left:50%;
-  transform:translateX(-50%);
-  background:var(--panel2);border:1px solid var(--border2);
-  color:var(--text);font-size:10.5px;padding:3px 8px;
-  border-radius:var(--rs);white-space:nowrap;
-  pointer-events:none;z-index:20000;
-  box-shadow:var(--shadow-sm);
-}
+
 .tb-btn[title],.theme-toggle[title]{position:relative;}
 
 /* better focus ring for keyboard nav */
@@ -1796,6 +1787,249 @@ button, select, input[type="date"] {
 }
 .cal-sheet-empty .cse-ico { font-size: 38px; opacity: .18; }
 .cal-sheet-empty p { font-size: 13px; color: var(--text3); }
+
+/* ═══════════════════════════════════
+   DAILY GOAL CHECKER — STYLES
+═══════════════════════════════════ */
+.gp-overlay {
+  position: fixed; inset: 0; z-index: 760;
+  display: flex; justify-content: flex-end;
+  opacity: 0; visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.gp-overlay::before {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  transition: opacity .25s ease;
+}
+.gp-overlay.open { opacity: 1; visibility: visible; }
+[data-theme="light"] .gp-overlay::before { background: rgba(0,0,0,.35); }
+
+.gp-panel {
+  position: relative;
+  width: min(390px, 96vw);
+  height: 100%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-left: 1px solid var(--glass-border);
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.22,1,.36,1);
+  overflow: hidden;
+  box-shadow: -8px 0 40px rgba(0,0,0,.3);
+}
+.gp-overlay.open .gp-panel { transform: translateX(0); }
+
+.gp-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px 13px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--glass-bg);
+}
+.gp-header-title {
+  font-size: 14px; font-weight: 700;
+  color: var(--text); letter-spacing: -.3px; flex: 1;
+}
+.gp-close {
+  background: none; border: 1px solid var(--border);
+  color: var(--text2); width: 30px; height: 30px;
+  border-radius: 10px; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--tr);
+}
+.gp-close:hover { background: var(--panel2); color: var(--text); }
+
+.gp-tabs {
+  display: flex; gap: 2px; padding: 10px 12px 10px;
+  background: var(--glass-bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; overflow-x: auto; scrollbar-width: none;
+}
+.gp-tabs::-webkit-scrollbar { display: none; }
+.gp-tab {background:none;border:none;color:var(--text3);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:500;transition:all var(--tr);display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0
+}
+.gp-tab:hover {color:var(--text);background:var(--panel3)}
+.gp-tab.active {
+  color:#fff;background:var(--accent)
+}
+
+.gp-body {
+  flex: 1; overflow-y: auto; padding: 14px 14px 80px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* today header */
+.gp-today-header {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 14px;
+}
+.gp-today-stats { flex: 1; }
+.gp-ts-n { font-size: 28px; font-weight: 800; color: var(--accent); font-family: var(--mono); line-height: 1; }
+.gp-ts-l { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.gp-ts-date { font-size: 10.5px; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
+
+/* section label */
+.gp-section-lbl {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.3px;
+  text-transform: uppercase; color: var(--text4);
+  margin-bottom: 7px; padding: 0 2px;
+}
+
+/* goal item */
+.gp-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; padding: 11px 12px;
+  margin-bottom: 6px; transition: all var(--tr);
+  position: relative; overflow: hidden;
+}
+.gp-item:hover { border-color: var(--border2); background: var(--panel2); }
+.gp-item.gp-done { opacity: .75; }
+.gp-item.gp-completing { animation: gpCompleting .4s ease forwards; }
+@keyframes gpCompleting {
+  0%   { background: var(--panel); }
+  40%  { background: var(--green-bg); border-color: var(--green); }
+  100% { background: var(--panel); }
+}
+
+.gp-check-btn {
+  background: none; border: none; padding: 0; cursor: pointer;
+  flex-shrink: 0; margin-top: 1px;
+}
+.gp-chk-circle {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--border3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .25s cubic-bezier(.34,1.56,.64,1);
+  background: none;
+}
+.gp-chk-circle.done {
+  background: var(--green); border-color: var(--green);
+  animation: checkPop .25s cubic-bezier(.34,1.56,.64,1);
+}
+.gp-check-btn:hover .gp-chk-circle:not(.done) {
+  border-color: var(--green); background: var(--green-bg);
+  transform: scale(1.08);
+}
+
+.gp-item-info { flex: 1; min-width: 0; }
+.gp-item-title {
+  font-size: 13.5px; font-weight: 600; color: var(--text);
+  line-height: 1.4; position: relative; display: inline-block;
+  transition: color .3s ease;
+}
+.gp-item-title::after {
+  content: ''; position: absolute;
+  left: 0; top: 50%;
+  width: 0; height: 1.5px;
+  background: var(--text3);
+  transition: width .38s cubic-bezier(.4,0,.2,1);
+  margin-top: -0.75px;
+}
+.gp-item-title.done { color: var(--text3); }
+.gp-item-title.done::after { width: 100%; }
+
+.gp-item-desc { font-size: 11.5px; color: var(--text3); margin-top: 2px; line-height: 1.5; }
+.gp-item-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.gp-meta-chip {
+  font-size: 10px; color: var(--text3); background: var(--panel3);
+  border: 1px solid var(--border); border-radius: 20px;
+  padding: 1px 7px; white-space: nowrap;
+}
+
+.gp-item-edit {
+  background: none; border: 1px solid transparent; color: var(--text4);
+  padding: 4px 6px; border-radius: 8px; cursor: pointer;
+  transition: all var(--tr); flex-shrink: 0;
+}
+.gp-item-edit:hover { border-color: var(--border2); color: var(--accent); background: var(--panel2); }
+
+/* empty state */
+.gp-empty {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 50px 20px; gap: 10px; text-align: center;
+}
+.gp-empty p { font-size: 13px; color: var(--text3); line-height: 1.75; }
+
+/* add fab */
+.gp-add-fab {
+  position: sticky; bottom: 14px;
+  width: 100%; background: var(--accent); color: #fff;
+  border: none; padding: 11px; border-radius: 12px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: var(--font); transition: all var(--tr);
+  margin-top: 14px;
+  box-shadow: 0 4px 14px rgba(47,129,247,.15);
+}
+.gp-add-fab:hover { background: var(--accent-h); transform: translateY(-1px); }
+.gp-add-fab:active { transform: none; }
+
+/* form */
+.gp-form { display: flex; flex-direction: column; gap: 0; }
+.gp-form-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin-bottom: 16px; letter-spacing: -.3px;
+}
+
+/* manage item */
+.gp-manage-item {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 13px; margin-bottom: 7px;
+}
+.gmh-wrap { margin-top: 10px; }
+.gmh-grid {
+  display: grid; grid-template-columns: repeat(28, 1fr); gap: 2px;
+}
+.gmh-cell {
+  width: 100%; aspect-ratio: 1; border-radius: 2px;
+  background: var(--panel3); transition: background .15s;
+}
+.gmh-cell.done { background: var(--accent); }
+
+/* backup section */
+.gp-backup-sec {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 14px; margin-bottom: 8px;
+}
+.gp-backup-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--text4); margin-bottom: 6px;
+}
+.gp-backup-row { font-size: 12px; color: var(--text2); margin-bottom: 8px; line-height: 1.6; }
+.gp-backup-btn {
+  width: 100%; background: none; border: 1px solid var(--border2);
+  color: var(--text2); padding: 8px; border-radius: 10px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  font-family: var(--font); transition: all var(--tr); text-align: center;
+}
+.gp-backup-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim2); }
+
+/* reminder banner */
+#goalReminderBanner {
+  display: none; position: fixed; bottom: 48px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel2); border: 1px solid var(--border2);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px; padding: 11px 14px;
+  min-width: 290px; max-width: 88vw;
+  align-items: center; gap: 10px;
+  font-size: 13px; color: var(--text);
+  box-shadow: var(--shadow);
+  z-index: 9990; animation: cardIn .28s ease;
+}
+
+/* toolbar goal badge dot */
+#goalBadge {
+  position: absolute; top: 4px; right: 4px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--amber); border: 1.5px solid var(--bg);
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -1881,7 +2115,11 @@ button, select, input[type="date"] {
 
     <!-- Theme toggle -->
 
-
+<!-- Goal Checker Button (always visible) -->
+<button class="tb-btn" id="goalBtn" onclick="openGoalPanel()" style="position:relative" title="Daily Goals">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><circle cx="8" cy="8" r="6"/><polyline points="5,8 7,10 11,6"/></svg>
+  <span id="goalBadge"></span>
+</button>
     <!-- New Entry (desktop) -->
     <button class="tb-btn primary newbtn" id="desktopNewBtn" onclick="openModal()" style="gap:5px">
       <span style="font-size:16px;line-height:1;margin-top:-1px">+</span>
@@ -2140,7 +2378,7 @@ button, select, input[type="date"] {
           <input class="todo-due-inp" type="date" id="todoDueInp" title="Due date (optional)">
           <button class="tag-add-btn" onclick="addTodo()">Add</button>
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:5px">Click circle to mark done (animated strikethrough). Click again to undo.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:5px">Click circle to mark done. Click again to undo.</div>
       </div>
     </div>
     <div class="m-body tab" id="tab-media">
@@ -2340,7 +2578,7 @@ button, select, input[type="date"] {
 
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
 <svg width = "18px" height = "18px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path stroke="#f85149" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.12 4.623a1 1 0 011.76 0l11.32 20.9A1 1 0 0127.321 27H4.679a1 1 0 01-.88-1.476l11.322-20.9zM16 18v-6"></path> <path fill="#f85149" d="M17.5 22.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path> </g></svg>
-  <span style="opacity:.8">Entry deleted</span><button onclick="undoDelete()">Undo <span class="mpxx">(Ctrl+Z)</span></button></div>
+  <span style="color:white;opacity:.8">Entry deleted</span><button onclick="undoDelete()">Undo <span class="mpxx">(Ctrl+Z)</span></button></div>
 <div id="toast"></div>
 <!-- scroll to top -->
 <button id="scrollTopBtn" onclick="viewArea.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
@@ -2348,6 +2586,28 @@ button, select, input[type="date"] {
 <span id="draftDot"></span>
 <!-- Floating Action Button for new entry (mobile) -->
 <button class="fab-add" id="fabAddBtn" title="New entry">+</button>
+
+<!-- ▀▄▀▄ DAILY GOAL PANEL ▀▄▀▄ -->
+<div id="goalPanelOv" class="gp-overlay" onclick="if(event.target===this)closeGoalPanel()">
+  <div class="gp-panel" id="goalPanel">
+    <div class="gp-header">
+      <div class="gp-header-title">🎯 Daily Goals</div>
+      <div id="goalHeaderMeta" style="font-size:11px;color:var(--text3);font-family:var(--mono)"></div>
+      <button class="gp-close" onclick="closeGoalPanel()">×</button>
+    </div>
+    <div class="gp-tabs" id="goalPanelTabs">
+      <button class="gp-tab active" data-tab="today" onclick="setGoalTab('today')">Today</button>
+      <button class="gp-tab" data-tab="add" onclick="setGoalTab('add')">+ Add</button>
+      <button class="gp-tab" data-tab="manage" onclick="setGoalTab('manage')">All Goals</button>
+      <button class="gp-tab" data-tab="backup" onclick="setGoalTab('backup')">Backup</button>
+    </div>
+    <div class="gp-body" id="goalPanelBody"></div>
+  </div>
+</div>
+
+<!-- ▀▄▀▄ GOAL REMINDER BANNER ▀▄▀▄ -->
+<div id="goalReminderBanner"></div>
+
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <script>
 'use strict';
@@ -3246,9 +3506,9 @@ if (ghToken) {
     showSetup();
   }
   initDetailDrag();
-  // At the very end of init() function, add:
-reinitToolbarSearch();
-initModalSwipe();
+  reinitToolbarSearch();
+  initModalSwipe();
+  await initGoals();
 }
 function initModalSwipe() {
   const modal = document.getElementById('entryModal');
@@ -6044,7 +6304,577 @@ function setupCalLongPress() {
     openDayPanel(cell.dataset.date);
   });
 }
+
+
+/* ═══════════════════════════════════
+   DAILY GOAL CHECKER — JAVASCRIPT
+═══════════════════════════════════ */
+let goals = [];
+let goalPanelOpen = false;
+let goalActiveTab = 'today';
+let editGoalId = null;
+let reminderCheckerInterval = null;
+let notifPermission = 'default';
+
+const GOALS_LS_KEY = 'slp_goals_v1';
+const GOALS_GIST_FILE = 'studylog_goals.json';
+
+/* ── storage ── */
+function loadGoals() {
+  try {
+    const d = JSON.parse(localStorage.getItem(GOALS_LS_KEY) || 'null');
+    goals = d?.goals || [];
+  } catch(e) { goals = []; }
+}
+
+async function saveGoals(pushToGist = true) {
+  const data = { version: 1, goals, saved: new Date().toISOString() };
+  try { localStorage.setItem(GOALS_LS_KEY, JSON.stringify(data)); } catch(e) {}
+  if (pushToGist && ghToken && gistId) {
+    try {
+      await ghFetch('PATCH', `/gists/${gistId}`, {
+        files: { [GOALS_GIST_FILE]: { content: JSON.stringify(data, null, 2) } }
+      });
+    } catch(e) { console.debug('Goal gist sync failed', e); }
+  }
+}
+
+async function loadGoalsFromGist() {
+  if (!ghToken || !gistId) return;
+  try {
+    const gist = await ghFetch('GET', `/gists/${gistId}`);
+    if (!gist?.files?.[GOALS_GIST_FILE]?.raw_url) return;
+    const res = await fetch(gist.files[GOALS_GIST_FILE].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data?.goals) return;
+    // merge: keep all unique goals, union completions
+    const localMap = Object.fromEntries(goals.map(g => [g.id, g]));
+    const cloudMap = Object.fromEntries(data.goals.map(g => [g.id, g]));
+    const ids = new Set([...Object.keys(localMap), ...Object.keys(cloudMap)]);
+    const merged = [];
+    for (const id of ids) {
+      const l = localMap[id], c = cloudMap[id];
+      if (l && c) {
+        const base = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
+        const datesSet = new Set([...(l.completions||[]).map(x=>x.date)]);
+        const comps = [...(l.completions||[])];
+        (c.completions||[]).forEach(x => { if (!datesSet.has(x.date)) comps.push(x); });
+        merged.push({ ...base, completions: comps });
+      } else {
+        merged.push(l || c);
+      }
+    }
+    goals = merged.sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+    saveGoals(false);
+  } catch(e) { console.debug('Goal gist load failed', e); }
+}
+
+/* ── helpers ── */
+function gpToday() { return new Date().toISOString().split('T')[0]; }
+
+function isGoalDoneToday(goal) {
+  return (goal.completions || []).some(c => c.date === gpToday());
+}
+
+/* ── panel open / close ── */
+function openGoalPanel() {
+  goalPanelOpen = true;
+  document.getElementById('goalPanelOv')?.classList.add('open');
+  renderGoalPanel();
+  requestNotifPermission();
+}
+
+function closeGoalPanel() {
+  goalPanelOpen = false;
+  document.getElementById('goalPanelOv')?.classList.remove('open');
+  editGoalId = null;
+}
+
+function setGoalTab(tab) {
+  goalActiveTab = tab;
+  document.querySelectorAll('.gp-tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  renderGoalPanel();
+}
+
+function renderGoalPanel() {
+  const body = document.getElementById('goalPanelBody');
+  if (!body) return;
+  // header meta
+  const meta = document.getElementById('goalHeaderMeta');
+  if (meta) {
+    const done = goals.filter(g => isGoalDoneToday(g)).length;
+    meta.textContent = goals.length ? `${done}/${goals.length} done` : '';
+  }
+  if (goalActiveTab === 'today')   renderGoalTodayTab(body);
+  else if (goalActiveTab === 'add') renderGoalAddTab(body);
+  else if (goalActiveTab === 'manage') renderGoalManageTab(body);
+  else if (goalActiveTab === 'backup') renderGoalBackupTab(body);
+}
+
+/* ── TODAY tab ── */
+function renderGoalTodayTab(body) {
+  const today = gpToday();
+  const todayGoals = goals; // show all goals in today tab
+  const done = todayGoals.filter(g => isGoalDoneToday(g));
+  const pending = todayGoals.filter(g => !isGoalDoneToday(g));
+  const pct = todayGoals.length ? Math.round(done.length / todayGoals.length * 100) : 0;
+
+  // Progress ring
+  const r = 22, circ = 2 * Math.PI * r;
+const dash = pct >= 100 ? circ : circ * pct / 100;
+const ringColor = pct === 100 ? 'var(--green)' : 'var(--accent)';
+
+  const arcAttrs = pct >= 100
+    ? `stroke-dasharray="${circ + 10} ${circ + 10}" stroke-linecap="butt"`
+    : `stroke-dasharray="${dash} ${circ}" stroke-linecap="round"`;
+
+  let html = `<div class="gp-today-header">
+    <svg width="60" height="60" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="${r}" fill="none" stroke="var(--panel4)" stroke-width="5"/>
+      <circle cx="30" cy="30" r="${r}" fill="none" stroke="${ringColor}" stroke-width="5"
+        ${arcAttrs} transform="rotate(-90 30 30)"
+        style="transition:stroke-dasharray .6s ease"/>
+      <text x="30" y="34" text-anchor="middle" font-size="11" font-weight="800"
+        fill="${ringColor}" font-family="var(--mono)">${pct}%</text>
+    </svg>
+    <div class="gp-today-stats">
+      <div class="gp-ts-n">${done.length}/${todayGoals.length}</div>
+      <div class="gp-ts-l">Goals completed</div>
+      <div class="gp-ts-date">${new Date().toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'})}</div>
+    </div>
+  </div>`;
+
+  if (!todayGoals.length) {
+    html += `<div class="gp-empty"><div style="font-size:40px;opacity:.18">🎯</div><p>No goals yet.<br>Tap <strong>+ Add</strong> to create your first goal.</p></div>`;
+  } else {
+    if (pending.length) {
+      html += `<div class="gp-section-lbl">Pending · ${pending.length}</div>`;
+      html += pending.map(g => buildGoalItem(g, false)).join('');
+    }
+    if (done.length) {
+      html += `<div class="gp-section-lbl" style="margin-top:14px">Completed · ${done.length}</div>`;
+      html += done.map(g => buildGoalItem(g, true)).join('');
+    }
+  }
+
+  html += `<button class="gp-add-fab" onclick="setGoalTab('add')">+ Add New Goal</button>`;
+  body.innerHTML = html;
+
+  // Attach check button handlers
+  body.querySelectorAll('.gp-check-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const item = document.getElementById('gpi_' + id);
+      const isDone = item?.classList.contains('gp-done');
+      if (!isDone && item) {
+        item.classList.add('gp-completing');
+        await new Promise(r => setTimeout(r, 380));
+      }
+      await toggleGoalDone(id);
+    });
+  });
+}
+
+function buildGoalItem(goal, isDone) {
+  const today = gpToday();
+  const comp = (goal.completions||[]).find(c => c.date === today);
+  const compTime = comp ? new Date(comp.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}) : '';
+  return `<div class="gp-item${isDone?' gp-done':''}" id="gpi_${goal.id}">
+    <button class="gp-check-btn" data-id="${goal.id}" title="${isDone?'Mark undone':'Mark done'}">
+      <div class="gp-chk-circle${isDone?' done':''}">
+        ${isDone ? `<svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="2,6 5,9 10,3"/></svg>` : ''}
+      </div>
+    </button>
+    <div class="gp-item-info">
+      <div class="gp-item-title${isDone?' done':''}">${esc(goal.title)}</div>
+      ${goal.desc ? `<div class="gp-item-desc">${esc(goal.desc)}</div>` : ''}
+      <div class="gp-item-meta">
+        ${goal.reminderTime ? `<span class="gp-meta-chip">🔔 ${goal.reminderTime}</span>` : ''}
+        ${goal.repeatDaily ? `<span class="gp-meta-chip">🔁 Daily</span>` : ''}
+        ${isDone && compTime ? `<span class="gp-meta-chip" style="color:var(--green);border-color:rgba(63,185,80,.3);background:var(--green-bg)">✓ ${compTime}</span>` : ''}
+      </div>
+    </div>
+    <button class="gp-item-edit" onclick="editGoal('${goal.id}')" title="Edit goal">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg>
+    </button>
+  </div>`;
+}
+
+/* ── TOGGLE DONE ── */
+async function toggleGoalDone(id) {
+  const goal = goals.find(g => g.id === id);
+  if (!goal) return;
+  const today = gpToday();
+  const existIdx = (goal.completions || []).findIndex(c => c.date === today);
+  if (!goal.completions) goal.completions = [];
+  if (existIdx > -1) {
+    goal.completions.splice(existIdx, 1);
+  } else {
+    goal.completions.push({ date: today, ts: Date.now() });
+    haptic('success');
+  }
+  goal.updatedAt = Date.now();
+  await saveGoals();
+  if (goalPanelOpen) renderGoalPanel();
+  updateGoalBadge();
+  // Also patch stats if open
+  if (currentView === 'stats') renderStats();
+}
+
+/* ── ADD / EDIT tab ── */
+function renderGoalAddTab(body) {
+  const isEdit = !!editGoalId;
+  const g = isEdit ? goals.find(x => x.id === editGoalId) : null;
+  body.innerHTML = `<div class="gp-form">
+    <div class="gp-form-title">${isEdit ? '✎ Edit Goal' : '✚ New Goal'}</div>
+    <div class="fg" style="margin-bottom:11px">
+      <label class="flbl">Title *</label>
+      <input class="finp" id="gfTitle" placeholder="e.g. Read 10 pages" value="${g ? esc(g.title) : ''}">
+    </div>
+    <div class="fg" style="margin-bottom:11px">
+      <label class="flbl">Description <span class="flbl-note">optional</span></label>
+      <input class="finp" id="gfDesc" placeholder="e.g. From current book on shelf" value="${g ? esc(g.desc||'') : ''}">
+    </div>
+<div class="fg" style="margin-bottom:11px">
+  <label class="flbl">Reminder Time <span class="flbl-note">optional — triggers notification</span></label>
+  <input class="finp" type="time" id="gfTime" value="${g ? (g.reminderTime||'') : ''}">
+</div>
+
+<div class="fg" style="margin-bottom:18px">
+  <label style="display:flex; align-items:center; gap:10px; cursor:pointer; padding:10px 12px; background:var(--panel2); border:1px solid var(--border); border-radius:10px">
+    <input type="checkbox" id="gfRepeat" ${g?.repeatDaily ? 'checked' : ''} style="accent-color:var(--accent); width:15px; height:15px; cursor:pointer">
+
+    <div style="display: inline-flex; align-items: center; gap: 6px; font-size:13px; color:var(--text); font-weight:500;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="16" width="16" fill="currentColor">
+        <path d="M0 7c0 0.553125 0.446875 1 1 1s1 -0.446875 1 -1c0 -1.65625 1.34375 -3 3 -3h5v1c0 0.403125 0.24375 0.76875 0.61875 0.925s0.803125 0.06875 1.090625 -0.215625l2 -2c0.390625 -0.390625 0.390625 -1.025 0 -1.415625l-2 -2c-0.2875 -0.2875 -0.715625 -0.371875 -1.090625 -0.215625S10 0.596875 10 1v1H5C2.2375 2 0 4.2375 0 7zm16 2c0 -0.553125 -0.446875 -1 -1 -1s-1 0.446875 -1 1c0 1.65625 -1.34375 3 -3 3H6v-1c0 -0.403125 -0.24375 -0.76875 -0.61875 -0.925s-0.803125 -0.06875 -1.090625 0.215625l-2 2c-0.390625 0.390625 -0.390625 1.025 0 1.415625l2 2c0.2875 0.2875 0.715625 0.371875 1.090625 0.215625s0.61875 -0.51875 0.61875 -0.925V14h5c2.7625 0 5 -2.2375 5 -5z" stroke-width="0.0313"></path>
+      </svg>
+      <span>Repeat every day</span>
+    </div>
+
+    <div style="font-size:11px; color:var(--text3); margin-left: auto;">Show this goal each day</div>
+  </label>
+</div>
+
+    <div style="font-size:11px; color:var(--text3); margin-top:1px">Show this goal each day</div>
+  </label>
+</div>
+    <div style="display:flex;gap:7px">
+      <button class="btn-p" style="flex:1" onclick="saveGoalForm()">${isEdit ? 'Update Goal' : 'Add Goal'}</button>
+      ${isEdit ? `<button class="btn-c" onclick="deleteGoalConfirm('${editGoalId}')" style="color:var(--red)">Delete</button>` : ''}
+      <button class="btn-c" onclick="editGoalId=null;setGoalTab('today')">Cancel</button>
+    </div>
+  </div>`;
+  setTimeout(() => document.getElementById('gfTitle')?.focus(), 60);
+  document.getElementById('gfTitle')?.addEventListener('keydown', e => { if (e.key === 'Enter') saveGoalForm(); });
+}
+
+function editGoal(id) {
+  editGoalId = id;
+  setGoalTab('add');
+}
+
+async function saveGoalForm() {
+  const title = (document.getElementById('gfTitle')?.value || '').trim();
+  if (!title) { toast('Enter a goal title', 'err'); return; }
+  const desc = (document.getElementById('gfDesc')?.value || '').trim();
+  const reminderTime = document.getElementById('gfTime')?.value || '';
+  const repeatDaily = document.getElementById('gfRepeat')?.checked || false;
+  const wasEdit = !!editGoalId;
+  if (editGoalId) {
+    const g = goals.find(x => x.id === editGoalId);
+    if (g) { g.title = title; g.desc = desc; g.reminderTime = reminderTime; g.repeatDaily = repeatDaily; g.updatedAt = Date.now(); }
+  } else {
+    goals.push({
+      id: Date.now().toString() + Math.random().toString(36).slice(2,6),
+      title, desc, reminderTime, repeatDaily,
+      createdAt: Date.now(), updatedAt: Date.now(), completions: []
+    });
+  }
+  editGoalId = null;
+  await saveGoals();
+  scheduleReminders();
+  updateGoalBadge();
+  setGoalTab('today');
+  toast(wasEdit ? 'Goal updated ✓' : 'Goal added ✓', 'ok');
+  if (currentView === 'stats') renderStats();
+}
+
+async function deleteGoalConfirm(id) {
+  if (!confirm('Delete this goal and all its history?')) return;
+  goals = goals.filter(g => g.id !== id);
+  editGoalId = null;
+  await saveGoals();
+  updateGoalBadge();
+  setGoalTab('today');
+  toast('Goal deleted', 'info');
+  if (currentView === 'stats') renderStats();
+}
+
+/* ── MANAGE tab ── */
+function renderGoalManageTab(body) {
+  if (!goals.length) {
+    body.innerHTML = `<div class="gp-empty"><div style="font-size:40px;opacity:.18">📋</div><p>No goals created yet.</p></div>`;
+    return;
+  }
+  body.innerHTML = goals.map(g => {
+    const totalDone = (g.completions||[]).length;
+    const ageDays = Math.max(1, Math.ceil((Date.now() - (g.createdAt||Date.now())) / 864e5));
+    const rate = Math.min(100, Math.round(totalDone / ageDays * 100));
+    const isDone = isGoalDoneToday(g);
+    return `<div class="gp-manage-item">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px">
+            ${isDone ? `<span style="color:var(--green);font-size:12px">✓</span>` : `<span style="width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block"></span>`}
+            ${esc(g.title)}
+          </div>
+          ${g.desc ? `<div style="font-size:11.5px;color:var(--text3);margin-top:2px">${esc(g.desc)}</div>` : ''}
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px">
+            ${g.reminderTime ? `<span class="gp-meta-chip">🔔 ${g.reminderTime}</span>` : ''}
+            ${g.repeatDaily ? `<span class="gp-meta-chip">🔁 Daily</span>` : ''}
+            <span class="gp-meta-chip">${totalDone} completions</span>
+            <span class="gp-meta-chip">${rate}% rate</span>
+          </div>
+        </div>
+        <button class="gp-item-edit" onclick="editGoal('${g.id}')" style="padding:5px 9px;font-size:11px;color:var(--text2);border-radius:8px;background:var(--panel2);border:1px solid var(--border)">Edit</button>
+      </div>
+      <div class="gmh-wrap"><div class="gp-section-lbl" style="margin:8px 0 4px">Last 28 days</div>
+        <div class="gmh-grid">${buildMiniHeatmap(g)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildMiniHeatmap(goal) {
+  const done = new Set((goal.completions||[]).map(c => c.date));
+  let html = '';
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    html += `<div class="gmh-cell${done.has(ds)?' done':''}" title="${ds}"></div>`;
+  }
+  return html;
+}
+
+/* ── BACKUP tab ── */
+function renderGoalBackupTab(body) {
+  const connected = !!ghToken;
+  const lastSync = goals.reduce((a,g) => Math.max(a,g.updatedAt||0), 0);
+  const syncLbl = lastSync ? `Last saved ${new Date(lastSync).toLocaleString('en-IN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}` : 'Not yet saved';
+  body.innerHTML = `
+    <div class="gp-backup-sec">
+      <div class="gp-backup-title">GitHub Gist Sync</div>
+      <div class="gp-backup-row">${connected ? '🟢 Connected · ' + syncLbl : '🔴 Not connected - goals saved locally only'}</div>
+      ${connected
+        ? `<button class="gp-backup-btn" onclick="syncGoalsNow()">🔄 Sync goals now</button>`
+        : `      <button id="ghConnectBtn" class="gp-backup-btn" style="display: inline-flex; align-items: center; gap: 6px;" onclick="openGHConnectModal()">
+  <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13">
+    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+  </svg>
+  <span>Connect GitHub Sync</span>
+</button>`}
+    </div>
+    <div class="gp-backup-sec">
+      <div class="gp-backup-title">Export</div>
+      <div class="gp-backup-row">Download all goals and completion history as JSON</div>
+      <button class="gp-backup-btn" onclick="exportGoals()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 12V4M5 7L8 4l3 3"/></svg> Export Goals JSON</button>
+    </div>
+    <div class="gp-backup-sec">
+      <div class="gp-backup-title">Import</div>
+      <div class="gp-backup-row">Restore from a previously exported goals file. Existing data is kept.</div>
+      <button class="gp-backup-btn" onclick="importGoals()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 10v4h10v-4M8 2v8M5 7l3 3 3-3"/></svg> Import Goals JSON</button>
+    </div>
+    <div class="gp-backup-sec">
+      <div class="gp-backup-title">Danger Zone</div>
+      <button class="gp-backup-btn" style="color:var(--red);border-color:rgba(248,81,73,.25)" onclick="clearAllGoals()">🗑 Clear all goals & history</button>
+    </div>`;
+}
+
+async function syncGoalsNow() {
+  toast('Syncing goals…', 'info');
+  await loadGoalsFromGist();
+  await saveGoals(true);
+  renderGoalPanel();
+  toast('Goals synced ✓', 'ok');
+}
+
+function exportGoals() {
+  const data = { version: 1, goals, exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `studylog_goals_${gpToday()}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Goals exported ✓', 'ok');
+}
+
+function importGoals() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = async e => {
+    try {
+      const d = JSON.parse(await e.target.files[0].text());
+      if (!Array.isArray(d?.goals)) throw new Error('Invalid format');
+      const existIds = new Set(goals.map(g => g.id));
+      let added = 0;
+      for (const g of d.goals) {
+        if (!existIds.has(g.id)) { goals.push(g); added++; }
+        else {
+          // merge completions only
+          const existing = goals.find(x => x.id === g.id);
+          const haveDates = new Set((existing.completions||[]).map(c=>c.date));
+          (g.completions||[]).forEach(c => { if (!haveDates.has(c.date)) existing.completions.push(c); });
+        }
+      }
+      await saveGoals();
+      renderGoalPanel();
+      updateGoalBadge();
+      toast(`Imported ${added} new goals ✓`, 'ok');
+    } catch(err) { toast('Import failed: ' + err.message, 'err'); }
+  };
+  inp.click();
+}
+
+async function clearAllGoals() {
+  if (!confirm('Clear ALL goals and their entire history?\nThis cannot be undone.')) return;
+  goals = [];
+  await saveGoals();
+  renderGoalPanel();
+  updateGoalBadge();
+  toast('All goals cleared', 'info');
+}
+
+/* ── BADGE ── */
+function updateGoalBadge() {
+  const badge = document.getElementById('goalBadge');
+  if (!badge) return;
+  const pending = goals.filter(g => !isGoalDoneToday(g)).length;
+  badge.style.display = pending > 0 ? 'block' : 'none';
+}
+
+/* ── REMINDERS ── */
+function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(p => { notifPermission = p; });
+  } else {
+    notifPermission = Notification.permission;
+  }
+}
+
+function scheduleReminders() {
+  if (reminderCheckerInterval) clearInterval(reminderCheckerInterval);
+  reminderCheckerInterval = setInterval(checkGoalReminders, 55000); // check every ~55s
+  checkGoalReminders();
+}
+
+function checkGoalReminders() {
+  const now = new Date();
+  const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const today = gpToday();
+  goals.forEach(g => {
+    if (!g.reminderTime || g.reminderTime !== hhmm) return;
+    if (isGoalDoneToday(g)) return;
+    const notifKey = `slp_gnotif_${g.id}_${today}`;
+    if (localStorage.getItem(notifKey)) return;
+    localStorage.setItem(notifKey, '1');
+    fireGoalReminder(g);
+  });
+}
+
+function fireGoalReminder(goal) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      const n = new Notification('🎯 Daily Goal Reminder', {
+        body: goal.title + (goal.desc ? ' — ' + goal.desc : ''),
+        tag: 'slp_goal_' + goal.id,
+        icon: ''
+      });
+      n.onclick = () => { openGoalPanel(); window.focus(); n.close(); };
+      return;
+    } catch(e) {}
+  }
+  // Fallback: in-app banner
+  const banner = document.getElementById('goalReminderBanner');
+  if (!banner) return;
+  banner.innerHTML = `<span style="font-size:15px;flex-shrink:0">🔔</span>
+    <span style="flex:1;font-size:13px"><strong>${esc(goal.title)}</strong>${goal.desc ? ' — ' + esc(goal.desc) : ''}</span>
+    <button onclick="toggleGoalDone('${goal.id}');document.getElementById('goalReminderBanner').style.display='none'"
+      style="background:var(--green);border:none;color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap">Done ✓</button>
+    <button onclick="this.closest('#goalReminderBanner').style.display='none'"
+      style="background:none;border:none;color:var(--text3);font-size:19px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0">×</button>`;
+  banner.style.display = 'flex';
+  setTimeout(() => { if (banner) banner.style.display = 'none'; }, 18000);
+}
+
+/* ── STATS INTEGRATION ── */
+const _origRenderStats = renderStats;
+renderStats = function() {
+  _origRenderStats.apply(this, arguments);
+  const c = document.getElementById('statsCont');
+  if (!c || !goals.length) return;
+
+  const today = gpToday();
+  const doneToday = goals.filter(g => isGoalDoneToday(g)).length;
+  const total = goals.length;
+  const pctToday = total ? Math.round(doneToday / total * 100) : 0;
+
+  // 30-day bars
+  const days30 = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const done = goals.filter(g => (g.completions||[]).some(c=>c.date===ds)).length;
+    days30.push({ ds, done });
+  }
+  const max30 = Math.max(...days30.map(d => d.done), 1);
+
+  // Goal streak
+  let gStreak = 0;
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    if (goals.some(g => (g.completions||[]).some(c=>c.date===ds))) gStreak++;
+    else break;
+  }
+
+  // All-time completions
+  const allTime = goals.reduce((a,g) => a + (g.completions||[]).length, 0);
+
+  const sec = document.createElement('div');
+  sec.innerHTML = `
+    <div class="chart-sec" style="margin-top:10px">
+      <div class="chart-title">Daily Goals Overview</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:14px">
+        <div class="sb-stat"><div class="sb-stat-n">${doneToday}/${total}</div><div class="sb-stat-l">Done today</div></div>
+        <div class="sb-stat"><div class="sb-stat-n">${pctToday}%</div><div class="sb-stat-l">Today rate</div></div>
+        <div class="sb-stat"><div class="sb-stat-n" style="color:var(--green)">${gStreak}</div><div class="sb-stat-l">Goal streak</div></div>
+        <div class="sb-stat"><div class="sb-stat-n">${allTime}</div><div class="sb-stat-l">All-time done</div></div>
+      </div>
+      <div class="chart-title">Goal Completion — Last 30 Days</div>
+      <div class="trend-bars" style="height:80px">
+        ${days30.map(d => `<div class="tb-col" title="${d.ds}: ${d.done} done">
+          <div class="tb-bar" style="height:${Math.max(3, d.done/max30*60)}px;background:${d.done===total&&total>0?'var(--green)':'var(--accent)'}"></div>
+          <div class="tb-lbl" style="font-size:8px">${d.ds.slice(8)}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  c.appendChild(sec);
+};
+
+/* ── INIT GOALS ── */
+async function initGoals() {
+  loadGoals();
+  if (ghToken) await loadGoalsFromGist();
+  updateGoalBadge();
+  scheduleReminders();
+  requestNotifPermission();
+}
 /* ── KICK OFF ── */
+
 init();
 
 </script>
