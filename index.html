@@ -6922,53 +6922,49 @@ function _initGoalPanelSwipe() {
   const ov    = document.getElementById('goalPanelOv');
   if (!panel || !ov) return;
 
+  const TABS = ['today', 'add', 'manage', 'backup'];
+  const DISMISS_VEL  = 0.4;
+  const DISMISS_DIST = 100;
+  const SWIPE_TAB_DIST = 48;   // px needed to switch tab
+  const MAX_VERT = 80;
+
   const S = {
     active: false, touchId: null,
-    startX: 0, currentX: 0,
-    lastX: 0, lastT: 0, vel: 0
+    startX: 0, startY: 0,
+    currentX: 0, lastX: 0, lastT: 0, vel: 0,
+    intent: null   // 'dismiss' | 'tab' | null
   };
 
-  const DISMISS_VEL  = 0.4;   // px/ms flick threshold
-  const DISMISS_DIST = 100;   // px drag threshold
+  function currentTabIdx() { return TABS.indexOf(goalActiveTab); }
 
   function scrollBody() { return document.getElementById('goalPanelBody'); }
 
   function canStart(el) {
     if (el.closest('button,a,input,select,textarea,label')) return false;
-    const b = scrollBody();
-    // only allow drag from the header area or if body is scrolled to left
-    if (b && b.contains(el) && b.scrollLeft > 4) return false;
     return true;
   }
 
-  function applyX(dx) {
-    const x = dx < 0 ? dx * 0.08 : dx;   // resist leftward drag
+  /* ── panel slide for dismiss (horizontal, affects whole panel) ── */
+  function applyDismissX(dx) {
+    const x = dx < 0 ? dx * 0.08 : dx;
     const progress = Math.max(0, x) / window.innerWidth;
     panel.style.transform = `translateX(${x}px)`;
     panel.style.opacity   = String(Math.max(0.4, 1 - progress * 0.5));
-    ov.style.setProperty('--ov-alpha', String(Math.max(0.02, 0.55 - progress * 0.55)));
-    const beforeEl = window.getComputedStyle(ov, '::before');
-    ov.style.setProperty('--ov-opacity', String(Math.max(0, 1 - progress * 1.4)));
   }
 
   function snapBack() {
     panel.style.transition = 'transform .38s cubic-bezier(.22,1,.36,1), opacity .25s ease';
-    ov.style.transition    = 'opacity .25s ease';
     panel.style.transform  = 'translateX(0)';
     panel.style.opacity    = '1';
-    setTimeout(() => {
-      panel.style.transition = '';
-      ov.style.transition    = '';
-      panel.style.opacity    = '';
-    }, 400);
+    setTimeout(() => { panel.style.transition = ''; panel.style.opacity = ''; }, 410);
   }
 
   function dismissNow() {
     const exitX = Math.max(S.currentX + S.vel * 160, window.innerWidth * 0.4);
     panel.style.transition = 'transform .26s cubic-bezier(.4,0,1,1), opacity .2s ease';
-    ov.style.transition    = 'opacity .2s ease';
     panel.style.transform  = `translateX(${exitX}px)`;
     panel.style.opacity    = '0';
+    ov.style.transition    = 'opacity .2s ease';
     ov.style.opacity       = '0';
     setTimeout(() => {
       panel.style.cssText = '';
@@ -6977,56 +6973,171 @@ function _initGoalPanelSwipe() {
     }, 270);
   }
 
-  function begin(x) {
-    S.active   = true;
-    S.startX   = S.lastX = x;
-    S.lastT    = performance.now();
-    S.vel      = 0; S.currentX = 0;
-    panel.style.transition = 'none';
-    ov.style.transition    = 'none';
+  /* ── tab slide animation ── */
+  function animateTabSwitch(direction) {
+    const body = document.getElementById('goalPanelBody');
+    if (!body) return;
+    body.style.transition = 'none';
+    body.style.transform  = direction === 'left'
+      ? 'translateX(32px)' : 'translateX(-32px)';
+    body.style.opacity = '0.4';
+    requestAnimationFrame(() => {
+      body.style.transition = 'transform .28s cubic-bezier(.22,1,.36,1), opacity .22s ease';
+      body.style.transform  = 'translateX(0)';
+      body.style.opacity    = '1';
+      setTimeout(() => { body.style.transition = ''; body.style.transform = ''; body.style.opacity = ''; }, 300);
+    });
   }
 
-  function move(x) {
-    if (!S.active) return;
-    const now = performance.now(), dt = now - S.lastT;
-    if (dt > 0) S.vel = S.vel * 0.55 + ((x - S.lastX) / dt) * 0.45;
-    S.lastX = x; S.lastT = now;
-    S.currentX = x - S.startX;
-    requestAnimationFrame(() => { if (S.active) applyX(S.currentX); });
-  }
-
-  function finish() {
-    if (!S.active) return;
-    S.active = false;
-    if (S.vel > DISMISS_VEL || S.currentX > DISMISS_DIST) dismissNow();
-    else snapBack();
-  }
-
-  /* Touch */
+  /* ── touch start ── */
   panel.addEventListener('touchstart', e => {
     if (!canStart(e.target)) return;
-    S.touchId = e.touches[0].identifier;
-    begin(e.touches[0].clientX);
+    S.touchId  = e.touches[0].identifier;
+    S.startX   = S.lastX = e.touches[0].clientX;
+    S.startY   = e.touches[0].clientY;
+    S.lastT    = performance.now();
+    S.vel      = 0; S.currentX = 0;
+    S.active   = true; S.intent  = null;
+    panel.style.transition = 'none';
+    ov.style.transition    = 'none';
   }, { passive: true });
 
+  /* ── touch move ── */
   panel.addEventListener('touchmove', e => {
     if (!S.active) return;
     const t = [...e.touches].find(x => x.identifier === S.touchId);
     if (!t) return;
-    if (t.clientX - S.startX > 6) e.preventDefault();
-    move(t.clientX);
+
+    const now = performance.now(), dt = now - S.lastT;
+    if (dt > 0) S.vel = S.vel * 0.55 + ((t.clientX - S.lastX) / dt) * 0.45;
+    S.lastX = t.clientX; S.lastT = now;
+
+    const dx = t.clientX - S.startX;
+    const dy = Math.abs(t.clientY - S.startY);
+
+    /* cancel if vertical */
+    if (!S.intent && dy > MAX_VERT) { S.active = false; snapBack(); return; }
+
+    /* resolve intent once we have enough horizontal signal */
+    if (!S.intent && Math.abs(dx) > 10) {
+      const b = scrollBody();
+      const bodyScrolled = b && b.scrollTop > 6;
+      const isToday = goalActiveTab === 'today';
+      const goingRight = dx > 0;
+      const goingLeft  = dx < 0;
+      const atFirst = currentTabIdx() === 0;
+      const atLast  = currentTabIdx() === TABS.length - 1;
+
+      if (goingRight && isToday) {
+        S.intent = 'dismiss';
+      } else if (goingRight && !atFirst && !bodyScrolled) {
+        S.intent = 'tab';
+      } else if (goingLeft && !atLast && !bodyScrolled) {
+        S.intent = 'tab';
+      } else if (goingRight && atFirst) {
+        S.intent = 'dismiss'; // same as today since today is index 0
+      } else {
+        S.intent = 'none';
+      }
+    }
+
+    if (S.intent === 'dismiss') {
+      S.currentX = dx;
+      e.preventDefault();
+      requestAnimationFrame(() => { if (S.active) applyDismissX(S.currentX); });
+    } else if (S.intent === 'tab') {
+      S.currentX = dx;
+      e.preventDefault();
+      /* subtle rubber-band on the body to hint direction */
+      const body = document.getElementById('goalPanelBody');
+      if (body) {
+        const nudge = Math.sign(dx) * Math.min(Math.abs(dx) * 0.18, 18);
+        body.style.transition = 'none';
+        body.style.transform  = `translateX(${nudge}px)`;
+      }
+    }
+    /* intent === 'none' → do nothing, let scroll happen */
   }, { passive: false });
 
-  panel.addEventListener('touchend',    finish, { passive: true });
-  panel.addEventListener('touchcancel', () => { if (S.active) snapBack(); S.active = false; }, { passive: true });
+  /* ── touch end ── */
+  panel.addEventListener('touchend', e => {
+    if (!S.active) return;
+    S.active = false;
 
-  /* Mouse (desktop drag) */
+    /* reset body rubber-band */
+    const body = document.getElementById('goalPanelBody');
+    if (body && S.intent === 'tab') {
+      body.style.transition = 'transform .22s ease, opacity .18s ease';
+      body.style.transform  = 'translateX(0)';
+      setTimeout(() => { body.style.transition = ''; body.style.transform = ''; }, 230);
+    }
+
+    if (S.intent === 'dismiss') {
+      if (S.vel > DISMISS_VEL || S.currentX > DISMISS_DIST) dismissNow();
+      else snapBack();
+
+    } else if (S.intent === 'tab') {
+      const idx = currentTabIdx();
+      const dx  = S.currentX;
+      if (dx > SWIPE_TAB_DIST && idx > 0) {
+        /* swipe right → previous tab */
+        animateTabSwitch('right');
+        setGoalTab(TABS[idx - 1]);
+      } else if (dx < -SWIPE_TAB_DIST && idx < TABS.length - 1) {
+        /* swipe left → next tab */
+        animateTabSwitch('left');
+        setGoalTab(TABS[idx + 1]);
+      } else {
+        snapBack();
+      }
+    } else {
+      snapBack();
+    }
+  }, { passive: true });
+
+  panel.addEventListener('touchcancel', () => {
+    if (S.active) snapBack();
+    S.active = false;
+    const body = document.getElementById('goalPanelBody');
+    if (body) { body.style.transition = ''; body.style.transform = ''; }
+  }, { passive: true });
+
+  /* ── Mouse (desktop) ── */
   panel.addEventListener('mousedown', e => {
     if (!canStart(e.target)) return;
-    begin(e.clientX); e.preventDefault();
+    S.startX = S.lastX = e.clientX;
+    S.startY = e.clientY;
+    S.lastT  = performance.now();
+    S.vel    = 0; S.currentX = 0;
+    S.active = true; S.intent  = null;
+    panel.style.transition = 'none';
+    e.preventDefault();
   });
-  window.addEventListener('mousemove', e => { if (S.active) move(e.clientX); });
-  window.addEventListener('mouseup',   () => { if (S.active) finish(); });
+  window.addEventListener('mousemove', e => {
+    if (!S.active) return;
+    const now = performance.now(), dt = now - S.lastT;
+    if (dt > 0) S.vel = S.vel * 0.55 + ((e.clientX - S.lastX) / dt) * 0.45;
+    S.lastX = e.clientX; S.lastT = now;
+    S.currentX = e.clientX - S.startX;
+    if (!S.intent) {
+      if (S.currentX > 10) S.intent = goalActiveTab === 'today' ? 'dismiss' : 'tab';
+      else if (S.currentX < -10) S.intent = currentTabIdx() < TABS.length - 1 ? 'tab' : 'none';
+    }
+    if (S.intent === 'dismiss') applyDismissX(S.currentX);
+  });
+  window.addEventListener('mouseup', () => {
+    if (!S.active) return;
+    S.active = false;
+    if (S.intent === 'dismiss') {
+      if (S.vel > DISMISS_VEL || S.currentX > DISMISS_DIST) dismissNow();
+      else snapBack();
+    } else if (S.intent === 'tab') {
+      const idx = currentTabIdx();
+      if (S.currentX > SWIPE_TAB_DIST && idx > 0) { animateTabSwitch('right'); setGoalTab(TABS[idx - 1]); }
+      else if (S.currentX < -SWIPE_TAB_DIST && idx < TABS.length - 1) { animateTabSwitch('left'); setGoalTab(TABS[idx + 1]); }
+      else snapBack();
+    } else snapBack();
+  });
 }
 /* ── KICK OFF ── */
 
