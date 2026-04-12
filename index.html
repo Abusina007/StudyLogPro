@@ -367,15 +367,15 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .entry-row.selected,
 .wf-entry.selected,
 .entry-card.selected {
-  border-left: 3px solid var(--accent) !important;
-  background: rgba(47,129,247,.18) !important;
-  box-shadow: inset 0 0 0 1.5px rgba(47,129,247,.4) !important;
+  border-left: 3px solid var(--accent);
+  background: rgba(47,129,247,.18);
+  box-shadow: inset 0 0 0 1.5px rgba(47,129,247,.4);
 }
 .entry-row.selected .er-icon {
-  background: var(--accent) !important;
-  color: #fff !important;
-  font-size: 0 !important;
-  font-weight: 900 !important;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0;
+  font-weight: 900;
   animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
   display: flex;
   align-items: center;
@@ -1211,6 +1211,9 @@ input[type=date]{color-scheme:dark}
 .stc-s{font-size:11px;color:var(--text2)}
 .hmap-scroll{overflow-x:auto;padding-bottom:4px}
 .hmap-grid{display:grid;grid-template-columns:repeat(52,12px);gap:2px;min-width:fit-content;}
+@media (max-width:786px) {.hmap-grid{
+  display:grid;grid-template-columns:repeat(24,12px);gap:2px;min-width:fit-content;}
+}
 .hmc{width:12px;height:12px;border-radius:2px}
 .hml0{background:var(--panel3)}
 .hml1{background:rgba(47,129,247,.25)}
@@ -1867,9 +1870,33 @@ button, select, input[type="date"] {
 }
 
 .gp-body {
-  flex: 1; overflow-y: auto; padding: 14px 14px 80px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 14px 100px;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  min-height: 0;     /* critical for flex children to scroll */
+}
+.gp-panel {
+  position: relative;
+  width: min(390px, 96vw);
+  height: 100%;
+  max-height: 100dvh;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-left: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.22,1,.36,1);
+  overflow: hidden;
+  box-shadow: -8px 0 40px rgba(0,0,0,.3);
+  will-change: transform;
+}
+@media (max-width: 768px) {
+  .gp-panel { width: 100vw !important; border-left: none; border-radius: 0; }
 }
 
 /* today header */
@@ -2065,6 +2092,189 @@ button, select, input[type="date"] {
 .fab-goal.hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
 @media (min-width: 769px) { .fab-goal { display: none; } }
 @media (max-width: 768px) { #scrollTopBtn { bottom: 86px; } }
+/* ── ENHANCED MODAL ── */
+.attend-row { display:flex; gap:5px; }
+.attend-btn {
+  flex:1; padding:7px 4px; border-radius:10px; border:1.5px solid var(--border2);
+  background:none; color:var(--text3); font-size:11.5px; font-weight:600;
+  cursor:pointer; transition:all var(--tr); font-family:var(--font); text-align:center;
+}
+.attend-btn:hover { border-color:var(--border3); color:var(--text); }
+.attend-btn.on-present { background:var(--green-bg); border-color:var(--green); color:var(--green); }
+.attend-btn.on-late    { background:var(--amber-bg); border-color:var(--amber); color:var(--amber); }
+.attend-btn.on-absent  { background:var(--red-bg);   border-color:var(--red);   color:var(--red);   }
+
+.diff-row { display:flex; gap:4px; align-items:center; }
+.diff-star {
+  font-size:20px; cursor:pointer; transition:transform .15s, opacity .15s;
+  opacity:.28; line-height:1;
+}
+.diff-star.on { opacity:1; transform:scale(1.15); }
+.diff-star:hover { opacity:.8; }
+
+.dur-row { display:flex; gap:6px; align-items:center; }
+.dur-chip {
+  padding:5px 11px; border-radius:20px; border:1.5px solid var(--border);
+  background:none; color:var(--text3); font-size:11.5px; font-weight:600;
+  cursor:pointer; transition:all var(--tr); font-family:var(--font);
+}
+.dur-chip:hover  { border-color:var(--border3); color:var(--text); }
+.dur-chip.on     { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+.dur-custom      { width:64px; background:var(--panel2); border:1.5px solid var(--border2);
+  border-radius:10px; padding:5px 8px; color:var(--text); font-size:12px;
+  outline:none; font-family:var(--mono); }
+.dur-custom:focus { border-color:var(--accent); }
+
+.prio-btn {
+  padding:3px 9px; border-radius:20px; font-size:10.5px; font-weight:700;
+  border:1.5px solid transparent; cursor:pointer; transition:all var(--tr);
+  font-family:var(--font); background:var(--panel3); color:var(--text3);
+}
+.prio-btn.hi { background:var(--red-bg);   border-color:rgba(248,81,73,.4);  color:var(--red);   }
+.prio-btn.md { background:var(--amber-bg); border-color:rgba(210,153,34,.4); color:var(--amber); }
+.prio-btn.lo { background:var(--green-bg); border-color:rgba(63,185,80,.4);  color:var(--green); }
+
+.todo-form-item { position:relative; }
+.todo-prio-dot {
+  width:7px; height:7px; border-radius:50%; flex-shrink:0;
+}
+
+.stype-grid { display:flex; flex-wrap:wrap; gap:5px; }
+.stype-chip {
+  padding:5px 12px; border-radius:20px; font-size:11.5px; font-weight:600;
+  border:1.5px solid var(--border2); background:none; color:var(--text3);
+  cursor:pointer; transition:all var(--tr); font-family:var(--font);
+}
+.stype-chip:hover { border-color:var(--border3); color:var(--text); }
+.stype-chip.on { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+
+.link-form-row {
+  display:flex; align-items:center; gap:8px;
+  background:var(--panel2); border:1px solid var(--border);
+  border-radius:var(--rs); padding:6px 10px;
+  animation:cardIn .18s ease;
+}
+.link-form-ico { font-size:14px; flex-shrink:0; }
+.link-form-info { flex:1; min-width:0; }
+.link-form-url { font-size:11px; color:var(--text3); font-family:var(--mono);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.link-form-del { background:none; border:none; color:var(--text3);
+  cursor:pointer; font-size:14px; transition:color var(--tr); flex-shrink:0; }
+.link-form-del:hover { color:var(--red); }
+
+.notif-settings-row {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--panel2); border:1px solid var(--border);
+  border-radius:var(--rs); padding:9px 12px;
+}
+.toggle-sm {
+  position:relative; width:36px; height:20px; display:inline-block;
+}
+.toggle-sm input { opacity:0; width:0; height:0; position:absolute; }
+.toggle-sm-track {
+  position:absolute; inset:0; border-radius:20px;
+  background:var(--panel4); transition:background .2s; cursor:pointer;
+}
+.toggle-sm-track::after {
+  content:''; position:absolute; top:2px; left:2px;
+  width:16px; height:16px; border-radius:50%;
+  background:#fff; transition:transform .2s;
+}
+.toggle-sm input:checked + .toggle-sm-track { background:var(--accent); }
+.toggle-sm input:checked + .toggle-sm-track::after { transform:translateX(16px); }
+
+/* ── ENTRY ROW PRIORITY DOT ── */
+.er-prio { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-left:3px; }
+
+/* ── QUICK ADD BAR ── */
+#quickAddBar {
+  position:fixed; bottom:0; left:0; right:0; z-index:350;
+  background:var(--glass-bg);
+  backdrop-filter:blur(16px) saturate(160%);
+  -webkit-backdrop-filter:blur(16px) saturate(160%);
+  border-top:1px solid var(--glass-border);
+  padding:8px 14px 12px;
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.22,1,.36,1);
+  display:flex; gap:8px; align-items:center;
+}
+#quickAddBar.open { transform:translateY(0); }
+#quickAddBar input {
+  flex:1; background:var(--panel2); border:1.5px solid var(--border2);
+  border-radius:10px; padding:10px 12px; color:var(--text); font-size:14px;
+  outline:none; font-family:var(--font);
+}
+#quickAddBar input:focus { border-color:var(--accent); }
+#quickAddBar .qa-send {
+  background:var(--accent); border:none; color:#fff;
+  width:38px; height:38px; border-radius:12px; font-size:18px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background var(--tr); flex-shrink:0;
+}
+#quickAddBar .qa-send:hover { background:var(--accent-h); }
+#quickAddBar .qa-cancel {
+  background:none; border:1px solid var(--border2); color:var(--text2);
+  width:38px; height:38px; border-radius:12px; font-size:16px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all var(--tr); flex-shrink:0;
+}
+
+/* ── REVIEW DUE HIGHLIGHT ── */
+.review-overdue-row {
+  background:linear-gradient(90deg,var(--amber-bg),transparent);
+  border-left:3px solid var(--amber) !important;
+}
+
+/* ── STREAK TOAST ── */
+@keyframes streakPop {
+  0%   { transform:translateX(-50%) translateY(18px) scale(.7); opacity:0; }
+  55%  { transform:translateX(-50%) translateY(-4px) scale(1.08); opacity:1; }
+  100% { transform:translateX(-50%) translateY(0) scale(1); opacity:1; }
+}
+#streakCelebration {
+  position:fixed; bottom:60px; left:50%;
+  background:linear-gradient(135deg,#f0a500,#e05a00);
+  color:#fff; padding:10px 22px; border-radius:50px;
+  font-size:14px; font-weight:700; z-index:9999;
+  display:none; pointer-events:none; white-space:nowrap;
+  box-shadow:0 6px 24px rgba(240,165,0,.4);
+}
+#streakCelebration.show { display:block; animation:streakPop .4s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+/* ── WORD GOAL PROGRESS ── */
+.wg-bar-wrap {
+  height:3px; background:var(--panel3); border-radius:2px;
+  overflow:hidden; margin-top:5px;
+}
+.wg-bar-fill {
+  height:100%; border-radius:2px;
+  background:linear-gradient(90deg,var(--accent),#7c3aed);
+  transition:width .4s ease;
+}
+
+/* ── BETTER EMPTY STATE ── */
+.empty-state-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:4px; }
+.empty-state-btn {
+  background:var(--accent); color:#fff; border:none;
+  padding:9px 20px; border-radius:10px; font-size:13px; font-weight:600;
+  cursor:pointer; font-family:var(--font); transition:all var(--tr);
+}
+.empty-state-btn:hover { background:var(--accent-h); transform:translateY(-1px); }
+.empty-state-btn.sec {
+  background:none; color:var(--text2); border:1.5px solid var(--border2);
+}
+.empty-state-btn.sec:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim2); }
+
+/* ── SMART NOTES TOOLBAR ── */
+.notes-toolbar {
+  display:flex; gap:3px; padding:4px 6px 2px; flex-wrap:wrap;
+}
+.notes-tb-btn {
+  background:none; border:1px solid transparent; color:var(--text3);
+  padding:3px 7px; border-radius:6px; font-size:11px; cursor:pointer;
+  transition:all var(--tr); font-family:var(--font); white-space:nowrap;
+}
+.notes-tb-btn:hover { background:var(--panel3); border-color:var(--border); color:var(--text2); }
 </style>
 </head>
 <body>
@@ -2380,94 +2590,291 @@ button, select, input[type="date"] {
     <div class="m-head">
       <h2 id="modalTitle">New Entry</h2>
       <div class="m-tabs">
-        <button class="m-tab active" id="tab-btn-main" onclick="switchTab('main',this)">Main</button>
-        <button class="m-tab" id="tab-btn-todos" onclick="switchTab('todos',this)">Tasks</button>
-        <button class="m-tab" id="tab-btn-media" onclick="switchTab('media',this)">Media</button>
-        <button class="m-tab" id="tab-btn-meta" onclick="switchTab('meta',this)">Metadata</button>
+        <button class="m-tab active" id="tab-btn-main"  onclick="switchTab('main',this)">Main</button>
+        <button class="m-tab" id="tab-btn-todos"  onclick="switchTab('todos',this)">Tasks</button>
+        <button class="m-tab" id="tab-btn-media"  onclick="switchTab('media',this)">Media</button>
+        <button class="m-tab" id="tab-btn-meta"   onclick="switchTab('meta',this)">Meta</button>
       </div>
       <button class="m-close" onclick="closeModal()">×</button>
     </div>
+
+    <!-- ── MAIN TAB ── -->
     <div class="m-body tab active" id="tab-main">
       <div class="f2">
-        <div class="fg" style="margin-bottom:0"><label class="flbl">Date</label><input class="finp" type="date" id="fDate" onchange="onDateChange()"></div>
-        <div class="fg" style="margin-bottom:0"><label class="flbl">Batch</label>
+        <div class="fg" style="margin-bottom:0">
+          <label class="flbl">Date</label>
+          <input class="finp" type="date" id="fDate" onchange="onDateChange()">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label class="flbl">Batch</label>
           <select class="fsel" id="fBatch" onchange="onDateChange()">
-            <option value="G1">Group 1 (G1)</option><option value="G2">Group 2 (G2)</option><option value="both">Both / N/A</option>
+            <option value="G1">Group 1 (G1)</option>
+            <option value="G2">Group 2 (G2)</option>
+            <option value="both">Both / N/A</option>
           </select>
         </div>
       </div>
+
       <div class="fg" style="margin-top:11px">
         <label class="flbl">Class / Period <span class="flbl-note">Sat/Sun are holidays</span></label>
         <div id="schedPicker"><div class="sch-empty">Select a date to see schedule</div></div>
-        <input type="hidden" id="fSubj" value="OTHER"><input type="hidden" id="fTime" value="">
+        <input type="hidden" id="fSubj" value="OTHER">
+        <input type="hidden" id="fTime" value="">
       </div>
-      <div class="fg"><label class="flbl">Session Titles <span class="flbl-note">add URL to make clickable</span></label><div class="titles-list" id="titlesList"></div><button class="add-row-btn" onclick="addTitleRow()">＋ Add title</button></div>
-      <div class="fg" style="margin-bottom:0"><label class="flbl">Notes</label><textarea class="ftxt" id="fNotes" placeholder="Key concepts, formulas, insights…" oninput="onNotesInput()" style="min-height:110px"></textarea><div class="char-c" id="notesStats">0 words</div></div>
+
+      <div class="f2">
+        <div class="fg" style="margin-bottom:0">
+          <label class="flbl">Attendance</label>
+          <div class="attend-row">
+            <button class="attend-btn" id="att-present" onclick="setAttend('present')">✓ Present</button>
+            <button class="attend-btn" id="att-late"    onclick="setAttend('late')">⏰ Late</button>
+            <button class="attend-btn" id="att-absent"  onclick="setAttend('absent')">✗ Absent</button>
+          </div>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label class="flbl">Session Type</label>
+          <select class="fsel" id="fStype">
+            <option value="">— select —</option>
+            <option value="lecture">📖 Lecture</option>
+            <option value="lab">🔬 Lab / Practical</option>
+            <option value="tutorial">✏️ Tutorial</option>
+            <option value="seminar">🎤 Seminar</option>
+            <option value="selfstudy">📚 Self Study</option>
+            <option value="exam">📝 Exam / Test</option>
+            <option value="revision">🔄 Revision</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="f2" style="margin-top:11px">
+        <div class="fg" style="margin-bottom:0">
+          <label class="flbl">Duration</label>
+          <div class="dur-row">
+            <button class="dur-chip" onclick="setDur(50,this)">50m</button>
+            <button class="dur-chip" onclick="setDur(90,this)">90m</button>
+            <button class="dur-chip" onclick="setDur(120,this)">2h</button>
+            <input class="dur-custom" id="fDurCustom" type="number" min="5" max="480"
+              placeholder="min" oninput="onDurCustom(this.value)" title="Custom minutes">
+          </div>
+          <input type="hidden" id="fDuration" value="">
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="flbl">Difficulty</label>
+        <div class="diff-row" id="diffRow">
+          <span class="diff-star" data-v="1" onclick="setDiff(1)">★</span>
+          <span class="diff-star" data-v="2" onclick="setDiff(2)">★</span>
+          <span class="diff-star" data-v="3" onclick="setDiff(3)">★</span>
+          <span class="diff-star" data-v="4" onclick="setDiff(4)">★</span>
+          <span class="diff-star" data-v="5" onclick="setDiff(5)">★</span>
+          <span id="diffLabel" style="font-size:11px;color:var(--text3);margin-left:6px"></span>
+        </div>
+        <input type="hidden" id="fDifficulty" value="">
+      </div>
+
+      <div class="fg" style="margin-top:11px">
+        <label class="flbl">Session Titles <span class="flbl-note">add URL to make clickable</span></label>
+        <div class="titles-list" id="titlesList"></div>
+        <button class="add-row-btn" onclick="addTitleRow()">＋ Add title / topic</button>
+      </div>
+
+      <div class="fg" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <label class="flbl" style="margin:0">Notes</label>
+          <div class="notes-toolbar">
+            <button class="notes-tb-btn" onclick="injectNote('## Summary\n')">Heading</button>
+            <button class="notes-tb-btn" onclick="injectNote('- ')">• List</button>
+            <button class="notes-tb-btn" onclick="injectNote('> ')">Quote</button>
+            <button class="notes-tb-btn" onclick="injectNote('**key formula:** ')">Formula</button>
+            <button class="notes-tb-btn" onclick="injectNote('\n⸻\n')">Divider</button>
+          </div>
+        </div>
+        <textarea class="ftxt" id="fNotes" placeholder="Key concepts, formulas, insights… Use heading / list buttons above for structure." oninput="onNotesInput()" style="min-height:110px"></textarea>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+          <div class="char-c" style="margin:0;flex:1" id="notesStats">0 words</div>
+          <div class="wg-bar-wrap" style="width:90px" id="wordGoalWrap" title="Word goal progress">
+            <div class="wg-bar-fill" id="wordGoalBar" style="width:0%"></div>
+          </div>
+          <span id="wordGoalLabel" style="font-size:10px;color:var(--text3);font-family:var(--mono);min-width:36px;text-align:right"></span>
+        </div>
+      </div>
     </div>
+
+    <!-- ── TASKS TAB ── -->
     <div class="m-body tab" id="tab-todos">
       <div class="fg">
-        <label class="flbl">Tasks / To-Do <span class="flbl-note">homework, assignments, revision</span></label>
+        <label class="flbl">Tasks / To-Do
+          <span class="flbl-note">homework, assignments, revision</span>
+        </label>
         <div class="todo-form-list" id="todoFormList"></div>
-        <div class="todo-add-row" style="margin-top:7px">
-          <input class="finp" id="todoInp" placeholder="Add a task…" style="flex:1" onkeydown="if(event.key==='Enter'){event.preventDefault();addTodo()}">
-          <input class="todo-due-inp" type="date" id="todoDueInp" title="Due date (optional)">
-          <button class="tag-add-btn" onclick="addTodo()">Add</button>
+        <div style="margin-top:9px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:10px;display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:6px">
+            <input class="finp" id="todoInp" placeholder="Add a task…"
+              style="flex:1;padding:8px 10px;font-size:13px"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();addTodo()}">
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <input class="todo-due-inp" type="date" id="todoDueInp" title="Due date">
+            <div style="display:flex;gap:4px;align-items:center">
+              <span style="font-size:10.5px;color:var(--text3)">Priority:</span>
+              <button class="prio-btn" id="prioBtnHi" onclick="setTodoPrio('high')"   title="High">🔴 High</button>
+              <button class="prio-btn" id="prioBtnMd" onclick="setTodoPrio('medium')" title="Medium">🟡 Med</button>
+              <button class="prio-btn" id="prioBtnLo" onclick="setTodoPrio('low')"    title="Low">🟢 Low</button>
+            </div>
+            <button class="tag-add-btn" onclick="addTodo()" style="margin-left:auto">+ Add</button>
+          </div>
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:5px">Click circle to mark done. Click again to undo.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:5px;display:flex;align-items:center;gap:6px">
+          <span>Long-press any task to reorder.</span>
+          <span id="taskSummary" style="margin-left:auto;color:var(--accent);font-family:var(--mono);font-size:10.5px"></span>
+        </div>
       </div>
     </div>
+
+    <!-- ── MEDIA TAB ── -->
     <div class="m-body tab" id="tab-media">
-      <div class="fg"><label class="flbl">YouTube / Video Links</label>
-        <div style="display:flex;gap:7px"><input class="finp" id="ytInp" placeholder="Paste YouTube URL…" style="flex:1" onkeydown="if(event.key==='Enter'){event.preventDefault();addYT()}"><button class="tag-add-btn" onclick="addYT()">Add</button></div>
+      <div class="fg">
+        <label class="flbl">YouTube / Video Links</label>
+        <div style="display:flex;gap:7px">
+          <input class="finp" id="ytInp" placeholder="Paste YouTube URL…"
+            style="flex:1" onkeydown="if(event.key==='Enter'){event.preventDefault();addYT()}">
+          <button class="tag-add-btn" onclick="addYT()">Add</button>
+        </div>
         <div class="yt-form-rows" id="ytFormRows"></div>
       </div>
-      <div class="fg" style="margin-bottom:0"><label class="flbl">File Attachments</label>
-        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="handleDrop(event)">
-          <div class="drop-ico">📎</div><div style="font-size:13px;font-weight:500">Click or drag files here</div><div class="drop-sub">Images, PDFs, docs – max 10 MB</div>
+
+      <div class="fg">
+        <label class="flbl">Web Links <span class="flbl-note">articles, docs, references</span></label>
+        <div style="display:flex;gap:7px">
+          <input class="finp" id="linkInp" placeholder="https://…"
+            style="flex:1;font-family:var(--mono);font-size:12px"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addWebLink()}">
+          <input class="finp" id="linkLblInp" placeholder="Label (optional)"
+            style="width:110px" onkeydown="if(event.key==='Enter'){event.preventDefault();addWebLink()}">
+          <button class="tag-add-btn" onclick="addWebLink()">Add</button>
+        </div>
+        <div id="linkFormRows" style="display:flex;flex-direction:column;gap:5px;margin-top:5px"></div>
+      </div>
+
+      <div class="fg" style="margin-bottom:0">
+        <label class="flbl">File Attachments</label>
+        <div class="drop-zone" id="dropZone"
+          onclick="document.getElementById('fileInput').click()"
+          ondragover="event.preventDefault();this.classList.add('over')"
+          ondragleave="this.classList.remove('over')"
+          ondrop="handleDrop(event)">
+          <div class="drop-ico">📎</div>
+          <div style="font-size:13px;font-weight:500">Click or drag files here</div>
+          <div class="drop-sub">Images, PDFs, docs — max 10 MB each</div>
+          <div class="drop-sub" style="margin-top:3px;font-size:10px;opacity:.6">Ctrl+V to paste screenshots</div>
           <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this.files)">
         </div>
         <div class="file-prevs-list" id="filePrevs"></div>
       </div>
     </div>
+
+    <!-- ── METADATA TAB ── -->
     <div class="m-body tab" id="tab-meta">
-      <div class="fg"><label class="flbl">Tags</label>
-        <div class="tag-inp-row"><input class="finp" id="tagInp" placeholder="Type tag and press Enter…" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}"><button class="tag-add-btn" onclick="addTag()">Add</button></div>
+      <div class="fg">
+        <label class="flbl">Tags</label>
+        <div class="tag-inp-row">
+          <input class="finp" id="tagInp" placeholder="Type tag and press Enter…"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}"
+            oninput="showTagAutocomplete(this.value)">
+          <button class="tag-add-btn" onclick="addTag()">Add</button>
+        </div>
+        <div id="tagAutoComplete" style="display:none;flex-wrap:wrap;gap:4px;margin-top:5px"></div>
         <div class="tags-picked" id="tagsDisplay"></div>
-        <div style="margin-top:7px;font-size:11px;color:var(--text3)">Quick: <span class="sugg-tags" id="suggTags"></span></div>
-      </div>
-      <div class="fg"><label class="flbl">Mood / Energy</label>
-        <div style="display:flex;gap:7px;flex-wrap:wrap" id="moodPicker">
-          <span class="tag-pill" data-mood="great" onclick="setMood('great')">😄 Great</span>
-          <span class="tag-pill" data-mood="good" onclick="setMood('good')">😊 Good</span>
-          <span class="tag-pill" data-mood="okay" onclick="setMood('okay')">😐 Okay</span>
-          <span class="tag-pill" data-mood="tired" onclick="setMood('tired')">😪 Tired</span>
-          <span class="tag-pill" data-mood="confused" onclick="setMood('confused')">🤔 Confused</span>
+        <div style="margin-top:7px;font-size:11px;color:var(--text3)">
+          Suggestions: <span class="sugg-tags" id="suggTags"></span>
         </div>
       </div>
-      <div class="fg"><label class="flbl">Self Rating <span class="flbl-note">optional</span></label>
-        <div class="rating-row">
-          <label class="rating-chk-wrap"><input type="checkbox" id="ratingChk" onchange="toggleRatingSlider()"><span class="rating-chk-label">Enable rating</span></label>
-          <div id="ratingSliderWrap" class="hidden">
-            <input type="range" id="ratingInp" min="1" max="10" value="7" oninput="onRatingInput(this.value)" style="flex:1;accent-color:var(--accent)">
-            <span id="ratingVal" style="font-size:17px;font-family:var(--mono);color:var(--accent);min-width:24px;font-weight:700">7</span>
-            <span style="font-size:11.5px;color:var(--text3)">/10</span>
+
+      <div class="fg">
+        <label class="flbl">Mood / Energy</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap" id="moodPicker">
+          <span class="tag-pill" data-mood="great"    onclick="setMood('great')">😄 Great</span>
+          <span class="tag-pill" data-mood="good"     onclick="setMood('good')">😊 Good</span>
+          <span class="tag-pill" data-mood="okay"     onclick="setMood('okay')">😐 Okay</span>
+          <span class="tag-pill" data-mood="tired"    onclick="setMood('tired')">😪 Tired</span>
+          <span class="tag-pill" data-mood="confused" onclick="setMood('confused')">🤔 Confused</span>
+          <span class="tag-pill" data-mood="stressed" onclick="setMood('stressed')">😤 Stressed</span>
+          <span class="tag-pill" data-mood="focused"  onclick="setMood('focused')">🎯 Focused</span>
+        </div>
+      </div>
+
+      <div class="f2">
+        <div class="fg">
+          <label class="flbl">Self Rating <span class="flbl-note">optional</span></label>
+          <div class="rating-row">
+            <label class="rating-chk-wrap">
+              <input type="checkbox" id="ratingChk" onchange="toggleRatingSlider()">
+              <span class="rating-chk-label">Enable</span>
+            </label>
+            <div id="ratingSliderWrap" class="hidden">
+              <input type="range" id="ratingInp" min="1" max="10" value="7"
+                oninput="onRatingInput(this.value)" style="flex:1;accent-color:var(--accent)">
+              <span id="ratingVal" style="font-size:17px;font-family:var(--mono);color:var(--accent);min-width:24px;font-weight:700">7</span>
+              <span style="font-size:11.5px;color:var(--text3)">/10</span>
+            </div>
           </div>
         </div>
       </div>
-      <div class="fg" style="margin-bottom:0"><label class="flbl">Review Reminder</label>
-        <input class="finp" type="date" id="reviewDate">
-        <div style="font-size:11px;color:var(--text3);margin-top:3px">Overdue entries show an amber badge.</div>
+      <div class="fg">
+        <label class="flbl">Word Goal <span class="flbl-note">for notes</span></label>
+        <select class="fsel" id="fWordGoal" onchange="onNotesInput()">
+          <option value="">N/A</option>
+          <option value="50">50 words</option>
+          <option value="100">100 words</option>
+          <option value="200">200 words</option>
+          <option value="300">300 words</option>
+          <option value="500">500 words</option>
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="flbl">Review Reminder</label>
+        <div class="f2" style="margin-bottom:0">
+          <input class="finp" type="date" id="reviewDate">
+          <select class="fsel" id="fReviewType">
+            <option value="general">General review</option>
+            <option value="exam">Before exam</option>
+            <option value="spaced">Spaced repetition</option>
+            <option value="assignment">Assignment due</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px" id="reviewQuickBtns">
+          <button class="dur-chip" onclick="setReviewQuick(1)">+1d</button>
+          <button class="dur-chip" onclick="setReviewQuick(3)">+3d</button>
+          <button class="dur-chip" onclick="setReviewQuick(7)">+1w</button>
+          <button class="dur-chip" onclick="setReviewQuick(14)">+2w</button>
+        </div>
       </div>
     </div>
+
     <div class="m-foot">
-      <div style="font-size:12px;color:var(--text3)">Subject: <span id="modalSubjHint" style="color:var(--accent);font-weight:600">–</span></div>
+      <div style="font-size:12px;color:var(--text3)">
+        Subject: <span id="modalSubjHint" style="color:var(--accent);font-weight:600">–</span>
+      </div>
       <div class="m-foot-r">
         <button class="btn-c" onclick="closeModal()">Cancel</button>
-        <button class="btn-p" onclick="saveEntry()">Save <span class="mpxx"><kbd style="font-size:9px;opacity:.65">Ctrl+↵</kbd></span></button>
+        <button class="btn-p" onclick="saveEntry()">
+          Save <span class="mpxx"><kbd style="font-size:9px;opacity:.65">Ctrl+↵</kbd></span>
+        </button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- ▀▄▀▄ QUICK ADD BAR ▀▄▀▄ -->
+<div id="quickAddBar">
+  <input id="qaInput" placeholder="Quick note — type and press Enter…"
+    onkeydown="if(event.key==='Enter')qaSubmit();if(event.key==='Escape')closeQA()">
+  <button class="qa-cancel" onclick="closeQA()">×</button>
+  <button class="qa-send"   onclick="qaSubmit()">↑</button>
+</div>
+
+<!-- ▀▄▀▄ STREAK CELEBRATION ▀▄▀▄ -->
+<div id="streakCelebration"></div>
 
 <!-- ▀▄▀▄ HELP MODAL ▀▄▀▄ -->
 <div class="overlay" id="helpModal">
@@ -3464,7 +3871,9 @@ const DAY_ALIASES = {sun:0,sunday:0,mon:1,monday:1,tue:2,tuesday:2,wed:3,wednesd
 const MONTH_ALIASES = {jan:1,january:1,feb:2,february:2,mar:3,march:3,apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,aug:8,august:8,sep:9,september:9,oct:10,october:10,nov:11,november:11,dec:12,december:12};
 const SUGG_TAGS = ['exam','revision','assignment','lab','quiz','important','confused','formula','theorem','practice'];
 
-let entries = [], editId = null, formYTs = [], formFiles = [], formTags = [], formTodos = [], formMood = '', formRating = 7, formRatingOn = false;
+let entries = [], editId = null, formYTs = [], formLinks = [], formFiles = [], formTags = [],
+    formTodos = [], formMood = '', formRating = 7, formRatingOn = false,
+    formAttend = '', formDifficulty = 0, formDuration = '', formTodoPrio = '';
 let detailId = null, currentDayPanelDate = '';
 let isSaving = false;   // prevents rapid clicks
 let selSubj = 'OTHER', selTime = '';
@@ -3708,9 +4117,36 @@ function toggleTagFilter(t) { const i=activeTagFilters.indexOf(t); i>-1?activeTa
    TODOS
 ══════════════════════════════════ */
 function addTodo() {
-  const text=document.getElementById('todoInp').value.trim(); if(!text) return;
-  formTodos.push({id:Date.now().toString()+Math.random().toString(36).slice(2),text,done:false,due:document.getElementById('todoDueInp').value||''});
-  renderFormTodos(); document.getElementById('todoInp').value=''; document.getElementById('todoDueInp').value='';
+  const text = document.getElementById('todoInp').value.trim(); if (!text) return;
+  formTodos.push({
+    id: Date.now().toString() + Math.random().toString(36).slice(2),
+    text, done: false,
+    due: document.getElementById('todoDueInp').value || '',
+    priority: formTodoPrio || ''
+  });
+  renderFormTodos();
+  document.getElementById('todoInp').value    = '';
+  document.getElementById('todoDueInp').value = '';
+  setTodoPrio(''); // reset priority
+  updateTaskSummary();
+}
+function updateTaskSummary() {
+  const el = document.getElementById('taskSummary'); if (!el) return;
+  const t = formTodos.length, d = formTodos.filter(x=>x.done).length;
+  el.textContent = t ? `${d}/${t} done` : '';
+}
+const PRIO_DOT = { high:'#f85149', medium:'#d29922', low:'#3fb950' };
+const PRIO_LBL = { high:'🔴', medium:'🟡', low:'🟢' };
+function renderFormTodos() {
+  document.getElementById('todoFormList').innerHTML = formTodos.map((t,i) => `
+    <div class="todo-form-item${t.done?' done':''}">
+      <button class="todo-form-chk${t.done?' done':''}" onclick="toggleFormTodo(${i})">${t.done?'✓':''}</button>
+      ${t.priority ? `<div class="todo-prio-dot" style="background:${PRIO_DOT[t.priority]}" title="${t.priority}"></div>` : ''}
+      <span class="todo-form-txt">${esc(t.text)}</span>
+      ${t.due ? `<span class="todo-form-due">${t.due}</span>` : ''}
+      <button class="todo-form-del" onclick="removeFormTodo(${i})">✕</button>
+    </div>`).join('');
+  updateTaskSummary();
 }
 function toggleFormTodo(idx) { formTodos[idx].done=!formTodos[idx].done; renderFormTodos(); }
 function removeFormTodo(idx) { formTodos.splice(idx,1); renderFormTodos(); }
@@ -4124,14 +4560,22 @@ if (todos.length) {
     taskPreview = `${todos.length} task${todos.length!==1?'s':''} · ${doneCount} done`;
   }
 }
-let badges='';
-if(e.pinned) badges+=`<span style="font-size:11px">📌</span>`;
-if(e.mood) badges+=`<span style="font-size:11px">${moodEmo(e.mood)}</span>`;
-if(e.rating) badges+=`<span class="er-badge" style="background:var(--accent-dim);color:var(--accent)">★${e.rating}</span>`;
-const pend = (e.todos||[]).filter(t=>!t.done).length;
-if(pend) badges+=`<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">${pend}</span>`;
-if((e.youtubes||[]).length) badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">▶${e.youtubes.length}</span>`;
-if((e.files||[]).length) badges+=`<span class="er-badge" style="background:var(--panel3);color:var(--text3)">📎${e.files.length}</span>`;
+const ATTEND_ICO = { present:'✓', late:'⏰', absent:'✗' };
+  const ATTEND_COL = { present:'var(--green)', late:'var(--amber)', absent:'var(--red)' };
+  let badges = '';
+  if (e.pinned) badges += `<span style="font-size:11px">📌</span>`;
+  if (e.attendance && e.attendance !== 'present') badges += `<span style="font-size:11px;color:${ATTEND_COL[e.attendance]}">${ATTEND_ICO[e.attendance]}</span>`;
+  if (e.difficulty) badges += `<span class="er-badge" style="background:var(--panel3);color:var(--text3)" title="Difficulty ${'★'.repeat(e.difficulty)}">★${e.difficulty}</span>`;
+  if (e.mood) badges += `<span style="font-size:11px">${moodEmo(e.mood)}</span>`;
+  if (e.rating) badges += `<span class="er-badge" style="background:var(--accent-dim);color:var(--accent)">★${e.rating}</span>`;
+  const pend = (e.todos||[]).filter(t=>!t.done).length;
+  const highPrio = (e.todos||[]).filter(t=>!t.done&&t.priority==='high').length;
+  if (pend) badges += `<span class="er-badge" style="background:${highPrio?'var(--red-bg)':'var(--amber-bg)'};color:${highPrio?'var(--red)':'var(--amber)'}">${pend}${highPrio?'!':''}</span>`;
+  if ((e.youtubes||[]).length)  badges += `<span class="er-badge" style="background:var(--panel3);color:var(--text3)">▶${e.youtubes.length}</span>`;
+  if ((e.weblinks||[]).length)  badges += `<span class="er-badge" style="background:var(--panel3);color:var(--text3)">🔗${e.weblinks.length}</span>`;
+  if ((e.files||[]).length)     badges += `<span class="er-badge" style="background:var(--panel3);color:var(--text3)">📎${e.files.length}</span>`;
+  const isReviewDue = e.reviewDate && e.reviewDate <= new Date().toISOString().split('T')[0];
+  if (isReviewDue) badges += `<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">📅</span>`;
   const dateLabel=isToday?'Today':`${d.getDate()} ${MSHORT[d.getMonth()]}`;
 const iconHTML = `<div class="er-icon" style="background:${isSel ? 'var(--accent)' : s.bg}; color:${isSel ? '#fff' : s.color}">
   ${isSel ? '' : e.subject.slice(0,4)}
@@ -4184,13 +4628,34 @@ function openDetailPanel(id){
     html+=`</div>`;
   }
   if((e.youtubes||[]).length){html+=`<div class="dp-sec"><div class="dp-sec-lbl">Videos</div><div class="yt-grid">`;e.youtubes.forEach(y=>html+=`<div class="yt-card" onclick="openYTPopup('${y}')"><img src="https://img.youtube.com/vi/${y}/mqdefault.jpg" alt=""><div class="yt-play-ov"><div class="yt-play-ico">▶</div></div></div>`);html+=`</div></div>`;}
+  if((e.weblinks||[]).length){
+    html+=`<div class="dp-sec"><div class="dp-sec-lbl">Links</div><div class="files-row">`;
+    e.weblinks.forEach(l=>html+=`<a class="file-chip" href="${esc(l.url)}" target="_blank" rel="noopener">🔗<span>${esc(l.label||l.url)}</span></a>`);
+    html+=`</div></div>`;
+  }
   if((e.files||[]).length){html+=`<div class="dp-sec"><div class="dp-sec-lbl">Attachments</div><div class="files-row">`;e.files.forEach((f,i)=>html+=`<div class="file-chip" onclick="viewFile('${e.id}',${i})">${fIco(f.type)}<span>${esc(f.name)}</span></div>`);html+=`</div></div>`;}
   if((e.tags||[]).length){html+=`<div class="dp-sec"><div class="dp-sec-lbl">Tags</div><div>`;e.tags.forEach(t=>html+=`<span class="dp-tag-chip">#${esc(t)}</span>`);html+=`</div></div>`;}
-  const metaItems=[];
-  if(e.mood)metaItems.push({k:'Mood',v:`${moodEmo(e.mood)} ${e.mood.charAt(0).toUpperCase()+e.mood.slice(1)}`});
-  if(e.rating)metaItems.push({k:'Rating',v:`<span style="font-size:15px;font-weight:800;color:var(--accent);font-family:var(--mono)">${e.rating}</span><div class="dp-rating-track"><div class="dp-rating-fill" style="width:${e.rating*10}%"></div></div><span style="font-size:11px;color:var(--text3)">/10</span>`});
-  if(e.reviewDate)metaItems.push({k:'Review',v:e.reviewDate});
-  if(e.batch&&e.batch!=='both')metaItems.push({k:'Batch',v:e.batch});
+const metaItems = [];
+  if (e.attendance) {
+    const ac = { present:'✓ Present', late:'⏰ Late', absent:'✗ Absent' };
+    const acol = { present:'var(--green)', late:'var(--amber)', absent:'var(--red)' };
+    metaItems.push({ k:'Attend', v:`<span style="color:${acol[e.attendance]};font-weight:700">${ac[e.attendance]}</span>` });
+  }
+  if (e.sessionType) {
+    const stypes = { lecture:'📖 Lecture', lab:'🔬 Lab', tutorial:'✏️ Tutorial', seminar:'🎤 Seminar', selfstudy:'📚 Self Study', exam:'📝 Exam', revision:'🔄 Revision' };
+    metaItems.push({ k:'Type', v: stypes[e.sessionType] || e.sessionType });
+  }
+  if (e.duration) metaItems.push({ k:'Duration', v:`${e.duration >= 60 ? Math.floor(e.duration/60)+'h '+(e.duration%60?e.duration%60+'m':'') : e.duration+'m'}` });
+  if (e.difficulty) metaItems.push({ k:'Difficulty', v:`${'★'.repeat(e.difficulty)}${'☆'.repeat(5-e.difficulty)} (${['','Very Easy','Easy','Medium','Hard','Very Hard'][e.difficulty]})` });
+  if (e.mood) metaItems.push({ k:'Mood', v:`${moodEmo(e.mood)} ${e.mood.charAt(0).toUpperCase()+e.mood.slice(1)}` });
+  if (e.rating) metaItems.push({ k:'Rating', v:`<span style="font-size:15px;font-weight:800;color:var(--accent);font-family:var(--mono)">${e.rating}</span><div class="dp-rating-track"><div class="dp-rating-fill" style="width:${e.rating*10}%"></div></div><span style="font-size:11px;color:var(--text3)">/10</span>` });
+  if (e.reviewDate) metaItems.push({ k:'Review', v: e.reviewDate + (e.reviewType && e.reviewType !== 'general' ? ` (${e.reviewType})` : '') });
+  if (e.wordGoal && e.notes) {
+    const wc = wCount(e.notes);
+    const pct = Math.min(100, Math.round(wc/e.wordGoal*100));
+    metaItems.push({ k:'Words', v:`${wc}/${e.wordGoal} (${pct}%)` });
+  }
+  if (e.batch && e.batch !== 'both') metaItems.push({ k:'Batch', v: e.batch });
   if(metaItems.length){html+=`<div class="dp-sec"><div class="dp-sec-lbl">Details</div><div class="dp-info-grid">`;metaItems.forEach(r=>html+=`<div class="dp-info-row"><span class="dp-info-key">${r.k}</span><div class="dp-info-val">${r.v}</div></div>`);html+=`</div></div>`;}
   if(!html)html=`<div style="padding:30px;text-align:center;color:var(--text3);font-size:13px">No content yet.<br><button class="dp-act" style="margin-top:10px" onclick="dpEdit()">✎ Add notes</button></div>`;
   document.getElementById('dpBody').innerHTML=html;
@@ -4534,20 +4999,15 @@ function switchTab(tab, btn, direction) {
 }
 function openModal(id = null, dateOverride = null) {
   editId = id;
-  formYTs = [];
-  formFiles = [];
-  formTags = [];
-  formTodos = [];
-  formMood = '';
-  formRating = 7;
-  formRatingOn = false;
-  selSubj = 'OTHER';
-  selTime = '';
+  formYTs = []; formLinks = []; formFiles = []; formTags = []; formTodos = [];
+  formMood = ''; formRating = 7; formRatingOn = false;
+  formAttend = ''; formDifficulty = 0; formDuration = ''; formTodoPrio = '';
+  selSubj = 'OTHER'; selTime = '';
 
-  // Reset UI elements
   document.getElementById('modalTitle').textContent = id ? 'Edit Entry' : 'New Entry';
   document.getElementById('titlesList').innerHTML = '';
   document.getElementById('ytFormRows').innerHTML = '';
+  document.getElementById('linkFormRows').innerHTML = '';
   document.getElementById('filePrevs').innerHTML = '';
   document.getElementById('todoFormList').innerHTML = '';
   document.getElementById('fNotes').value = '';
@@ -4561,60 +5021,60 @@ function openModal(id = null, dateOverride = null) {
   document.getElementById('ratingChk').checked = false;
   document.getElementById('ratingSliderWrap').classList.add('hidden');
   document.querySelectorAll('[data-mood]').forEach(el => el.classList.remove('on'));
-  renderTags();
-  populateTagSuggestions();
+  document.querySelectorAll('.attend-btn').forEach(el => el.className = 'attend-btn');
+  document.querySelectorAll('.diff-star').forEach(el => el.classList.remove('on'));
+  document.getElementById('diffLabel').textContent = '';
+  document.getElementById('fDifficulty').value = '';
+  document.getElementById('fDuration').value = '';
+  document.getElementById('fDurCustom').value = '';
+  document.getElementById('fWordGoal').value = '';
+  if (document.getElementById('fStype')) document.getElementById('fStype').value = '';
+  if (document.getElementById('fReviewType')) document.getElementById('fReviewType').value = 'general';
+  document.querySelectorAll('.dur-chip').forEach(el => el.classList.remove('on'));
+  document.querySelectorAll('.prio-btn').forEach(el => {
+    el.className = 'prio-btn';
+  });
+  renderTags(); populateTagSuggestions();
   switchTab('main', document.getElementById('tab-btn-main'));
 
   const date = dateOverride || new Date().toISOString().split('T')[0];
   document.getElementById('fDate').value = date;
-  const batch = document.getElementById('fBatch').value;
 
   if (id) {
-    // Editing: load existing data
     const e = entries.find(x => x.id === id);
     if (!e) return;
-    document.getElementById('fDate').value = e.date;
-    document.getElementById('fBatch').value = e.batch || 'G1';
-    document.getElementById('fNotes').value = e.notes || '';
+    document.getElementById('fDate').value    = e.date;
+    document.getElementById('fBatch').value   = e.batch || 'G1';
+    document.getElementById('fNotes').value   = e.notes || '';
+    if (e.attendance) setAttend(e.attendance);
+    if (e.difficulty) setDiff(e.difficulty);
+    if (e.duration)   { formDuration = String(e.duration); document.getElementById('fDuration').value = formDuration; document.getElementById('fDurCustom').value = formDuration; }
+    if (e.sessionType && document.getElementById('fStype')) document.getElementById('fStype').value = e.sessionType;
+    if (e.reviewType  && document.getElementById('fReviewType')) document.getElementById('fReviewType').value = e.reviewType;
+    if (e.wordGoal    && document.getElementById('fWordGoal'))   document.getElementById('fWordGoal').value = String(e.wordGoal);
     onNotesInput();
-    (e.titles || []).forEach(t => addTitleRow(t.text, t.url));
-    formYTs = [...(e.youtubes || [])];
-    formYTs.forEach(y => addYTPreview(y));
-    formFiles = (e.files || []).map(f => ({ ...f }));
-    renderFilePrevs();
-    formTags = [...(e.tags || [])];
-    renderTags();
-    populateTagSuggestions();
-    formTodos = (e.todos || []).map(t => ({ ...t }));
-    renderFormTodos();
-    formMood = e.mood || '';
-    setMood(formMood);
-    formRatingOn = !!e.rating;
-    formRating = e.rating || 7;
+    (e.titles  || []).forEach(t => addTitleRow(t.text, t.url));
+    formYTs   = [...(e.youtubes || [])]; formYTs.forEach(y => addYTPreview(y));
+    formLinks = (e.weblinks || []).map(l => ({...l})); renderLinkPrevs();
+    formFiles = (e.files    || []).map(f => ({...f})); renderFilePrevs();
+    formTags  = [...(e.tags  || [])];  renderTags(); populateTagSuggestions();
+    formTodos = (e.todos    || []).map(t => ({...t})); renderFormTodos();
+    formMood  = e.mood || ''; if (formMood) setMood(formMood);
+    formRatingOn = !!e.rating; formRating = e.rating || 7;
     document.getElementById('ratingChk').checked = formRatingOn;
     if (formRatingOn) {
       document.getElementById('ratingSliderWrap').classList.remove('hidden');
-      document.getElementById('ratingInp').value = formRating;
-      document.getElementById('ratingVal').textContent = formRating;
+      document.getElementById('ratingInp').value      = formRating;
+      document.getElementById('ratingVal').textContent = String(formRating);
     }
     document.getElementById('reviewDate').value = e.reviewDate || '';
-    selSubj = e.subject || 'OTHER';
-    selTime = e.time || '';
+    selSubj = e.subject || 'OTHER'; selTime = e.time || '';
   } else {
-    // New entry: auto‑select the next unused subject
-    const next = getNextSubjectForDate(date, batch);
-    if (next) {
-      selSubj = next.subj;
-      selTime = next.time;
-    } else {
-      selSubj = 'OTHER';
-      selTime = '';
-    }
+    const next = getNextSubjectForDate(date, document.getElementById('fBatch').value);
+    if (next) { selSubj = next.subj; selTime = next.time; }
   }
 
-  // Render schedule picker (this will also highlight the selected card)
   onDateChange();
-
   document.getElementById('entryModal').classList.add('open');
   setTimeout(() => document.getElementById('fDate').focus(), 80);
 }
@@ -4629,6 +5089,187 @@ function closeModal() {
   }
   isSaving = false;
 }
+
+/* ── ATTENDANCE ── */
+function setAttend(v) {
+  formAttend = (formAttend === v) ? '' : v;
+  document.querySelectorAll('.attend-btn').forEach(el => el.className = 'attend-btn');
+  if (formAttend) {
+    const el = document.getElementById('att-' + formAttend);
+    if (el) el.classList.add('on-' + formAttend);
+  }
+}
+
+/* ── DIFFICULTY ── */
+const DIFF_LABELS = ['','Very Easy','Easy','Medium','Hard','Very Hard'];
+function setDiff(v) {
+  formDifficulty = (formDifficulty === v) ? 0 : v;
+  document.getElementById('fDifficulty').value = formDifficulty;
+  document.querySelectorAll('.diff-star').forEach(el => {
+    el.classList.toggle('on', parseInt(el.dataset.v) <= formDifficulty);
+  });
+  document.getElementById('diffLabel').textContent = formDifficulty ? DIFF_LABELS[formDifficulty] : '';
+}
+
+/* ── DURATION ── */
+function setDur(min, btn) {
+  formDuration = String(min);
+  document.getElementById('fDuration').value = formDuration;
+  document.getElementById('fDurCustom').value = '';
+  document.querySelectorAll('.dur-chip').forEach(el => el.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+}
+function onDurCustom(v) {
+  formDuration = v;
+  document.getElementById('fDuration').value = v;
+  document.querySelectorAll('.dur-chip').forEach(el => el.classList.remove('on'));
+}
+
+/* ── REVIEW QUICK BUTTONS ── */
+function setReviewQuick(days) {
+  const d = new Date(); d.setDate(d.getDate() + days);
+  document.getElementById('reviewDate').value = d.toISOString().split('T')[0];
+}
+
+/* ── TODO PRIORITY ── */
+function setTodoPrio(p) {
+  formTodoPrio = (formTodoPrio === p) ? '' : p;
+  const map = { high:'prioBtnHi', medium:'prioBtnMd', low:'prioBtnLo' };
+  const cls = { high:'hi', medium:'md', low:'lo' };
+  Object.keys(map).forEach(k => {
+    const el = document.getElementById(map[k]);
+    if (el) el.className = 'prio-btn' + (k === formTodoPrio ? ' ' + cls[k] : '');
+  });
+}
+
+/* ── WEB LINKS ── */
+function addWebLink() {
+  const url   = (document.getElementById('linkInp')?.value || '').trim();
+  const label = (document.getElementById('linkLblInp')?.value || '').trim();
+  if (!url || !url.startsWith('http')) { toast('Enter a valid URL (https://…)', 'err'); return; }
+  formLinks.push({ url, label: label || url.replace(/^https?:\/\//,'').slice(0,40) });
+  renderLinkPrevs();
+  document.getElementById('linkInp').value    = '';
+  document.getElementById('linkLblInp').value = '';
+}
+function removeLink(i) { formLinks.splice(i, 1); renderLinkPrevs(); }
+function renderLinkPrevs() {
+  const el = document.getElementById('linkFormRows'); if (!el) return;
+  el.innerHTML = formLinks.map((l, i) => `
+    <div class="link-form-row">
+      <span class="link-form-ico">🔗</span>
+      <div class="link-form-info">
+        <div style="font-size:12.5px;font-weight:500;color:var(--text)">${esc(l.label)}</div>
+        <div class="link-form-url">${esc(l.url)}</div>
+      </div>
+      <button class="link-form-del" onclick="removeLink(${i})">✕</button>
+    </div>`).join('');
+}
+
+/* ── NOTES TOOLBAR INJECT ── */
+function injectNote(snippet) {
+  const ta = document.getElementById('fNotes');
+  if (!ta) return;
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  ta.value = ta.value.slice(0, s) + snippet + ta.value.slice(e);
+  ta.selectionStart = ta.selectionEnd = s + snippet.length;
+  ta.focus(); onNotesInput();
+}
+
+/* ── WORD GOAL ── */
+function onNotesInput() {
+  const v  = document.getElementById('fNotes').value;
+  const wc = wCount(v);
+  document.getElementById('notesStats').textContent =
+    `${wc}w · ${v.length}c · ~${Math.max(1, Math.ceil(wc/200))}min`;
+  const goal = parseInt(document.getElementById('fWordGoal')?.value || '0');
+  const wrap = document.getElementById('wordGoalWrap');
+  const bar  = document.getElementById('wordGoalBar');
+  const lbl  = document.getElementById('wordGoalLabel');
+  if (goal && wrap && bar && lbl) {
+    const pct = Math.min(100, Math.round(wc / goal * 100));
+    bar.style.width  = pct + '%';
+    bar.style.background = pct >= 100 ? 'var(--green)' : '';
+    lbl.textContent  = `${wc}/${goal}`;
+    wrap.style.display = '';
+    lbl.style.display  = '';
+  } else {
+    if (wrap) wrap.style.display = 'none';
+    if (lbl)  lbl.style.display  = 'none';
+  }
+}
+
+/* ── TAG AUTOCOMPLETE ── */
+function showTagAutocomplete(q) {
+  const ac = document.getElementById('tagAutoComplete'); if (!ac) return;
+  if (!q.trim()) { ac.style.display = 'none'; return; }
+  const all = [...new Set(entries.flatMap(e => e.tags || []))];
+  const matches = all.filter(t => t.includes(q.toLowerCase()) && !formTags.includes(t)).slice(0, 8);
+  if (!matches.length) { ac.style.display = 'none'; return; }
+  ac.style.display = 'flex';
+  ac.innerHTML = matches.map(t =>
+    `<span class="sugg-tag" onclick="addTagDir('${t}');document.getElementById('tagInp').value='';document.getElementById('tagAutoComplete').style.display='none'">#${t}</span>`
+  ).join('');
+}
+
+/* ── QUICK ADD BAR ── */
+function openQA() {
+  document.getElementById('quickAddBar').classList.add('open');
+  setTimeout(() => document.getElementById('qaInput')?.focus(), 60);
+}
+function closeQA() {
+  document.getElementById('quickAddBar').classList.remove('open');
+  const inp = document.getElementById('qaInput'); if (inp) inp.value = '';
+}
+async function qaSubmit() {
+  const inp = document.getElementById('qaInput');
+  const val = (inp?.value || '').trim(); if (!val) return;
+  const today = new Date().toISOString().split('T')[0];
+  const entry = {
+    id: Date.now().toString(), date: today, subject: 'OTHER', time: '',
+    batch: 'both', titles: [{ text: val, url: '' }], notes: '',
+    youtubes: [], weblinks: [], files: [], tags: ['quick'],
+    todos: [], mood: '', rating: 0, reviewDate: '',
+    createdAt: Date.now(), updatedAt: Date.now()
+  };
+  entries.unshift(entry);
+  await saveData();
+  render(); buildSubjList(); updateSideTagCloud();
+  closeQA(); toast('Quick note saved ✓', 'ok');
+}
+
+/* ── CLIPBOARD PASTE FOR SCREENSHOTS ── */
+document.addEventListener('paste', e => {
+  if (!document.getElementById('entryModal')?.classList.contains('open')) return;
+  if (!document.getElementById('tab-media')?.classList.contains('active')) return;
+  const items = e.clipboardData?.items || [];
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      item.getAsFile() && handleFiles([item.getAsFile()]);
+      toast('Screenshot pasted ✓', 'ok');
+    }
+  }
+});
+
+/* ── STREAK CELEBRATION ── */
+function maybeShowStreakCelebration() {
+  const st = calcStreak();
+  if (!st || st < 2) return;
+  const key = 'slp_streak_shown_' + new Date().toISOString().split('T')[0];
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, '1');
+  const milestones = [3, 7, 14, 21, 30, 50, 100];
+  const msg = milestones.includes(st)
+    ? `🔥 ${st}-day streak milestone!`
+    : (st % 5 === 0 ? `🔥 ${st} days in a row!` : null);
+  if (!msg) return;
+  const el = document.getElementById('streakCelebration'); if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
 function addTitleRow(text='',url=''){const row=document.createElement('div');row.className='t-row';row.innerHTML=`<input class="t-title" placeholder="Session title…" value="${esc(text)}"><input class="t-url" placeholder="https:// (optional)" value="${esc(url)}"><button class="t-del" onclick="this.closest('.t-row').remove()">✕</button>`;document.getElementById('titlesList').appendChild(row);}
 function onNotesInput(){const v=document.getElementById('fNotes').value;const wc=wCount(v);document.getElementById('notesStats').textContent=`${wc}w · ${v.length}c · ~${Math.max(1,Math.ceil(wc/200))}min`;}
 function onDateChange() {
@@ -4758,22 +5399,29 @@ async function saveEntry() {
 
   const rating = formRatingOn ? formRating : 0;
 
-  const entry = {
-    id: editId || Date.now().toString(),
+const entry = {
+    id:          editId || Date.now().toString(),
     date,
-    subject: selSubj,
-    time: selTime,
-    batch: document.getElementById('fBatch').value,
+    subject:     selSubj,
+    time:        selTime,
+    batch:       document.getElementById('fBatch').value,
     titles,
-    notes: document.getElementById('fNotes').value.trim(),
-    youtubes: [...formYTs],
-    files: formFiles.map(f => ({ ...f })),
-    tags: [...formTags],
-    todos: formTodos.map(t => ({ ...t })),
-    mood: formMood,
+    notes:       document.getElementById('fNotes').value.trim(),
+    youtubes:    [...formYTs],
+    weblinks:    formLinks.map(l => ({...l})),
+    files:       formFiles.map(f => ({...f})),
+    tags:        [...formTags],
+    todos:       formTodos.map(t => ({...t})),
+    mood:        formMood,
     rating,
-    reviewDate: document.getElementById('reviewDate').value,
-    updatedAt: Date.now()
+    attendance:  formAttend || '',
+    difficulty:  formDifficulty || 0,
+    duration:    parseInt(document.getElementById('fDuration').value) || 0,
+    sessionType: document.getElementById('fStype')?.value || '',
+    reviewType:  document.getElementById('fReviewType')?.value || 'general',
+    wordGoal:    parseInt(document.getElementById('fWordGoal')?.value) || 0,
+    reviewDate:  document.getElementById('reviewDate').value,
+    updatedAt:   Date.now()
   };
   if (!editId) entry.createdAt = Date.now();
 
@@ -4785,7 +5433,8 @@ async function saveEntry() {
   }
 
   await saveData();
-
+  maybeShowStreakCelebration();
+  updateStats();
   closeModal();
   render();
   buildSubjList();
@@ -5061,6 +5710,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('#ctxMenu'))hideCtx()
 /* ── COMMAND PALETTE ── */
 const CMDS=[
   {l:'New Entry',s:'Create journal entry',i:'✚',k:'Alt+N',fn:()=>openModal()},
+  {l:'Quick note',s:'Fast capture without full form',i:'⚡',k:'Alt+Q',fn:()=>openQA()},
   {l:'Search',i:'⌕',k:'Ctrl+F',fn:()=>document.getElementById('searchInp').focus()},
   {l:'Toggle theme',i:'🌙',k:'Alt+T',fn:()=>toggleTheme()},
   {l:'List view',i:'☰',k:'1',fn:()=>switchView('list')},
@@ -5107,14 +5757,13 @@ function initDetailDrag() {
   const S = {
     active: false, touchId: null,
     startY: 0, currentY: 0,
-    lastY: 0, lastT: 0, vel: 0,
-    raf: null
+    lastY: 0, lastT: 0,
+    velSamples: [],   /* rolling velocity buffer */
+    raf: null,
+    phase: 'idle'    /* 'idle' | 'drag' | 'animating' */
   };
 
-  const DISMISS_VEL  = 0.45;   // px/ms — flick threshold
-  const DISMISS_DIST = 110;    // px   — drag-distance threshold
-
-  function scrollBody()  { return document.getElementById('dpBody'); }
+  function scrollBody() { return document.getElementById('dpBody'); }
 
   function canStart(el) {
     if (el.closest('button,a,input,select,textarea,[role="button"]')) return false;
@@ -5124,21 +5773,42 @@ function initDetailDrag() {
     return true;
   }
 
-  /* 1-to-1 tracking with a gentle rubber-band when pulling UP */
+  /* ── 1:1 finger tracking ── */
   function applyY(dy) {
-    const y = dy < 0 ? dy * 0.1 : dy;          // resist upward drag
-    const progress = Math.max(0, y) / 360;
+    const y = dy >= 0 ? dy : dy * 0.11;  /* down=1:1, up=rubber-band */
     panel.style.transform = `translateY(${y}px)`;
-    panel.style.opacity   = String(Math.max(0.35, 1 - progress * 0.55));
-    overlay.style.setProperty('--ov-alpha',
-      String(Math.max(0.02, 0.65 - progress * 0.63)));
+
+    /* opacity: full until 20% of screen, then gentle fade */
+    const fadeStart = window.innerHeight * 0.20;
+    const fadeEnd   = window.innerHeight * 0.80;
+    let   op = 1;
+    if (y > fadeStart) {
+      op = 1 - ((y - fadeStart) / (fadeEnd - fadeStart)) * 0.9;
+      op = Math.max(0.05, op);
+    }
+    panel.style.opacity = String(op);
+
+    const bOp = Math.max(0, 0.65 * Math.min(1, op + 0.1));
+    overlay.style.setProperty('--ov-alpha', String(bOp));
+  }
+
+  function getVel() {
+    const samples = S.velSamples;
+    if (!samples.length) return 0;
+    /* weighted average — recent samples count more */
+    let num=0, den=0;
+    samples.forEach((v,i) => { const w=i+1; num+=v*w; den+=w; });
+    return num / den;
   }
 
   function begin(y) {
-    S.active = true;
-    S.startY = S.lastY = y;
-    S.lastT  = performance.now();
-    S.vel    = 0; S.currentY = 0;
+    if (S.phase === 'animating') return;
+    S.active   = true;
+    S.phase    = 'drag';
+    S.startY   = S.lastY = y;
+    S.lastT    = performance.now();
+    S.velSamples = [];
+    S.currentY = 0;
     panel.style.transition   = 'none';
     overlay.style.transition = 'none';
     overlay.classList.add('dp-dragging');
@@ -5146,65 +5816,72 @@ function initDetailDrag() {
   }
 
   function move(y) {
-    if (!S.active) return;
+    if (!S.active || S.phase !== 'drag') return;
     const now = performance.now();
     const dt  = now - S.lastT;
     if (dt > 0) {
-      /* exponential moving average — smooths micro-jitter */
-      S.vel = S.vel * 0.55 + ((y - S.lastY) / dt) * 0.45;
+      const inst = (y - S.lastY) / dt;
+      S.velSamples.push(inst);
+      if (S.velSamples.length > 5) S.velSamples.shift();
     }
-    S.lastY = y; S.lastT = now;
-
-    const b  = scrollBody();
-    const dy = y - S.startY;
-    if (b && b.scrollTop > 6 && dy < 0) { finish(); return; }
-
-    S.currentY = dy;
+    S.lastY    = y;
+    S.lastT    = now;
+    S.currentY = y - S.startY;
     if (S.raf) cancelAnimationFrame(S.raf);
     S.raf = requestAnimationFrame(() => { if (S.active) applyY(S.currentY); });
   }
 
-  function finish() {
-    if (!S.active) return;
-    S.active = false;
-    overlay.classList.remove('dp-dragging');
-    if (S.raf) cancelAnimationFrame(S.raf);
-
-    if (S.vel > DISMISS_VEL || S.currentY > DISMISS_DIST) {
-      dismissNow();
-    } else {
-      snapBack();
-    }
-  }
-
   function snapBack() {
-    /* spring overshoot — same feel as YouTube's bottom sheet snap */
-    panel.style.transition   = 'transform .44s cubic-bezier(.22,1,.36,1), opacity .3s ease';
+    S.active = false;
+    S.phase  = 'animating';
+    if (S.raf) cancelAnimationFrame(S.raf);
+    overlay.classList.remove('dp-dragging');
+
+    /* spring back — slight overshoot for satisfaction */
+    panel.style.transition   = 'transform .5s cubic-bezier(.22,1.3,.36,1), opacity .3s ease';
     overlay.style.transition = 'opacity .3s ease';
-    panel.style.transform    = '';
-    panel.style.opacity      = '';
+    panel.style.transform    = 'translateY(0)';
+    panel.style.opacity      = '1';
     overlay.style.setProperty('--ov-alpha', '0.65');
+
     setTimeout(() => {
       panel.style.transition   = '';
       overlay.style.transition = '';
-    }, 460);
+      panel.style.transform    = '';
+      panel.style.opacity      = '';
+      S.phase = 'idle';
+    }, 520);
     S.currentY = 0;
   }
 
   function dismissNow() {
+    S.active = false;
+    S.phase  = 'animating';
+    if (S.raf) cancelAnimationFrame(S.raf);
+    overlay.classList.remove('dp-dragging');
+
     const row = detailId
       ? document.querySelector(`.entry-row[data-id="${detailId}"]`)
       : null;
-    /* project exit point using velocity for a natural flyaway */
-    const exitY = Math.max(S.currentY + S.vel * 180, window.innerHeight * 0.45);
-    panel.style.transition   = 'transform .28s cubic-bezier(.4,0,1,1), opacity .2s ease';
-    overlay.style.transition = 'opacity .2s ease';
-    panel.style.transform    = `translateY(${exitY}px)`;
-    panel.style.opacity      = '0';
-    overlay.style.opacity    = '0';
+
+    /* always travel to screen bottom — no matter how fast the flick */
+    const panelTop  = panel.getBoundingClientRect().top;
+    const travelPx  = window.innerHeight - panelTop + 30;
+    const vel       = Math.max(Math.abs(getVel()), 0.2);
+    /* duration: min 300ms so animation is always visible */
+    const dur       = Math.max(300, Math.min(480, travelPx / vel));
+
+    panel.style.transition   = `transform ${dur}ms cubic-bezier(.4,.1,.6,1)`;
+    overlay.style.transition = `opacity ${dur * 0.85}ms ease`;
+
+    /* start moving — opacity follows via applyY values already set */
+    panel.style.transform  = `translateY(${travelPx}px)`;
+    overlay.style.opacity  = '0';
+
     setTimeout(() => {
-      panel.style.cssText  = '';
+      panel.style.cssText   = '';
       overlay.style.cssText = '';
+      S.phase = 'idle';
       closeDetailPanel();
       if (row) {
         row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -5213,12 +5890,23 @@ function initDetailDrag() {
         row.classList.add('dp-land-flash');
         setTimeout(() => row.classList.remove('dp-land-flash'), 900);
       }
-    }, 290);
+    }, dur + 20);
     S.currentY = 0;
+  }
+
+  function finish() {
+    if (!S.active) return;
+    if (S.raf) cancelAnimationFrame(S.raf);
+    const vel  = getVel();
+    const dist = S.currentY;
+    const h    = window.innerHeight;
+    if (vel > 0.45 || dist > h * 0.36) dismissNow();
+    else snapBack();
   }
 
   /* ── Touch ── */
   panel.addEventListener('touchstart', e => {
+    if (S.phase !== 'idle') return;
     if (!canStart(e.target)) return;
     S.touchId = e.touches[0].identifier;
     begin(e.touches[0].clientY);
@@ -5228,26 +5916,25 @@ function initDetailDrag() {
     if (!S.active) return;
     const t = [...e.touches].find(x => x.identifier === S.touchId);
     if (!t) return;
-    if (t.clientY - S.startY > 5) e.preventDefault(); // block scroll while dragging
+    if (t.clientY - S.startY > 2) e.preventDefault();
     move(t.clientY);
   }, { passive: false });
 
   panel.addEventListener('touchend',    finish, { passive: true });
-  panel.addEventListener('touchcancel', () => { if (S.active) snapBack(); S.active = false; }, { passive: true });
+  panel.addEventListener('touchcancel', () => { if (S.active) snapBack(); }, { passive: true });
 
-  /* ── Mouse (desktop) ── */
+  /* ── Mouse ── */
   panel.addEventListener('mousedown', e => {
+    if (S.phase !== 'idle') return;
     if (!canStart(e.target)) return;
     begin(e.clientY); e.preventDefault();
   });
-  window.addEventListener('mousemove', e => { if (S.active) move(e.clientY); });
+  window.addEventListener('mousemove', e => { if (S.active && S.phase === 'drag') move(e.clientY); });
   window.addEventListener('mouseup',   () => { if (S.active) finish(); });
 
-  /* Reset visuals when panel closes without a gesture */
   new MutationObserver(() => {
-    if (!overlay.classList.contains('open') && !S.active) {
-      panel.style.cssText  = '';
-      S.currentY = 0;
+    if (!overlay.classList.contains('open') && S.phase === 'idle') {
+      panel.style.cssText = ''; S.currentY = 0;
     }
   }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
 }
@@ -5284,7 +5971,21 @@ function updateStats(){
 function calcStreak(){const dates=[...new Set(entries.map(e=>e.date))].sort().reverse();if(!dates.length)return 0;let streak=0,cur=new Date();cur.setHours(0,0,0,0);for(const ds of dates){const d=new Date(ds+'T00:00:00');if((cur-d)/864e5<1.5){streak++;cur=d;}else break;}return streak;}
 function setSaveStatus(s){const dot=document.getElementById('saveDot'),txt=document.getElementById('saveStatus');if(s==='saving'){if(dot)dot.classList.add('saving');if(txt)txt.textContent='Saving…';}else{if(dot)dot.classList.remove('saving');if(txt)txt.textContent='Saved';}}
 function startClock(){const tick=()=>{const el=document.getElementById('statusTime');if(el)el.textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});};tick();setInterval(tick,15000);}
-function showEmpty(v){const el=document.getElementById('emptyState');if(el)el.style.display=v?'flex':'none';}
+function showEmpty(v) {
+  const el = document.getElementById('emptyState'); if (!el) return;
+  el.style.display = v ? 'flex' : 'none';
+  if (v) {
+    el.innerHTML = `
+      <div class="empty-ico">📖</div>
+      <h3>No entries yet</h3>
+      <p>Start logging your classes to build your academic journal.</p>
+      <div class="empty-state-actions">
+        <button class="empty-state-btn" onclick="openModal()">+ New Entry</button>
+        <button class="empty-state-btn sec" onclick="openQA()">⚡ Quick Note</button>
+        <button class="empty-state-btn sec" onclick="importData()">⬇ Import</button>
+      </div>`;
+  }
+}
 
 /* ── KEYBOARD ── */
 document.addEventListener('keydown',e=>{
@@ -5300,7 +6001,8 @@ if(e.key==='Escape'){if(ytOpen){closeYTPopup();return;}if(cmdOpen){closeCmd();re
   if(modOpen){if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();saveEntry();}return;}
   if(cmdOpen)return;
   if(e.altKey&&(e.key==='n'||e.key==='N')){e.preventDefault();openModal();return;}
-if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+  if(e.altKey&&(e.key==='q'||e.key==='Q')){e.preventDefault();openQA();return;}
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
   e.preventDefault();
   const searchInput = document.getElementById('searchInp');
   if (searchInput) {
@@ -5331,7 +6033,9 @@ document.getElementById('cmdpal')?.addEventListener('click',e=>{if(e.target===do
 function wCount(s){return s.trim()?s.trim().split(/\s+/).length:0;}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function fIco(t){if(!t)return'📄';if(t.startsWith('image/'))return'🖼';if(t==='application/pdf')return'📋';if(t.includes('word'))return'📝';if(t.includes('sheet')||t.includes('excel'))return'📊';if(t.includes('zip'))return'📦';return'📎';}
-function moodEmo(m){return{great:'😄',good:'😊',okay:'😐',tired:'😪',confused:'🤔'}[m]||'';}
+function moodEmo(m) {
+  return { great:'😄', good:'😊', okay:'😐', tired:'😪', confused:'🤔', stressed:'😤', focused:'🎯' }[m] || '';
+}
 let tToast;
 const _toastIco = { ok: '✔', err: '✘', info: 'i' };
 function toast(msg, type = '') {
@@ -5501,12 +6205,15 @@ document.addEventListener('touchend', e => {
   }
 
   // Touch event handlers
+let ptrStartX = 0;
+
   document.addEventListener('touchstart', e => {
     if (locked) return;
     const va = viewArea;
     if (!va || !va.contains(e.target)) return;
     if (va.scrollTop > 3) return;
-    startY = e.touches[0].clientY;
+    startY   = e.touches[0].clientY;
+    ptrStartX = e.touches[0].clientX;
     curDY = 0; armed = false; pulling = true;
     wrap.classList.remove('ptr-snap-back', 'ptr-hold');
   }, { passive: true });
@@ -5515,12 +6222,12 @@ document.addEventListener('touchend', e => {
     if (!pulling || locked) return;
     const va = viewArea;
     if (va && va.scrollTop > 3) { pulling = false; return; }
-    const raw = e.touches[0].clientY - startY;
-    if (raw <= 0) {
-      wrap.classList.remove('ptr-visible');
-      return;
-    }
-    curDY = Math.min(raw, MAX_DRAG);
+    const rawY = e.touches[0].clientY - startY;
+    const rawX = Math.abs(e.touches[0].clientX - ptrStartX);
+    /* cancel PTR if horizontal movement dominates — this is a view swipe */
+    if (rawX > 18 && rawX > Math.abs(rawY)) { pulling = false; snapBack(); return; }
+    if (rawY <= 0) { wrap.classList.remove('ptr-visible'); return; }
+    curDY = Math.min(rawY, MAX_DRAG);
     wrap.classList.add('ptr-visible');
     startFrame();
   }, { passive: true });
@@ -5535,80 +6242,125 @@ document.addEventListener('touchend', e => {
 /* ── SWIPE LEFT/RIGHT TO SWITCH VIEWS ── */
 (function(){
   const VIEWS = ['list','grid','calendar','stats'];
-  const THRESHOLD = 55;      // min px horizontal travel to trigger
-  const MAX_VERT = 100;      // max px vertical drift allowed
-  let x0 = 0, y0 = 0, t0 = 0, swiping = false;
+  const THRESHOLD = 52;
+  const MAX_VERT  = 90;
+  const NUDGE_MAX = 36;
+
+  let x0=0, y0=0, t0=0;
+  let swiping=false, committed=false, nudging=false;
+  let currentNudge=0, nudgeRaf=null;
 
   function idx(){ return VIEWS.indexOf(currentView); }
 
   function goView(dir){
     const next = idx() + dir;
     if(next < 0 || next >= VIEWS.length) return;
-    const cl = dir === 1 ? 'view-slide-left' : 'view-slide-right';
-    switchView(VIEWS[next]);   // this will also record history
-    const map = { list:'listCont', grid:'gridCont', calendar:'calCont', stats:'statsCont' };
-    const el = document.getElementById(map[VIEWS[next]]);
+    switchView(VIEWS[next]);
+    const map = {list:'listCont',grid:'gridCont',calendar:'calCont',stats:'statsCont'};
+    const el  = document.getElementById(map[VIEWS[next]]);
     if(!el) return;
     el.classList.remove('view-slide-left','view-slide-right');
     void el.offsetWidth;
-    el.classList.add(cl);
-    setTimeout(()=>el.classList.remove(cl),300);
+    el.classList.add(dir===1 ? 'view-slide-left' : 'view-slide-right');
+    setTimeout(()=>el.classList.remove('view-slide-left','view-slide-right'), 320);
+  }
+
+  const va = document.getElementById('viewArea');
+  if(!va) return;
+  /* prime the GPU layer once */
+  va.style.willChange = 'transform';
+
+  function writeNudge(px){
+    va.style.transition = 'none';
+    va.style.transform  = `translate3d(${px}px,0,0)`;
+    currentNudge = px;
+  }
+
+  function releaseNudge(){
+    nudging = false;
+    if(nudgeRaf){ cancelAnimationFrame(nudgeRaf); nudgeRaf=null; }
+    va.style.transition = 'transform .32s cubic-bezier(.22,1,.36,1)';
+    va.style.transform  = 'translate3d(0,0,0)';
+    /* clean up after transition */
+    setTimeout(()=>{
+      if(!nudging){
+        va.style.transition='';
+        va.style.transform='';
+      }
+    }, 340);
   }
 
   const area = document.getElementById('main');
   if(!area) return;
 
-  area.addEventListener('touchstart', e => {
+  area.addEventListener('touchstart', e=>{
+    /* block if any overlay is open */
     if(document.getElementById('detailOverlay')?.classList.contains('open')) return;
-    if(document.getElementById('dayPanel')?.classList.contains('open')) return;
-    if(document.getElementById('entryModal')?.classList.contains('open')) return;
+    if(document.getElementById('dayPanel')?.classList.contains('open'))      return;
+    if(document.getElementById('entryModal')?.classList.contains('open'))    return;
+    if(document.getElementById('goalPanelOv')?.classList.contains('open'))   return;
     if(e.touches.length !== 1) return;
 
-    // ----- PREVENT SWIPE INSIDE HORIZONTAL SCROLLABLE AREAS -----
-    let node = e.target;
-    let inHorizScroll = false;
-    while (node && node !== area) {
-      const style = window.getComputedStyle(node);
-      if (style.overflowX === 'auto' || style.overflowX === 'scroll') {
-        if (node.scrollWidth > node.clientWidth) {
-          inHorizScroll = true;
-          break;
-        }
+    /* block if touch is inside a horizontal scroll container */
+    let node=e.target, inHScroll=false;
+    while(node && node !== area){
+      const s=window.getComputedStyle(node);
+      if((s.overflowX==='auto'||s.overflowX==='scroll') && node.scrollWidth>node.clientWidth+2){
+        inHScroll=true; break;
       }
-      node = node.parentNode;
+      node=node.parentNode;
     }
-    if (inHorizScroll) {
-      swiping = false;
-      return;
-    }
-    // ------------------------------------------------------------
+    if(inHScroll) return;
 
-    x0 = e.touches[0].clientX;
-    y0 = e.touches[0].clientY;
-    t0 = Date.now();
-    swiping = true;
-  }, { passive: true });
+    x0=e.touches[0].clientX; y0=e.touches[0].clientY;
+    t0=Date.now(); swiping=true; committed=false; currentNudge=0;
+  },{passive:true});
 
-  area.addEventListener('touchmove', e => {
+  area.addEventListener('touchmove', e=>{
     if(!swiping) return;
     const dx = e.touches[0].clientX - x0;
-    const dy = Math.abs(e.touches[0].clientY - y0);
-    if(dy > MAX_VERT){ swiping = false; return; }
-    if(Math.abs(dx) > 18){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, { passive: false });
+    const dy = e.touches[0].clientY - y0;
+    const adx= Math.abs(dx), ady=Math.abs(dy);
 
-  area.addEventListener('touchend', e => {
-    if(!swiping){ swiping = false; return; }
-    swiping = false;
-    const dx = e.changedTouches[0].clientX - x0;
-    const dy = Math.abs(e.changedTouches[0].clientY - y0);
-    const dt = Date.now() - t0;
-    if(dy > MAX_VERT || Math.abs(dx) < THRESHOLD || dt > 600) return;
+    /* if primarily vertical, cancel */
+    if(!committed && ady > MAX_VERT){ swiping=false; releaseNudge(); return; }
+    /* wait until clear horizontal intent */
+    if(!committed && adx < 8) return;
+    if(!committed){ committed=true; }
+
+    e.preventDefault(); e.stopPropagation();
+
+    const i=idx();
+    const atLeft  = i===0;
+    const atRight = i===VIEWS.length-1;
+    /* resist at edges */
+    let nudge;
+    if((dx>0 && atLeft)||(dx<0 && atRight)){
+      nudge = dx * 0.06;
+    } else {
+      nudge = dx * 0.28;
+    }
+    nudge = Math.max(-NUDGE_MAX, Math.min(NUDGE_MAX, nudge));
+
+    if(nudgeRaf) cancelAnimationFrame(nudgeRaf);
+    nudging = true;
+    nudgeRaf = requestAnimationFrame(()=>{ nudgeRaf=null; writeNudge(nudge); });
+  },{passive:false});
+
+  area.addEventListener('touchend', e=>{
+    if(!swiping){ swiping=false; return; }
+    swiping=false; committed=false;
+    const dx  = e.changedTouches[0].clientX - x0;
+    const ady = Math.abs(e.changedTouches[0].clientY - y0);
+    const dt  = Date.now()-t0;
+    releaseNudge();
+    if(ady > MAX_VERT || Math.abs(dx) < THRESHOLD || dt > 550) return;
     goView(dx < 0 ? 1 : -1);
-  }, { passive: true });
+  },{passive:true});
+
+  area.addEventListener('touchcancel',()=>{
+    swiping=false; committed=false; releaseNudge();
+  },{passive:true});
 })();
 
 /* ── EDGE SWIPE TO OPEN SIDEBAR ── */
@@ -6421,7 +7173,6 @@ function openGoalPanel() {
   goalPanelOpen = true;
   document.getElementById('goalPanelOv')?.classList.add('open');
   renderGoalPanel();
-  requestNotifPermission();
 }
 
 function closeGoalPanel() {
@@ -6800,25 +7551,27 @@ function updateGoalBadge() {
 /* ── REMINDERS ── */
 function requestNotifPermission() {
   if (!('Notification' in window)) return;
-  if (Notification.permission === 'default') {
-    Notification.requestPermission().then(p => { notifPermission = p; });
-  } else {
-    notifPermission = Notification.permission;
-  }
+  if (Notification.permission === 'granted') { notifPermission = 'granted'; return; }
+  if (Notification.permission === 'denied')  { notifPermission = 'denied';  return; }
+  if (localStorage.getItem('slp_notif_asked')) { notifPermission = Notification.permission; return; }
+  localStorage.setItem('slp_notif_asked', '1');
+  Notification.requestPermission().then(p => { notifPermission = p; });
 }
 
 function scheduleReminders() {
   if (reminderCheckerInterval) clearInterval(reminderCheckerInterval);
-  reminderCheckerInterval = setInterval(checkGoalReminders, 55000); // check every ~55s
+  reminderCheckerInterval = setInterval(checkGoalReminders, 30000);
   checkGoalReminders();
 }
 
 function checkGoalReminders() {
-  const now = new Date();
-  const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const now   = new Date();
+  const hhmm  = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   const today = gpToday();
   goals.forEach(g => {
-    if (!g.reminderTime || g.reminderTime !== hhmm) return;
+    if (!g.reminderTime) return;
+    /* fire if within the current minute */
+    if (g.reminderTime !== hhmm) return;
     if (isGoalDoneToday(g)) return;
     const notifKey = `slp_gnotif_${g.id}_${today}`;
     if (localStorage.getItem(notifKey)) return;
@@ -6856,37 +7609,61 @@ function fireGoalReminder(goal) {
 const _origRenderStats = renderStats;
 renderStats = function() {
   _origRenderStats.apply(this, arguments);
+  _appendGoalStats();
+};
+
+function _appendGoalStats() {
   const c = document.getElementById('statsCont');
-  if (!c || !goals.length) return;
+  if (!c) return;
 
-  const today = gpToday();
+  /* remove previous goal section if re-rendering */
+  const old = c.querySelector('#goalStatsSection');
+  if (old) old.remove();
+
+  const today   = gpToday();
+  const total   = goals.length;
   const doneToday = goals.filter(g => isGoalDoneToday(g)).length;
-  const total = goals.length;
-  const pctToday = total ? Math.round(doneToday / total * 100) : 0;
+  const pctToday  = total ? Math.round(doneToday / total * 100) : 0;
+  const allTime   = goals.reduce((a,g) => a + (g.completions||[]).length, 0);
 
-  // 30-day bars
-  const days30 = [];
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const ds = d.toISOString().split('T')[0];
-    const done = goals.filter(g => (g.completions||[]).some(c=>c.date===ds)).length;
-    days30.push({ ds, done });
-  }
-  const max30 = Math.max(...days30.map(d => d.done), 1);
-
-  // Goal streak
   let gStreak = 0;
   for (let i = 0; i < 60; i++) {
     const d = new Date(); d.setDate(d.getDate() - i);
     const ds = d.toISOString().split('T')[0];
-    if (goals.some(g => (g.completions||[]).some(c=>c.date===ds))) gStreak++;
+    if (goals.some(g => (g.completions||[]).some(cc => cc.date === ds))) gStreak++;
     else break;
   }
 
-  // All-time completions
-  const allTime = goals.reduce((a,g) => a + (g.completions||[]).length, 0);
+  const days30 = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const done = goals.filter(g => (g.completions||[]).some(cc => cc.date === ds)).length;
+    days30.push({ ds, done });
+  }
+  const max30 = Math.max(...days30.map(d => d.done), 1);
 
   const sec = document.createElement('div');
+  sec.id = 'goalStatsSection';
+
+  if (!total) {
+    sec.innerHTML = `<div class="chart-sec" style="margin-top:10px">
+      <div class="chart-title">Daily Goals</div>
+      <div style="padding:18px 0;text-align:center;font-size:13px;color:var(--text3)">No goals created yet — open the Goals panel to add some.</div>
+    </div>`;
+    c.appendChild(sec);
+    return;
+  }
+
+  const bars = days30.map(d => {
+    const pct   = Math.max(4, Math.round(d.done / max30 * 100));
+    const color = (d.done === total && total > 0) ? 'var(--green)' : 'var(--accent)';
+    const op    = d.ds === today ? '1' : '0.65';
+    return `<div style="flex:1;min-width:0;display:flex;align-items:flex-end;height:56px">
+      <div style="width:100%;height:${pct}%;background:${color};border-radius:2px 2px 0 0;opacity:${op};min-height:3px"></div>
+    </div>`;
+  }).join('');
+
   sec.innerHTML = `
     <div class="chart-sec" style="margin-top:10px">
       <div class="chart-title">Daily Goals Overview</div>
@@ -6897,15 +7674,17 @@ renderStats = function() {
         <div class="sb-stat"><div class="sb-stat-n">${allTime}</div><div class="sb-stat-l">All-time done</div></div>
       </div>
       <div class="chart-title">Goal Completion — Last 30 Days</div>
-      <div class="trend-bars" style="height:80px">
-        ${days30.map(d => `<div class="tb-col" title="${d.ds}: ${d.done} done">
-          <div class="tb-bar" style="height:${Math.max(3, d.done/max30*60)}px;background:${d.done===total&&total>0?'var(--green)':'var(--accent)'}"></div>
-          <div class="tb-lbl" style="font-size:8px">${d.ds.slice(8)}</div>
-        </div>`).join('')}
+      <div style="display:flex;align-items:flex-end;gap:2px;height:56px;width:100%;overflow:hidden;box-sizing:border-box;margin-top:6px">
+        ${bars}
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--text4);font-family:var(--mono)">
+        <span>${days30[0].ds.slice(5)}</span>
+        <span>${days30[14].ds.slice(5)}</span>
+        <span>${days30[29].ds.slice(5)}</span>
       </div>
     </div>`;
   c.appendChild(sec);
-};
+}
 
 /* ── INIT GOALS ── */
 async function initGoals() {
@@ -6915,6 +7694,8 @@ async function initGoals() {
   scheduleReminders();
   requestNotifPermission();
   _initGoalPanelSwipe();
+  /* refresh stats section if already on stats view */
+  if (currentView === 'stats') _appendGoalStats();
 }
 
 function _initGoalPanelSwipe() {
