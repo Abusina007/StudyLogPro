@@ -863,17 +863,17 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .sch-day-title{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text3);margin-bottom:7px;display:flex;align-items:center;gap:7px}
 .sch-day-pill{color:#fff;background:var(--accent);padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:700;text-transform:none;letter-spacing:0}
 .sch-grid{display:flex;flex-direction:column;gap:4px}
-.sch-card{display:flex;align-items:stretch;border:1.5px solid var(--border2);border-radius:var(--rs);overflow:hidden;cursor:pointer;transition:all var(--tr);background:var(--panel2)}
+.sch-card{display:flex;align-items:stretch;border:1.5px solid var(--border2);border-radius:10px;overflow:hidden;cursor:pointer;transition:all var(--tr);background:var(--panel2)}
 .sch-card:hover{border-color:var(--accent)}
 .sch-card.selected{border-color:var(--accent);background:var(--accent-dim2)}
-.sch-time-col{background:var(--panel3);padding:8px 10px;display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:82px;font-family:var(--mono);color:var(--text3);flex-shrink:0;text-align:center;gap:1px}
-.sch-t-main{font-size:11.5px;font-weight:600;color:var(--text2);line-height:1}
-.sch-t-end{font-size:8.5px;color:var(--text4)}
-.sch-info{padding:8px 11px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px}
-.sch-subj-id{font-size:13px;font-weight:700}
-.sch-subj-name{font-size:11px;color:var(--text2)}
-.sch-room{font-size:10px;color:var(--text3);font-family:var(--mono)}
-.sch-side{padding:7px 10px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;flex-shrink:0}
+.sch-time-col{background:var(--panel3);padding:6px 8px;display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:62px;font-family:var(--mono);color:var(--text3);flex-shrink:0;text-align:center;gap:1px}
+.sch-t-main{font-size:11px;font-weight:600;color:var(--text2);line-height:1}
+.sch-t-end{font-size:8px;color:var(--text4)}
+.sch-info{padding:6px 9px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:0}
+.sch-subj-id{font-size:12px;font-weight:700}
+.sch-subj-name{font-size:10.5px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sch-room{font-size:9px;color:var(--text3);font-family:var(--mono)}
+.sch-side{padding:6px 8px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;flex-shrink:0}
 .sch-batch{font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:20px;background:var(--panel4);color:var(--text2)}
 .sch-sel-ico{font-size:14px;color:var(--accent);opacity:0;transition:opacity var(--tr)}
 .sch-card.selected .sch-sel-ico{opacity:1}
@@ -1749,7 +1749,7 @@ button, select, input[type="date"] {
 
 /* ─── GENERAL SMOOTHNESS ─────────────────────────────── */
 #viewArea { overscroll-behavior-y: contain; }
-#sidebar, .dp-body, .m-body, .cmd-list {
+#sidebar, .dp-body, .m-body, .cmd-list, .routine-editor-body, .cal-sheet-body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
@@ -2309,6 +2309,7 @@ button, select, input[type="date"] {
 
 /* Mobile UI Fixes */
 @media (max-width: 768px) {
+  .m-body { min-height: auto !important; max-height: calc(100dvh - 130px) !important; overflow-y: auto; }
   #routineEditorModal { padding: 0; }
   .routine-editor-container { width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; }
   .routine-slot input, .routine-slot select { flex: 1 1 100%; min-width: 100%; }
@@ -3473,25 +3474,29 @@ async function loadFromGist() {
     if (!gist || !gist.files) return null;
     
     let data = null;
-    if (gist.files[GIST_FILENAME]?.raw_url) {
+    if (gist.files[GIST_FILENAME]?.content) {
+      try { data = JSON.parse(gist.files[GIST_FILENAME].content); } catch(e) {}
+    } else if (gist.files[GIST_FILENAME]?.raw_url) {
       const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
       if (res.ok) data = await res.json();
     }
     
     // Load ALL routines if present
-    if (gist.files[ROUTINE_FILENAME]?.raw_url) {
+    if (gist.files[ROUTINE_FILENAME]?.content || gist.files[ROUTINE_FILENAME]?.raw_url) {
       try {
-        const res = await fetch(gist.files[ROUTINE_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-        if (res.ok) {
-          const cloudRoutines = await res.json();
-          if (cloudRoutines && typeof cloudRoutines === 'object') {
-            // 1. MERGE: Save cloud routines into local storage and state
-            let localRoutines = JSON.parse(localStorage.getItem('studylog_routines') || '{}');
-            Object.assign(localRoutines, cloudRoutines);
-            localStorage.setItem('studylog_routines', JSON.stringify(localRoutines));
-            routines = localRoutines;
-            cleanUpRoutines(); // <--- ADD THIS LINE to deduplicate merged routines
-          }
+        let cloudRoutines = null;
+        if (gist.files[ROUTINE_FILENAME]?.content) {
+          cloudRoutines = JSON.parse(gist.files[ROUTINE_FILENAME].content);
+        } else {
+          const res = await fetch(gist.files[ROUTINE_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) cloudRoutines = await res.json();
+        }
+        if (cloudRoutines && typeof cloudRoutines === 'object') {
+          let localRoutines = JSON.parse(localStorage.getItem('studylog_routines') || '{}');
+          Object.assign(localRoutines, cloudRoutines);
+          localStorage.setItem('studylog_routines', JSON.stringify(localRoutines));
+          routines = localRoutines;
+          cleanUpRoutines();
         }
       } catch (e) { console.error('Error loading routines from gist', e); }
     }
@@ -3508,7 +3513,6 @@ async function loadFromGist() {
         toast('Switched to ' + activeRoutine.meta.routineName, 'info');
       }
     } else if (currentRoutineId === 'generic_sem' || !routines[currentRoutineId]) {
-      // Fallback: If no active ID in cloud, but we have real routines locally, switch to the first one
       const realRoutineIds = Object.keys(routines).filter(id => id !== 'generic_sem');
       if (realRoutineIds.length > 0) {
         currentRoutineId = realRoutineIds[0];
@@ -3518,7 +3522,6 @@ async function loadFromGist() {
         routineChanged = true;
       }
     } else if (currentRoutineId && routines[currentRoutineId] && !activeRoutine) {
-      // Safety fallback: If activeRoutine is null but we have a valid ID, load it
       activeRoutine = routines[currentRoutineId];
       applyRoutine(activeRoutine, true);
     }
@@ -3540,27 +3543,24 @@ async function pollForChanges() {
   if (!ghToken || isPolling || !gistId) return;
   isPolling = true;
   try {
-    // Step 1: lightweight metadata check
     const gist = await ghFetch('GET', `/gists/${gistId}`);
     if (!gist) return;
-
     if (gist.updated_at === lastGistUpdatedAt) return;
 
-    // Step 2: fetch only the raw file content
-    const rawUrl = gist.files[GIST_FILENAME]?.raw_url;
-    if (!rawUrl) return;
-    const res = await fetch(rawUrl + '?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) return;
-    const gistData = await res.json();
-
+    let gistData = null;
+    if (gist.files[GIST_FILENAME]?.content) {
+      try { gistData = JSON.parse(gist.files[GIST_FILENAME].content); } catch(e) {}
+    } else if (gist.files[GIST_FILENAME]?.raw_url) {
+      const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      gistData = await res.json();
+    }
+    
     lastGistUpdatedAt = gist.updated_at;
-
     if (!gistData || !gistData.entries) return;
 
-    // Merge tombstones first
     if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
     
-    // SYNC ACTIVE ROUTINE in background polling
     if (gistData.activeRoutineId && routines[gistData.activeRoutineId] && currentRoutineId !== gistData.activeRoutineId) {
       currentRoutineId = gistData.activeRoutineId;
       activeRoutine = routines[currentRoutineId];
@@ -3582,17 +3582,13 @@ async function pollForChanges() {
         merged[id] = newer;
       } else {
         merged[id] = l || c;
-        if (c && !l) changed = true; // New entry from cloud
+        if (c && !l) changed = true;
       }
     }
 
-    // CRITICAL FIX: Apply tombstones BEFORE checking if changed
     const newEntries = applyTombstones(Object.values(merged));
     
-    // Check if deletion occurred (length mismatch or ID mismatch)
-    if (!changed && newEntries.length !== entries.length) {
-      changed = true;
-    }
+    if (!changed && newEntries.length !== entries.length) changed = true;
     if (!changed) {
       const oldIds = new Set(entries.map(e=>e.id));
       for (const e of newEntries) {
@@ -3607,7 +3603,7 @@ async function pollForChanges() {
     render();
     buildSubjList();
     updateSideTagCloud();
-    toast('🔄 Synced from another device', 'info');
+    toast('Synced from another device', 'info');
   } catch (e) {
     console.debug('Background sync error', e);
   } finally {
@@ -3695,11 +3691,9 @@ function _onWindowFocus() {
 
 function startBackgroundSync() {
   if (syncPollInterval) clearInterval(syncPollInterval);
-  // Poll every 10 seconds when tab is visible
   syncPollInterval = setInterval(() => {
     if (document.visibilityState === 'visible') pollForChanges();
   }, 10000);
-  // Instant re-sync when user switches back to this tab
   document.addEventListener('visibilitychange', _onVisChange);
   window.addEventListener('focus', _onWindowFocus);
 }
@@ -4835,48 +4829,45 @@ function initModalSwipe() {
   if (!modal) return;
   
   const tabs = ['main', 'todos', 'media', 'meta'];
-  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
-  let isSwiping = false;
-  let swipeThreshold = 50;   // minimum horizontal distance for a swipe
-  let maxVertical = 30;      // maximum allowed vertical drift
+  let startX = 0, startY = 0, startT = 0;
+  let active = false, intent = null;
+  const THRESHOLD = 48;
+  const MAX_VERT = 60; // more forgiving for diagonal swipes
   
   modal.addEventListener('touchstart', function(e) {
-    // Only consider touches on the modal content area (not on buttons, inputs, etc.)
     if (e.target.closest('input, textarea, select, button, .m-tab, .m-close')) return;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchStartTime = Date.now();
-    isSwiping = true;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startT = Date.now();
+    active = true;
+    intent = null;
   }, { passive: true });
   
   modal.addEventListener('touchmove', function(e) {
-    if (!isSwiping) return;
-    const dx = e.touches[0].clientX - touchStartX;
-    const dy = Math.abs(e.touches[0].clientY - touchStartY);
-    // If vertical drift exceeds threshold, cancel swipe
-    if (dy > maxVertical) {
-      isSwiping = false;
-      return;
+    if (!active) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = Math.abs(e.touches[0].clientY - startY);
+    
+    if (!intent) {
+      if (dy > MAX_VERT) { active = false; return; }
+      if (Math.abs(dx) > 10) { intent = 'swipe'; }
     }
-    // Optionally, prevent page scroll if horizontal swipe is detected
-    if (Math.abs(dx) > 10) {
-      e.preventDefault();   // stop scrolling while swiping horizontally
+    
+    if (intent === 'swipe') {
+      e.preventDefault(); // stop background scroll
     }
   }, { passive: false });
   
   modal.addEventListener('touchend', function(e) {
-    if (!isSwiping) return;
-    isSwiping = false;
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
-    const dt = Date.now() - touchStartTime;
+    if (!active) return;
+    active = false;
+    if (intent !== 'swipe') return;
     
-    // Valid swipe: horizontal distance > threshold, vertical drift low, time < 500ms
-    if (Math.abs(dx) > swipeThreshold && dy < maxVertical && dt < 500) {
-      // Determine direction: left (dx < 0) -> next tab, right (dx > 0) -> previous tab
-      const direction = dx < 0 ? 'next' : 'prev';
-      
-      // Find current active tab index
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = Math.abs(e.changedTouches[0].clientY - startY);
+    const dt = Date.now() - startT;
+    
+    if (Math.abs(dx) > THRESHOLD && dy < MAX_VERT) {
       let activeIndex = -1;
       for (let i = 0; i < tabs.length; i++) {
         const body = document.getElementById('tab-' + tabs[i]);
@@ -4887,6 +4878,7 @@ function initModalSwipe() {
       }
       if (activeIndex === -1) return;
       
+      const direction = dx < 0 ? 'next' : 'prev';
       let newIndex;
       if (direction === 'next') {
         newIndex = activeIndex + 1;
@@ -4899,7 +4891,6 @@ function initModalSwipe() {
       const newTab = tabs[newIndex];
       const newBtn = document.getElementById('tab-btn-' + newTab);
       if (newBtn) {
-        // Call switchTab with direction for animation
         switchTab(newTab, newBtn, direction === 'next' ? 'left' : 'right');
       }
     }
@@ -7010,7 +7001,7 @@ document.addEventListener('dragstart', e => {
 
 // Kill iOS bounce/overscroll on non-scrollable elements
 document.body.addEventListener('touchmove', e => {
-  if (!e.target.closest('#viewArea, #sidebar, .dp-body, .dp-day-body, .cmd-list, .m-body, #calCont, .hmap-scroll')) {
+  if (!e.target.closest('#viewArea, #sidebar, .dp-body, .dp-day-body, .cmd-list, .m-body, #calCont, .hmap-scroll, .routine-editor-body, .cal-sheet-body')) {
     e.preventDefault();
   }
 }, { passive: false });
@@ -8082,12 +8073,19 @@ async function loadGoalsFromGist() {
   if (!ghToken || !gistId) return;
   try {
     const gist = await ghFetch('GET', `/gists/${gistId}`);
-    if (!gist?.files?.[GOALS_GIST_FILE]?.raw_url) return;
-    const res = await fetch(gist.files[GOALS_GIST_FILE].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) return;
-    const data = await res.json();
+    if (!gist?.files?.[GOALS_GIST_FILE]) return;
+    
+    let data = null;
+    if (gist.files[GOALS_GIST_FILE]?.content) {
+      try { data = JSON.parse(gist.files[GOALS_GIST_FILE].content); } catch(e) {}
+    } else if (gist.files[GOALS_GIST_FILE]?.raw_url) {
+      const res = await fetch(gist.files[GOALS_GIST_FILE].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      data = await res.json();
+    }
+    
     if (!data?.goals) return;
-    // merge: keep all unique goals, union completions
+    
     const localMap = Object.fromEntries(goals.map(g => [g.id, g]));
     const cloudMap = Object.fromEntries(data.goals.map(g => [g.id, g]));
     const ids = new Set([...Object.keys(localMap), ...Object.keys(cloudMap)]);
