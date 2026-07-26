@@ -3061,8 +3061,9 @@ button, select, input[type="date"] {
 /* ─── SEMESTER FOLDER HELPER ─── */
 function getSemesterFolder(filenameOrId) {
   const str = (filenameOrId || '').toLowerCase();
-  const m = str.match(/y(\d+)[_s]?s(\d+)/);
-  if (m) return `${(parseInt(m[1]) - 1) * 2 + parseInt(m[2])}_Semester`;
+  let m = str.match(/y\d+s(\d+)/);      // prefer "y2s3" style
+  if (!m) m = str.match(/\bs(\d+)\b/);   // fallback: standalone "s3"
+  if (m) return `${parseInt(m[1])}_Semester`;
   return 'Semester_Data';
 }
 
