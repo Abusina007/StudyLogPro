@@ -3323,38 +3323,6 @@ function saveDeletedIds() {
   localStorage.setItem('slp_deleted', JSON.stringify(deletedIds));
 }
 
-function mergeDeletedIds(cloudDeleted) {
-  if (!cloudDeleted) return;
-  const liveMap = Object.fromEntries(entries.map(e => [e.id, e]));
-  for (const id in cloudDeleted) {
-    if (liveMap[id]) {
-      // entry is alive in memory — only accept tombstone if strictly newer than entry
-      const entryTime = liveMap[id].updatedAt || liveMap[id].createdAt || 0;
-      if (cloudDeleted[id] > entryTime) {
-        deletedIds[id] = cloudDeleted[id];
-      }
-      // else: ignore — entry was re-created/imported after deletion
-    } else {
-      if (!deletedIds[id] || cloudDeleted[id] > deletedIds[id]) {
-        deletedIds[id] = cloudDeleted[id];
-      }
-    }
-  }
-  saveDeletedIds();
-}
-function applyTombstones(list) {
-  return list.filter(e => {
-    if (!deletedIds[e.id]) return true;
-    // use any available timestamp — if none, assume entry is recent and keep it
-    const entryTime = e.updatedAt || e.createdAt || 0;
-    if (entryTime > deletedIds[e.id]) {
-      delete deletedIds[e.id];
-      saveDeletedIds();
-      return true;
-    }
-    return false;
-  });
-}
 
 async function ghFetch(method, path, body) {
   if (!ghToken) return null;
@@ -3559,7 +3527,22 @@ async function pollForChanges() {
     lastGistUpdatedAt = gist.updated_at;
     if (!gistData || !gistData.entries) return;
 
-    if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+    const gistUpdateTime = new Date(gist.updated_at).getTime();
+    
+    // 1. Sync tombstones directly
+    if (gistData.deletedIds) {
+      const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
+      for (const id in gistData.deletedIds) {
+        if (!cloudMap[id]) {
+          if (!deletedIds[id] || gistData.deletedIds[id] > deletedIds[id]) {
+            deletedIds[id] = gistData.deletedIds[id];
+          }
+        } else {
+          delete deletedIds[id]; // Resurrected on cloud
+        }
+      }
+      saveDeletedIds();
+    }
     
     if (gistData.activeRoutineId && routines[gistData.activeRoutineId] && currentRoutineId !== gistData.activeRoutineId) {
       currentRoutineId = gistData.activeRoutineId;
@@ -3580,22 +3563,27 @@ async function pollForChanges() {
         const newer = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
         if (newer !== l) changed = true;
         merged[id] = newer;
-      } else {
-        merged[id] = l || c;
-        if (c && !l) changed = true;
+      } else if (l) {
+        const lTime = l.updatedAt || l.createdAt || 0;
+        // If modified locally after the cloud update, keep it. (15s buffer for clock skew)
+        if (lTime > gistUpdateTime - 15000) {
+          merged[id] = l;
+          changed = true; 
+          if (deletedIds[id]) { delete deletedIds[id]; saveDeletedIds(); }
+        } else if (!deletedIds[id]) {
+          merged[id] = l; // New local entry
+        } else {
+          changed = true; // Dropped due to tombstone
+        }
+      } else if (c) {
+        if (!deletedIds[id]) {
+          merged[id] = c;
+          changed = true; // New from cloud
+        }
       }
     }
 
-    const newEntries = applyTombstones(Object.values(merged));
-    
-    if (!changed && newEntries.length !== entries.length) changed = true;
-    if (!changed) {
-      const oldIds = new Set(entries.map(e=>e.id));
-      for (const e of newEntries) {
-        if (!oldIds.has(e.id)) { changed = true; break; }
-      }
-    }
-
+    const newEntries = Object.values(merged);
     if (!changed) return;
 
     entries = newEntries;
@@ -3603,7 +3591,10 @@ async function pollForChanges() {
     render();
     buildSubjList();
     updateSideTagCloud();
-    toast('Synced from another device', 'info');
+    toast('✓ Synced from another device', 'info');
+    
+    // If we resurrected or merged something, push back to cloud
+    saveData(); 
   } catch (e) {
     console.debug('Background sync error', e);
   } finally {
@@ -3693,7 +3684,7 @@ function startBackgroundSync() {
   if (syncPollInterval) clearInterval(syncPollInterval);
   syncPollInterval = setInterval(() => {
     if (document.visibilityState === 'visible') pollForChanges();
-  }, 10000);
+  }, 5000);
   document.addEventListener('visibilitychange', _onVisChange);
   window.addEventListener('focus', _onWindowFocus);
 }
@@ -3747,12 +3738,37 @@ async function connectGitHub(token) {
   setSyncStatus('syncing', 'Loading from GitHub…');
   const gistData = await loadFromGist();
   if (gistData && gistData.entries) {
-    if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+    const gistUpdateTime = lastGistUpdatedAt ? new Date(lastGistUpdatedAt).getTime() : Date.now();
+    
+    if (gistData.deletedIds) {
+      const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
+      for (const id in gistData.deletedIds) {
+        if (!cloudMap[id]) {
+          if (!deletedIds[id] || gistData.deletedIds[id] > deletedIds[id]) deletedIds[id] = gistData.deletedIds[id];
+        } else delete deletedIds[id];
+      }
+      saveDeletedIds();
+    }
+    
     const cloudEntries = gistData.entries;
     const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
     const cloudMap = Object.fromEntries(cloudEntries.map(e => [e.id, e]));
-    const merged = Object.values({ ...localMap, ...cloudMap });
-    entries = applyTombstones(merged).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    const merged = {};
+    
+    for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
+      const l = localMap[id], c = cloudMap[id];
+      if (l && c) merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
+      else if (l) {
+        const lTime = l.updatedAt || l.createdAt || 0;
+        if (lTime > gistUpdateTime - 15000) { 
+          merged[id] = l; 
+          if (deletedIds[id]) { delete deletedIds[id]; saveDeletedIds(); } 
+        }
+        else if (!deletedIds[id]) merged[id] = l;
+      }
+      else if (c) { if (!deletedIds[id]) merged[id] = c; }
+    }
+    entries = Object.values(merged).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
     lsSave({ version: 7, entries });
   } else {
     await saveToGist({ version: 7, entries, saved: new Date().toISOString() });
@@ -3761,10 +3777,7 @@ async function connectGitHub(token) {
   updateSyncUI();
   render(); buildSubjList(); updateSideTagCloud();
   toast('Connected to GitHub  Syncing across devices!', 'ok');
-  
-  // Start background polling
   startBackgroundSync();
-  
   return true;
 }
 
@@ -3816,30 +3829,49 @@ async function syncNow() {
   // 1. PULL first
   const gistData = await loadFromGist();
   if (gistData && gistData.entries) {
-    if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+    const gistUpdateTime = lastGistUpdatedAt ? new Date(lastGistUpdatedAt).getTime() : Date.now();
+    
+    // Sync tombstones
+    if (gistData.deletedIds) {
+      const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
+      for (const id in gistData.deletedIds) {
+        if (!cloudMap[id]) {
+          if (!deletedIds[id] || gistData.deletedIds[id] > deletedIds[id]) {
+            deletedIds[id] = gistData.deletedIds[id];
+          }
+        } else {
+          delete deletedIds[id];
+        }
+      }
+      saveDeletedIds();
+    }
 
     const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
     const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
     const merged = {};
 
     for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
-      const l = localMap[id];
-      const c = cloudMap[id];
+      const l = localMap[id], c = cloudMap[id];
       if (l && c) {
         merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
-      } else {
-        merged[id] = l || c;
+      } else if (l) {
+        const lTime = l.updatedAt || l.createdAt || 0;
+        if (lTime > gistUpdateTime - 15000) {
+          merged[id] = l;
+          if (deletedIds[id]) { delete deletedIds[id]; saveDeletedIds(); }
+        } else if (!deletedIds[id]) {
+          merged[id] = l;
+        }
+      } else if (c) {
+        if (!deletedIds[id]) {
+          merged[id] = c;
+        }
       }
     }
-
-    const afterTombstone = applyTombstones(Object.values(merged));
-    const survivingIds = new Set(afterTombstone.map(e => e.id));
-    const rescued = entries.filter(e => !survivingIds.has(e.id) && !deletedIds[e.id]);
-    const next = [...afterTombstone, ...rescued];
-    entries = next;
+    entries = Object.values(merged);
   }
 
-  // 2. GLOBAL MIGRATION: Fix orphaned entries before pushing to cloud
+  // 2. GLOBAL MIGRATION
   if (currentRoutineId && currentRoutineId !== 'generic_sem' && routines[currentRoutineId]) {
     let migrated = 0;
     entries.forEach(e => {
@@ -3851,14 +3883,12 @@ async function syncNow() {
         }
       }
     });
-    if (migrated > 0) {
-      toast(`Migrated ${migrated} entries to active routine.`, 'info');
-    }
+    if (migrated > 0) toast(`Migrated ${migrated} entries to active routine.`, 'info');
   }
 
   lsSave({ version: 7, entries });
 
-  // 3. PUSH the merged & migrated result
+  // 3. PUSH
   const pushOk = await saveData();
 
   render();
@@ -3878,18 +3908,34 @@ async function loadData() {
   let data = null;
   try { data = JSON.parse(localStorage.getItem('studylog_v7') || localStorage.getItem('studylog_v6') || localStorage.getItem('studylog_v5') || 'null'); } catch (e) {}
   
-  // Restore settings
   if (data?.settings) {
     appSettings = data.settings;
     localStorage.setItem('slp_settings', JSON.stringify(appSettings));
   }
   
-  // Apply local tombstones immediately
-  if (data && data.entries) data.entries = applyTombstones(data.entries);
+  if (data && data.entries) {
+    // Filter out local tombstones initially
+    entries = data.entries.filter(e => !deletedIds[e.id]);
+  }
+  
   if (ghToken) {
     const gistData = await loadFromGist();
     if (gistData && gistData.entries) {
-      if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+      const gistUpdateTime = lastGistUpdatedAt ? new Date(lastGistUpdatedAt).getTime() : Date.now();
+      
+      if (gistData.deletedIds) {
+        const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
+        for (const id in gistData.deletedIds) {
+          if (!cloudMap[id]) {
+            if (!deletedIds[id] || gistData.deletedIds[id] > deletedIds[id]) {
+              deletedIds[id] = gistData.deletedIds[id];
+            }
+          } else {
+            delete deletedIds[id];
+          }
+        }
+        saveDeletedIds();
+      }
       
       if (gistData.settings && !data?.settings) {
         appSettings = gistData.settings;
@@ -3899,18 +3945,30 @@ async function loadData() {
       const localMap = Object.fromEntries((data?.entries || []).map(e => [e.id, e]));
       const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
       const merged = {};
+      
       for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
         const l = localMap[id], c = cloudMap[id];
-        if (l && c) merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
-        else merged[id] = l || c;
+        if (l && c) {
+          merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
+        } else if (l) {
+          const lTime = l.updatedAt || l.createdAt || 0;
+          if (lTime > gistUpdateTime - 15000) {
+            merged[id] = l;
+            if (deletedIds[id]) { delete deletedIds[id]; saveDeletedIds(); }
+          } else if (!deletedIds[id]) {
+            merged[id] = l;
+          }
+        } else if (c) {
+          if (!deletedIds[id]) {
+            merged[id] = c;
+          }
+        }
       }
-      data = { version: 7, entries: applyTombstones(Object.values(merged)), settings: appSettings };
+      entries = Object.values(merged);
       
-      // GLOBAL MIGRATION: Move orphaned entries to the active routine
       if (currentRoutineId && routines[currentRoutineId]) {
         let migrated = 0;
-        data.entries.forEach(e => {
-          // Only migrate if the semesterId is completely unknown/orphaned
+        entries.forEach(e => {
           if (!e.semesterId || !routines[e.semesterId]) {
             if (e.semesterId !== currentRoutineId) {
               e.semesterId = currentRoutineId;
@@ -3919,15 +3977,12 @@ async function loadData() {
             }
           }
         });
-        if (migrated > 0) {
-          toast(`Migrated ${migrated} orphaned entries.`, 'info');
-        }
+        if (migrated > 0) toast(`Migrated ${migrated} orphaned entries.`, 'info');
       }
       
-      lsSave(data);
+      lsSave({ version: 7, entries });
     }
   }
-  entries = data?.entries || [];
 }
 
 async function loadFile(f) {
