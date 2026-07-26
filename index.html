@@ -367,9 +367,9 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .entry-row.selected,
 .wf-entry.selected,
 .entry-card.selected {
-  border-left: 3px solid var(--accent);
   background: rgba(47,129,247,.18);
   box-shadow: inset 0 0 0 1.5px rgba(47,129,247,.4);
+  border-left: none !important; /* FORCE NO BLUE BOX */
 }
 .entry-row.selected .er-icon {
   background: var(--accent);
@@ -793,11 +793,12 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .sb-flex{flex:1;min-width:1px}
 
 /* ▀▄▀▄ OVERLAY/MODAL ▀▄▀▄ */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:810;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;}
-.overlay.open{opacity:1;visibility:visible}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:810;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .25s ease, visibility .25s ease, backdrop-filter .25s ease;backdrop-filter:blur(0px);}
+.overlay.open{opacity:1;visibility:visible;backdrop-filter:blur(4px);}
 [data-theme="light"] .overlay{background:rgba(0,0,0,.45)}
-.modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--rl);width:100%;max-width:750px;box-shadow:var(--shadow);transform:translateY(-8px) scale(.99);transition:transform .2s,background .25s;margin:auto;z-index: 1500;}
-.overlay.open .modal{transform:none}
+.modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--rl);width:100%;max-width:750px;box-shadow:var(--shadow);transform:translateY(20px) scale(0.96);opacity:0;transition:transform .4s cubic-bezier(0.32, 0.72, 0, 1), opacity .3s ease;margin:auto;z-index: 1500;}
+.overlay.open .modal{transform:translateY(0) scale(1);opacity:1;}
+
 .m-head{display:flex;align-items:center;gap:10px;padding:17px 20px 13px;border-bottom:1px solid var(--border)}
 .m-head h2{font-size: clamp(0.625rem, 0.493rem + 0.556vw, 0.875rem);font-weight:600;letter-spacing:-.3px;flex:1}
 .m-tabs{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:3px}
@@ -906,6 +907,25 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .btn-c:hover{border-color:var(--border3);color:var(--text)}
 .btn-p{background:var(--accent);color:#fff;border:none;padding:8px 20px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);font-family:var(--font)}
 .btn-p:hover{background:var(--accent-h);box-shadow:0 3px 12px rgba(79,142,247,.3)}
+/* ── SETTINGS TOGGLES ── */
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text);
+  padding: 5px 0;
+}
+.setting-row span { font-weight: 500; }
+.toggle-sw {
+  position: relative; width: 40px; height: 22px; background: var(--panel4); border-radius: 20px; cursor: pointer; transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-sw::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform 0.2s;
+}
+.toggle-sw.on { background: var(--accent); }
+.toggle-sw.on::after { transform: translateX(18px); }
 
 /* ▀▄▀▄ YT POPUP ▀▄▀▄ */
 #ytPopup{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:950;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px}
@@ -1087,14 +1107,9 @@ input[type=date]{color-scheme:dark}
 .entry-rows{display:flex;flex-direction:column;gap:5px}
 .entry-row{display:flex;align-items:center;gap:0;cursor:pointer;border:1px solid var(--border);border-radius:var(--r);background:var(--panel);transition:background .12s,border-color .12s,box-shadow .15s,transform .15s;position:relative;overflow:hidden}
 .entry-row:hover{background:var(--panel2);border-color:var(--border2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
-.entry-row.selected {
-  border-left: 4px solid var(--accent) !important;
-  background: rgba(47, 129, 247, 0.2) !important;
-  box-shadow: inset 0 0 0 1px rgba(47, 129, 247, 0.6) !important;
-}
 .entry-row.pinned .er-accent{background:var(--amber)!important}
-.er-accent{width:3px;align-self:stretch;flex-shrink:0}
-.er-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;font-family:var(--mono);flex-shrink:0;margin:10px 11px;letter-spacing:.3px}
+.er-accent{width:3px;align-self:stretch;flex-shrink:0; transition: background 0.2s;}
+.er-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;font-family:var(--mono);flex-shrink:0;margin:10px 11px;letter-spacing:.3px;transition: all .2s ease; position: relative; overflow: hidden;}
 .er-content{flex:1;min-width:0;padding:10px 12px 10px 0}
 .er-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
 .er-title{font-size:13.5px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1106,22 +1121,46 @@ input[type=date]{color-scheme:dark}
 .er-preview-task.done{color:var(--text3);text-decoration:line-through;opacity:.85}
 .er-badges{display:flex;gap:3px;align-items:center;flex-shrink:0}
 .er-badge{font-size:10px;padding:1px 6px;border-radius:20px;font-weight:500;line-height:1.6}
-.entry-rows .entry-row.selected{
-  background: rgba(47,129,247,.24) !important;
+
+/* CLEAN SELECTION STYLES - NO BLUE BOX */
+.entry-row.selected {
   border-color: var(--accent) !important;
-  border-left: 4px solid var(--accent) !important;
-  box-shadow: inset 0 0 0 1.5px rgba(47,129,247,.55) !important;
+  background: rgba(47, 129, 247, 0.12) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(47, 129, 247, 0.4) !important;
 }
-[data-theme="light"] .entry-rows .entry-row.selected{
-  background: rgba(37,99,235,.16) !important;
+[data-theme="light"] .entry-row.selected { background: rgba(37, 99, 235, 0.08) !important; }
+
+/* Turn the 3px left strip blue to indicate selection */
+.entry-row.selected .er-accent {
+  background: var(--accent) !important;
+}
+
+/* Sleek Checkmark Overlay inside the original colored icon */
+.er-icon .sel-check {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  border-radius: 9px;
+  animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes checkPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
 
 /* ▀▄▀▄ DETAIL PANEL ▀▄▀▄ */
-.detail-overlay{position:fixed;inset:0;z-index:700;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
-.detail-overlay.open{opacity:1;visibility:visible}
-.detail-overlay::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,var(--ov-alpha,.65));backdrop-filter:blur(var(--ov-blur,4px));transition:background .3s ease,backdrop-filter .3s ease}
-.detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;min-height: 500px;max-height:55vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(50px);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.detail-overlay{position:fixed;inset:0;z-index:700;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s ease, visibility .3s ease, backdrop-filter .3s ease;backdrop-filter:blur(0px);}
+.detail-overlay.open{opacity:1;visibility:visible;backdrop-filter:blur(4px);}
+.detail-overlay::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,var(--ov-alpha,.65));transition:background .3s ease}
+.detail-panel{position:relative;background:var(--panel);width:100%;max-width:700px;min-height: 500px;max-height:55vh;border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .45s cubic-bezier(0.32, 0.72, 0, 1);will-change: transform, border-radius, opacity;}
 .detail-overlay.open .detail-panel{transform:none}
+
 @media(min-width:720px){.detail-overlay{align-items:center}.detail-panel{border-radius:18px;max-height:88vh;margin:20px}}
 .dp-handle{width:36px;height:4px;background:var(--border3);border-radius:2px;margin:10px auto 0;flex-shrink:0;padding:12px 24px;background-clip:content-box;box-sizing:content-box;cursor:grab;}
 .dp-header{padding:14px 18px 13px;flex-shrink:0}
@@ -1177,7 +1216,7 @@ input[type=date]{color-scheme:dark}
 
 /* ▀▄▀▄ WEEK FOLDERS (grid) ▀▄▀▄ */
 .wf-container{display:flex;flex-direction:column;gap:7px}
-.wf-folder{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color var(--tr)}
+.wf-folder{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color var(--tr);contain: layout;}
 .wf-folder.wf-open{border-color:var(--accent)}
 .wf-folder-head{display:flex;align-items:center;gap:10px;padding:13px 15px;cursor:pointer;user-select:none;transition:background var(--tr-fast)}
 .wf-folder-head:hover{background:var(--panel2)}
@@ -1191,9 +1230,9 @@ input[type=date]{color-scheme:dark}
 .wf-folder-cnt{font-size:12px;font-weight:700;color:var(--text3);font-family:var(--mono);flex-shrink:0;background:var(--panel3);padding:2px 8px;border-radius:20px}
 .wf-arr{font-size:11px;color:var(--text3);flex-shrink:0;transition:transform .2s}
 .wf-folder.wf-open .wf-arr{transform:rotate(90deg)}
-.wf-body{display:none;border-top:1px solid var(--border)}
-.wf-folder.wf-open .wf-body{display:block}
-.wf-entry{display:flex;align-items:center;gap:9px;padding:9px 15px;cursor:pointer;border-bottom:1px solid var(--border);transition:background var(--tr-fast)}
+.wf-body{display:none;border-top:1px solid var(--border);width:100%;box-sizing:border-box;}
+.wf-folder.wf-open .wf-body{display:block;animation: cardIn .15s ease;}
+.wf-entry{display:flex;align-items:center;gap:9px;padding:9px 15px;cursor:pointer;border-bottom:1px solid var(--border);transition:background var(--tr-fast);width:100%;box-sizing:border-box;}
 .wf-entry:last-child{border-bottom:none}
 .wf-entry:hover{background:var(--panel2)}
 .wf-e-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -1352,10 +1391,10 @@ input, textarea, [contenteditable] {
 
 /* ▀▄▀▄ SWIPE VIEW TRANSITIONS ▀▄▀▄ */
 #viewArea{overflow-x:hidden;transition: transform 0.12s linear;}
-.view-slide-left{animation:slideFromRight .28s cubic-bezier(.4,0,.2,1) both}
-.view-slide-right{animation:slideFromLeft .28s cubic-bezier(.4,0,.2,1) both}
-@keyframes slideFromRight{from{opacity:0;transform:translateX(48px)}to{opacity:1;transform:none}}
-@keyframes slideFromLeft{from{opacity:0;transform:translateX(-48px)}to{opacity:1;transform:none}}
+.view-slide-left{animation:slideFromRight .35s cubic-bezier(0.32, 0.72, 0, 1) both}
+.view-slide-right{animation:slideFromLeft .35s cubic-bezier(0.32, 0.72, 0, 1) both}
+@keyframes slideFromRight{from{opacity:0.3;transform:translateX(40px) scale(0.98)}to{opacity:1;transform:none}}
+@keyframes slideFromLeft{from{opacity:0.3;transform:translateX(-40px) scale(0.98)}to{opacity:1;transform:none}}
 
 /* ▀▄▀▄ UX IMPROVEMENTS ▀▄▀▄ */
 
@@ -1433,20 +1472,40 @@ input, textarea, [contenteditable] {
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* ▀▄▀▄ SELECTION CHECK ICON ▀▄▀▄ */
-.entry-row.selected { background: rgba(47,129,247,.15) !important; }
-[data-theme="light"] .entry-row.selected { background: rgba(37,99,235,.11) !important; }
-.er-icon.sel-active {
-  background: var(--accent-dim) !important;
-  color: var(--accent) !important;
-  border: 1.5px solid rgba(47,129,247,.45);
+.entry-row.selected {
+  background: rgba(47, 129, 247, 0.15) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(47, 129, 247, 0.35) !important;
 }
-.er-sel-check {
-  font-size: 16px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+[data-theme="light"] .entry-row.selected { background: rgba(37, 99, 235, 0.13) !important; }
+
+/* Remove any leftover blue square ::before */
+
+/* Icon container transition */
+.er-icon { 
+  transition: background .2s ease, color .2s ease, transform .2s ease; 
+  border: 1px solid transparent; 
+  box-sizing: border-box; 
 }
+
+/* When selected, make it accent blue with white check */
+.entry-row.selected .er-icon {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  transform: scale(1.05);
+}
+
+/* Animated Checkmark SVG */
+.er-checkmark {
+  width: 20px; height: 20px;
+  stroke: #fff; stroke-width: 2.5; fill: none;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 30; stroke-dashoffset: 30;
+  animation: drawCheck 0.2s 0.05s forwards cubic-bezier(0.65, 0, 0.45, 1);
+}
+@keyframes drawCheck { to { stroke-dashoffset: 0; } }
 @keyframes checkPop {
-  from { transform: scale(0) rotate(-25deg); opacity: 0; }
+  from { transform: scale(0) rotate(-30deg); opacity: 0; }
   to   { transform: scale(1) rotate(0deg);   opacity: 1; }
 }
 /* ▀▄▀▄ SELECTION CHECK ICON ▀▄▀▄ */
@@ -1687,19 +1746,7 @@ button, select, input[type="date"] {
 .sb-icon-btn[data-tip].tip-show::after {
   opacity: 1;
 }
-/* Force list‑view selection highlight */
-/* FORCE list selection highlight – HIGH VISIBILITY */
-/* FORCE list selection highlight – most specific possible */
-#listCont .entry-row.selected {
-  border-left: 2px solid --accent!important;
-  background: rgba(47, 129, 247, 0.25) !important;
-  box-shadow: inset 0 0 0 2px var(--accent) !important;
-}
-#listCont .entry-row.selected .er-icon {
-  background: var(--accent) !important;
-  color: white !important;
-  transform: scale(1.02);
-}
+
 /* ─── GENERAL SMOOTHNESS ─────────────────────────────── */
 #viewArea { overscroll-behavior-y: contain; }
 #sidebar, .dp-body, .m-body, .cmd-list {
@@ -1798,254 +1845,194 @@ button, select, input[type="date"] {
   position: fixed; inset: 0; z-index: 760;
   display: flex; justify-content: flex-end;
   opacity: 0; visibility: hidden;
-  transition: opacity .25s ease, visibility .25s ease;
+  transition: opacity .3s ease, visibility .3s ease;
 }
 .gp-overlay::before {
   content: ''; position: absolute; inset: 0;
   background: rgba(0,0,0,.55);
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-  transition: opacity .25s ease;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: opacity .3s ease;
 }
 .gp-overlay.open { opacity: 1; visibility: visible; }
 [data-theme="light"] .gp-overlay::before { background: rgba(0,0,0,.35); }
 
 .gp-panel {
   position: relative;
-  width: min(390px, 96vw);
-  height: 100%;
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-left: 1px solid var(--glass-border);
-  display: flex; flex-direction: column;
-  transform: translateX(100%);
-  transition: transform .32s cubic-bezier(.22,1,.36,1);
-  overflow: hidden;
-  box-shadow: -8px 0 40px rgba(0,0,0,.3);
-  will-change: transform;
-}
-.gp-overlay.open .gp-panel { transform: translateX(0); }
-
-/* Mobile: full screen */
-@media (max-width: 768px) {
-  .gp-panel {
-    width: 100vw !important;
-    border-left: none;
-    border-radius: 0;
-  }
-}
-
-.gp-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 14px 16px 13px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  background: var(--glass-bg);
-}
-.gp-header-title {
-  font-size: 14px; font-weight: 700;
-  color: var(--text); letter-spacing: -.3px; flex: 1;
-}
-.gp-close {
-  background: none; border: 1px solid var(--border);
-  color: var(--text2); width: 30px; height: 30px;
-  border-radius: 10px; cursor: pointer; font-size: 16px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all var(--tr);
-}
-.gp-close:hover { background: var(--panel2); color: var(--text); }
-
-.gp-tabs {
-  display: flex; gap: 2px; padding: 10px 12px 10px;
-  background: var(--glass-bg);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0; overflow-x: auto; scrollbar-width: none;
-}
-.gp-tabs::-webkit-scrollbar { display: none; }
-.gp-tab {background:none;border:none;color:var(--text3);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:500;transition:all var(--tr);display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0
-}
-.gp-tab:hover {color:var(--text);background:var(--panel3)}
-.gp-tab.active {
-  color:#fff;background:var(--accent)
-}
-
-.gp-body {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 14px 14px 100px;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  min-height: 0;     /* critical for flex children to scroll */
-}
-.gp-panel {
-  position: relative;
-  width: min(390px, 96vw);
+  width: min(420px, 96vw);
   height: 100%;
   max-height: 100dvh;
   background: var(--glass-bg);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-left: 1px solid var(--glass-border);
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: column;
   transform: translateX(100%);
-  transition: transform .32s cubic-bezier(.22,1,.36,1);
+  transition: transform .4s cubic-bezier(0.32, 0.72, 0, 1);
   overflow: hidden;
   box-shadow: -8px 0 40px rgba(0,0,0,.3);
   will-change: transform;
 }
+.gp-overlay.open .gp-panel { transform: translateX(0); }
+
 @media (max-width: 768px) {
-  .gp-panel { width: 100vw !important; border-left: none; border-radius: 0; }
+  .gp-panel { width: 100vw !important; border-left: none; }
 }
 
-/* today header */
-.gp-today-header {
-  display: flex; align-items: center; gap: 16px;
+.gp-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--glass-bg);
+}
+.gp-header-title { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.3px; flex: 1; }
+.gp-close {
   background: var(--panel2); border: 1px solid var(--border);
-  border-radius: 14px; padding: 14px 16px; margin-bottom: 14px;
+  color: var(--text2); width: 32px; height: 32px;
+  border-radius: 50%; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--tr);
+}
+.gp-close:hover { background: var(--panel3); color: var(--text); transform: rotate(90deg); }
+
+.gp-tabs {
+  display: flex; gap: 4px; padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; overflow-x: auto; scrollbar-width: none;
+}
+.gp-tabs::-webkit-scrollbar { display: none; }
+.gp-tab {
+  background: none; border: 1px solid transparent; color: var(--text3);
+  padding: 8px 14px; border-radius: 20px; cursor: pointer;
+  font-size: 12px; font-weight: 600; transition: all var(--tr);
+  white-space: nowrap;
+}
+.gp-tab:hover { color: var(--text); background: var(--panel2); }
+.gp-tab.active { color: #fff; background: var(--accent); border-color: var(--accent); }
+
+.gp-body {
+  flex: 1; overflow-y: auto; padding: 20px;
+  overscroll-behavior-y: contain;
+}
+
+/* Modern Today Header with Gradient Progress Ring */
+.gp-today-header {
+  display: flex; align-items: center; gap: 20px;
+  background: linear-gradient(135deg, var(--accent-dim), transparent);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px; margin-bottom: 20px;
 }
 .gp-today-stats { flex: 1; }
-.gp-ts-n { font-size: 28px; font-weight: 800; color: var(--accent); font-family: var(--mono); line-height: 1; }
-.gp-ts-l { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.gp-ts-date { font-size: 10.5px; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
+.gp-ts-n { 
+  font-size: 32px; font-weight: 800; line-height: 1; 
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.gp-ts-l { font-size: 12px; font-weight: 600; color: var(--text2); margin-top: 4px; }
+.gp-ts-date { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: var(--mono); }
 
-/* section label */
 .gp-section-lbl {
-  font-size: 9px; font-weight: 700; letter-spacing: 1.3px;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
   text-transform: uppercase; color: var(--text4);
-  margin-bottom: 7px; padding: 0 2px;
+  margin-bottom: 12px; padding: 0 4px;
+  display: flex; align-items: center; gap: 8px;
 }
 
-/* goal item */
+/* Sleek Goal Item */
 .gp-item {
-  display: flex; align-items: flex-start; gap: 10px;
+  display: flex; align-items: flex-start; gap: 14px;
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 12px; padding: 11px 12px;
-  margin-bottom: 6px; transition: all var(--tr);
+  border-radius: 14px; padding: 16px;
+  margin-bottom: 10px; transition: all 0.2s ease;
   position: relative; overflow: hidden;
 }
-.gp-item:hover { border-color: var(--border2); background: var(--panel2); }
-.gp-item.gp-done { opacity: .75; }
-.gp-item.gp-completing { animation: gpCompleting .4s ease forwards; }
+.gp-item:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.gp-item.gp-done { opacity: .6; }
+.gp-item.gp-completing { animation: gpCompleting .5s ease forwards; }
 @keyframes gpCompleting {
   0%   { background: var(--panel); }
-  40%  { background: var(--green-bg); border-color: var(--green); }
-  100% { background: var(--panel); }
+  40%  { background: var(--green-bg); border-color: var(--green); transform: scale(1.02); }
+  100% { background: var(--panel); transform: scale(1); }
 }
 
-.gp-check-btn {
-  background: none; border: none; padding: 0; cursor: pointer;
-  flex-shrink: 0; margin-top: 1px;
-}
+.gp-check-btn { background: none; border: none; padding: 0; cursor: pointer; flex-shrink: 0; margin-top: 2px; }
 .gp-chk-circle {
-  width: 22px; height: 22px; border-radius: 50%;
+  width: 24px; height: 24px; border-radius: 50%;
   border: 2px solid var(--border3);
   display: flex; align-items: center; justify-content: center;
   transition: all .25s cubic-bezier(.34,1.56,.64,1);
-  background: none;
 }
-.gp-chk-circle.done {
-  background: var(--green); border-color: var(--green);
-  animation: checkPop .25s cubic-bezier(.34,1.56,.64,1);
-}
-.gp-check-btn:hover .gp-chk-circle:not(.done) {
-  border-color: var(--green); background: var(--green-bg);
-  transform: scale(1.08);
-}
+.gp-chk-circle.done { background: var(--green); border-color: var(--green); }
+.gp-check-btn:hover .gp-chk-circle:not(.done) { border-color: var(--green); background: var(--green-bg); }
 
 .gp-item-info { flex: 1; min-width: 0; }
 .gp-item-title {
-  font-size: 13.5px; font-weight: 600; color: var(--text);
+  font-size: 14px; font-weight: 600; color: var(--text);
   line-height: 1.4; position: relative; display: inline-block;
-  transition: color .3s ease;
 }
 .gp-item-title::after {
-  content: ''; position: absolute;
-  left: 0; top: 50%;
-  width: 0; height: 1.5px;
-  background: var(--text3);
-  transition: width .38s cubic-bezier(.4,0,.2,1);
-  margin-top: -0.75px;
+  content: ''; position: absolute; left: 0; top: 50%;
+  width: 0; height: 2px; background: var(--text3);
+  transition: width .4s cubic-bezier(.4,0,.2,1); margin-top: -1px;
 }
 .gp-item-title.done { color: var(--text3); }
 .gp-item-title.done::after { width: 100%; }
 
-.gp-item-desc { font-size: 11.5px; color: var(--text3); margin-top: 2px; line-height: 1.5; }
-.gp-item-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.gp-item-desc { font-size: 12px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+.gp-item-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .gp-meta-chip {
-  font-size: 10px; color: var(--text3); background: var(--panel3);
+  font-size: 10px; color: var(--text2); background: var(--panel2);
   border: 1px solid var(--border); border-radius: 20px;
-  padding: 1px 7px; white-space: nowrap;
+  padding: 3px 8px; white-space: nowrap; display: flex; align-items: center; gap: 4px;
 }
+.gp-meta-chip.streak { color: #f0a500; border-color: rgba(240,165,0,.3); background: rgba(240,165,0,.1); }
 
 .gp-item-edit {
   background: none; border: 1px solid transparent; color: var(--text4);
-  padding: 4px 6px; border-radius: 8px; cursor: pointer;
-  transition: all var(--tr); flex-shrink: 0;
+  padding: 4px; border-radius: 8px; cursor: pointer;
+  transition: all var(--tr); flex-shrink: 0; align-self: flex-start;
 }
-.gp-item-edit:hover { border-color: var(--border2); color: var(--accent); background: var(--panel2); }
+.gp-item-edit:hover { border-color: var(--border2); color: var(--accent); }
 
-/* empty state */
 .gp-empty {
   display: flex; flex-direction: column; align-items: center;
-  padding: 50px 20px; gap: 10px; text-align: center;
+  padding: 60px 20px; gap: 12px; text-align: center;
 }
-.gp-empty p { font-size: 13px; color: var(--text3); line-height: 1.75; }
+.gp-empty p { font-size: 14px; color: var(--text3); line-height: 1.75; }
 
-/* add fab */
 .gp-add-fab {
-  position: sticky; bottom: 14px;
-  width: 100%; background: var(--accent); color: #fff;
-  border: none; padding: 11px; border-radius: 12px;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: var(--font); transition: all var(--tr);
-  margin-top: 14px;
-  box-shadow: 0 4px 14px rgba(47,129,247,.15);
+  position: sticky; bottom: 0; width: 100%;
+  background: var(--accent); color: #fff; border: none;
+  padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: var(--font); transition: all var(--tr);
+  margin-top: 20px; box-shadow: 0 4px 14px rgba(47,129,247,.2);
 }
-.gp-add-fab:hover { background: var(--accent-h); transform: translateY(-1px); }
-.gp-add-fab:active { transform: none; }
+.gp-add-fab:hover { background: var(--accent-h); transform: translateY(-2px); }
 
-/* form */
-.gp-form { display: flex; flex-direction: column; gap: 0; }
-.gp-form-title {
-  font-size: 14px; font-weight: 700; color: var(--text);
-  margin-bottom: 16px; letter-spacing: -.3px;
-}
-
-/* manage item */
+/* Form & Manage styles */
+.gp-form { display: flex; flex-direction: column; gap: 16px; }
+.gp-form-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
 .gp-manage-item {
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 12px; padding: 12px 13px; margin-bottom: 7px;
+  border-radius: 14px; padding: 16px; margin-bottom: 10px;
 }
-.gmh-wrap { margin-top: 10px; }
-.gmh-grid {
-  display: grid; grid-template-columns: repeat(28, 1fr); gap: 2px;
-}
-.gmh-cell {
-  width: 100%; aspect-ratio: 1; border-radius: 2px;
-  background: var(--panel3); transition: background .15s;
-}
+.gmh-grid { display: grid; grid-template-columns: repeat(28, 1fr); gap: 3px; margin-top: 12px; }
+.gmh-cell { width: 100%; aspect-ratio: 1; border-radius: 3px; background: var(--panel3); transition: background .15s; }
 .gmh-cell.done { background: var(--accent); }
 
-/* backup section */
 .gp-backup-sec {
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 12px; padding: 13px 14px; margin-bottom: 8px;
+  border-radius: 14px; padding: 16px; margin-bottom: 10px;
 }
-.gp-backup-title {
-  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
-  text-transform: uppercase; color: var(--text4); margin-bottom: 6px;
-}
-.gp-backup-row { font-size: 12px; color: var(--text2); margin-bottom: 8px; line-height: 1.6; }
+.gp-backup-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text4); margin-bottom: 8px; }
+.gp-backup-row { font-size: 13px; color: var(--text2); margin-bottom: 12px; line-height: 1.6; }
 .gp-backup-btn {
-  width: 100%; background: none; border: 1px solid var(--border2);
-  color: var(--text2); padding: 8px; border-radius: 10px;
-  font-size: 12px; font-weight: 500; cursor: pointer;
-  font-family: var(--font); transition: all var(--tr); text-align: center;
+  width: 100%; background: var(--panel2); border: 1px solid var(--border2);
+  color: var(--text); padding: 10px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all var(--tr); display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .gp-backup-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim2); }
-
 /* reminder banner */
 #goalReminderBanner {
   display: none; position: fixed; bottom: 48px; left: 50%;
@@ -2085,7 +2072,6 @@ button, select, input[type="date"] {
   align-items: center;
   justify-content: center;
   transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), opacity 0.2s ease, background 0.2s;
-  position: fixed;
 }
 .fab-goal:hover { background: var(--accent-dim); transform: scale(1.06); }
 .fab-goal:active { transform: scale(0.94); }
@@ -2275,6 +2261,106 @@ button, select, input[type="date"] {
   transition:all var(--tr); font-family:var(--font); white-space:nowrap;
 }
 .notes-tb-btn:hover { background:var(--panel3); border-color:var(--border); color:var(--text2); }
+/* Full-Screen Routine Editor */
+#routineEditorModal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; 
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+#routineEditorModal.active { display: flex; }
+.routine-editor-container {
+  width: 100%; max-width: 900px; height: 90vh; max-height: 800px; 
+  background: var(--panel); color: var(--text);
+  border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+.routine-editor-header, .routine-editor-footer {
+  padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border); flex-shrink: 0; gap: 10px;
+}
+.routine-editor-footer { border-top: 1px solid var(--border); border-bottom: none; }
+.routine-editor-body { flex: 1; overflow-y: auto; padding: 20px; }
+.routine-meta-editor { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.routine-meta-editor input { 
+  padding: 8px; background: var(--panel2) !important; color: var(--text) !important; 
+  border: 1px solid var(--border2) !important; border-radius: 6px; outline: none; 
+}
+.routine-day-group { margin-bottom: 20px; border: 1px solid var(--border); border-radius: 8px; padding: 15px; background: var(--panel2); }
+.routine-day-title { font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; color: var(--accent); }
+.routine-slot { 
+  display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; 
+  background: var(--panel); padding: 8px; border-radius: 8px; border: 1px solid var(--border); 
+}
+.routine-slot input, .routine-slot select {
+  padding: 8px; background: var(--panel2); color: var(--text); border: 1px solid var(--border2); border-radius: 6px; outline: none; min-width: 80px;
+}
+.routine-slot input:focus, .routine-slot select:focus { border-color: var(--accent); }
+.routine-slot button { 
+  background: var(--red-bg); color: var(--red); border: none; border-radius: 6px; 
+  padding: 8px 12px; cursor: pointer; flex: 0 0 auto; font-weight: bold;
+  transition: background 0.2s;
+}
+.routine-slot button:hover { background: var(--red); color: #fff; }
+.add-slot-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Collapsible previous semesters */
+.prev-semester-group { border-left: 3px solid var(--border); padding-left: 15px; margin: 20px 0; }
+.prev-semester-group summary { cursor: pointer; font-weight: bold; opacity: 0.8; margin-bottom: 10px; }
+.prev-semester-group[open] summary { opacity: 1; }
+
+/* Mobile UI Fixes */
+@media (max-width: 768px) {
+  #routineEditorModal { padding: 0; }
+  .routine-editor-container { width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; }
+  .routine-slot input, .routine-slot select { flex: 1 1 100%; min-width: 100%; }
+  .routine-slot button { flex: 1 1 100%; padding: 12px; margin-top: 5px; }
+  .sch-card { flex-direction: column; align-items: stretch; }
+  .sch-time-col { flex-direction: row; width: 100%; min-width: 0; padding: 6px 10px; justify-content: center; gap: 5px; }
+  .sch-side { flex-direction: row; padding: 6px 10px; }
+  
+  /* Settings JSON area mobile fix */
+  #settingsRoutineJson { min-height: 200px; font-size: 11px; }
+  
+  /* Detail panel drag handle easier to reach */
+  .dp-handle { width: 50px; height: 5px; }
+}
+/* ═══════════════════════════════════════════════════════
+   FINAL SELECTION OVERWRITES (SOLID BLUE + WHITE TICK)
+═══════════════════════════════════════════════════════ */
+
+/* Kill any left borders on selected rows */
+.entry-row.selected,
+.entry-row.selected.pinned,
+#listCont .entry-row.selected,
+.entry-rows .entry-row.selected {
+  border-left: 1px solid var(--accent) !important;
+  background: rgba(47, 129, 247, 0.12) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(47, 129, 247, 0.4) !important;
+}
+
+/* Turn the icon into a solid blue circle */
+.entry-row.selected .er-icon,
+#listCont .entry-row.selected .er-icon {
+  background: var(--accent) !important;
+  color: transparent !important; /* Hide the 4-letter text */
+  border: none !important;
+  transform: scale(1.05) !important;
+}
+
+/* Simple, perfect text checkmark */
+.er-sel-check {
+  position: absolute;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes checkPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
 </style>
 </head>
 <body>
@@ -2446,7 +2532,7 @@ button, select, input[type="date"] {
   <!-- Sort -->
   <div class="sb-sec" style="padding:10px 12px">
     <div class="sb-lbl" style="margin-bottom:6px">Sort</div>
-    <select class="sort-sel" id="sortSel" onchange="applyFilters()">
+        <select class="sort-sel" id="sortSel" onchange="changeSort(this.value)">
       <option value="desc">Newest first</option>
       <option value="asc">Oldest first</option>
       <option value="subj">By subject</option>
@@ -2512,8 +2598,9 @@ button, select, input[type="date"] {
         Export JSON
       </button>
 
-      <!-- Load Routine -->
-      <button class="ws-row-btn" onclick="loadRoutineFile()">
+
+      <!-- Manage Routines -->
+      <button class="ws-row-btn" id="btnManageRoutines" onclick="openRoutineManager()">
         <span class="ws-row-ico">
           <svg id="Settings--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="13" width="13">
           <defs></defs>
@@ -2523,15 +2610,22 @@ button, select, input[type="date"] {
           <path id="_Transparent_Rectangle_" d="M0 0h16v16H0Z" fill="none" stroke-width="1.5"></path>
         </svg>
         </span>
-        Load Routine
+        Manage Routines
       </button>
 
-      <!-- New Semester -->
-      <button class="ws-row-btn" onclick="logoutSemester()">
+            <!-- Additional Settings -->
+      <button class="ws-row-btn" id="btnSettings" onclick="openSettings()">
         <span class="ws-row-ico">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M2 8h9M8 5l3 3-3 3"/><path d="M12 3v-.5A1.5 1.5 0 0013.5 1v0A1.5 1.5 0 0115 2.5v11a1.5 1.5 0 01-1.5 1.5v0A1.5 1.5 0 0112 13.5V13"/></svg>
+          <svg id="Pending--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="16" width="16">
+  <defs></defs>
+  <path d="M3.5 8a1 1 0 1 0 2 0 1 1 0 1 0 -2 0" fill="currentColor" stroke-width="0.5"></path>
+  <path d="M10.5 8a1 1 0 1 0 2 0 1 1 0 1 0 -2 0" fill="currentColor" stroke-width="0.5"></path>
+  <path d="M7 8a1 1 0 1 0 2 0 1 1 0 1 0 -2 0" fill="currentColor" stroke-width="0.5"></path>
+  <path d="M8 15a7 7 0 1 1 7 -7 7.0079 7.0079 0 0 1 -7 7Zm0 -13a6 6 0 1 0 6 6A6.00685 6.00685 0 0 0 8 2Z" fill="currentColor" stroke-width="0.5"></path>
+  <path id="_Transparent_Rectangle_" d="M0 0h16v16H0Z" fill="none" stroke-width="0.5"></path>
+</svg>
         </span>
-        New Semester
+        Additional Settings
       </button>
 
     </div>
@@ -3050,9 +3144,72 @@ button, select, input[type="date"] {
     <div class="gp-body" id="goalPanelBody"></div>
   </div>
 </div>
+<!-- ▀▄▀▄ SETTINGS MODAL ▀▄▀▄ -->
+<div id="settingsModal" class="overlay">
+  <div class="modal" style="max-width: 800px;">
+    <div class="m-head">
+      <h2>⚙️ Additional Settings</h2>
+      <button class="m-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="m-body" style="min-height: auto; max-height: 70vh; overflow-y: auto; padding: 20px;">
+      
+      <div class="fg" style="margin-bottom: 20px;">
+        <label class="flbl">App Features</label>
+        <div id="settingsToggles" style="display: flex; flex-direction: column; gap: 10px; background: var(--panel2); padding: 15px; border-radius: 10px; border: 1px solid var(--border);">
+          <!-- Toggles injected here -->
+        </div>
+      </div>
 
-<!-- ▀▄▀▄ GOAL REMINDER BANNER ▀▄▀▄ -->
-<div id="goalReminderBanner"></div>
+      <div class="fg" style="margin-bottom: 0;">
+        <label class="flbl">Active Routine JSON (Direct Edit)</label>
+        <p style="font-size: 11px; color: var(--text3); margin-bottom: 10px;">Paste or edit the raw routine JSON here. Changes will apply globally upon saving.</p>
+        <textarea id="settingsRoutineJson" style="width: 100%; min-height: 300px; font-family: var(--mono); font-size: 12px; background: var(--panel); color: var(--text); border: 1px solid var(--border2); border-radius: 8px; padding: 12px; resize: vertical;" placeholder="Loading routine..."></textarea>
+      </div>
+
+    </div>
+    <div class="m-foot">
+      <div style="font-size:11px; color:var(--text3);">⚠️ Invalid JSON will not be saved.</div>
+      <div class="m-foot-r">
+        <button class="btn-c" onclick="closeSettings()">Cancel</button>
+        <button class="btn-p" onclick="saveSettings()">Save & Apply Globally</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ▀▄▀▄ ROUTINE MANAGER MODAL ▀▄▀▄ -->
+<div id="routineManagerModal" class="overlay">
+  <div class="modal" style="max-width: 600px;">
+    <div class="m-head">
+      <h2>📚 Manage Routines</h2>
+      <button class="m-close" onclick="closeRoutineManager()">✕</button>
+    </div>
+    <div class="m-body" id="routineManagerBody" style="min-height: auto; max-height: 60vh; overflow-y: auto;">
+      <!-- Routines rendered here -->
+    </div>
+    <div class="m-foot">
+      <div style="font-size:11px; color:var(--text3);">Switch semesters instantly</div>
+      <div class="m-foot-r">
+        <button class="btn-c" onclick="loadRoutineFile()">Import JSON</button>
+        <button class="btn-p" onclick="openRoutineEditor(true)">+ New Semester</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▀▄▀▄ ROUTINE EDITOR MODAL ▀▄▀▄ -->
+<div id="routineEditorModal">
+  <div class="routine-editor-container">
+    <div class="routine-editor-header">
+      <h3 id="routineEditorTitle">Edit Routine</h3>
+      <button class="m-close" onclick="closeRoutineEditor()">×</button>
+    </div>
+    <div class="routine-editor-body"></div>
+    <div class="routine-editor-footer">
+      <button class="btn-c" onclick="closeRoutineEditor()">Cancel</button>
+      <button class="btn-p" onclick="saveRoutineFromEditor()">Save Routine</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <script>
@@ -3068,72 +3225,83 @@ function getSemesterFolder(filenameOrId) {
 }
 
 /* ─── DEFAULT ROUTINE ─── */
-const DEFAULT_ROUTINE = {
+// const DEFAULT_ROUTINE = {
+//   meta: {
+//     college: 'JIS College of Engineering',
+//     routineId: 'y1s2', routineName: 'Year 1 · Semester 2',
+//     academicYear: '2025-26', section: '1A', branch: 'CSE (AIML)',
+//     batches: ['G1', 'G2'],
+//   },
+//   subjects: [
+//     { id:'DSA',    label:'Data Structure and Algorithms',               color:'#4f8ef7', bg:'rgba(79,142,247,.14)' },
+//     { id:'AI',     label:'Introduction to Artificial Intelligence',     color:'#a78bfa', bg:'rgba(167,139,250,.14)' },
+//     { id:'DECO',   label:'Digital Electronics & CO',                   color:'#fb923c', bg:'rgba(251,146,60,.14)' },
+//     { id:'EC',     label:'Engineering Chemistry',                      color:'#2ecc71', bg:'rgba(46,204,113,.14)' },
+//     { id:'EM2',    label:'Engineering Mathematics II',                  color:'#2dd4bf', bg:'rgba(45,212,191,.14)' },
+//     { id:'DTI',    label:'Design Thinking & Innovation',                color:'#f472b6', bg:'rgba(244,114,182,.14)' },
+//     { id:'CIPE',   label:'Constitution & Professional Ethics',          color:'#ef4444', bg:'rgba(239,68,68,.14)' },
+//     { id:'IDEA',   label:'Idea Lab / Workshop',                        color:'#f0a500', bg:'rgba(240,165,0,.14)' },
+//     { id:'DSA_L',  label:'DSA Lab',                                    color:'#7ab0ff', bg:'rgba(122,176,255,.14)' },
+//     { id:'AI_L',   label:'AI Lab',                                     color:'#c4b5fd', bg:'rgba(196,181,253,.14)' },
+//     { id:'DECO_L', label:'DECO Lab',                                   color:'#fdba74', bg:'rgba(253,186,116,.14)' },
+//     { id:'EC_L',   label:'Engineering Chemistry Lab',                  color:'#86efac', bg:'rgba(134,239,172,.14)' },
+//     { id:'NPTEL',  label:'NPTEL / Online Course',                      color:'#ff9500', bg:'rgba(255,149,0,.14)' },
+//     { id:'OTHER',  label:'Other / General',                            color:'#8b92a8', bg:'rgba(139,146,168,.14)' },
+//   ],
+//   schedule: {
+//     '1': [
+//       { time:'10:00–11:45', subj:'DECO_L', room:'MB326',            batch:'G1',   note:'DECO Lab — ANG' },
+//       { time:'10:00–11:45', subj:'DSA_L',  room:'NPTEL Lab',        batch:'G2',   note:'DSA Lab — SG' },
+//       { time:'11:50–12:40', subj:'DECO',   room:'MB416',            batch:'both', note:'Digital Electronics & CO — ANG' },
+//       { time:'14:05–14:55', subj:'EC_L',   room:'Chem Lab (A001)',  batch:'G1',   note:'Engineering Chemistry Lab — TD' },
+//       { time:'14:05–14:55', subj:'AI_L',   room:'NPTEL Lab',        batch:'G2',   note:'AI Lab — NF1' },
+//     ],
+//     '2': [
+//       { time:'10:00–11:45', subj:'AI_L',   room:'NPTEL Lab',        batch:'G1',   note:'AI Lab — NF1' },
+//       { time:'10:00–11:45', subj:'EC_L',   room:'Chem Lab (A001)',  batch:'G2',   note:'Engineering Chemistry Lab — TD' },
+//       { time:'11:50–13:35', subj:'DECO_L', room:'MB326',            batch:'G2',   note:'DECO Lab — MD' },
+//       { time:'14:05–14:55', subj:'EM2',    room:'MB317',            batch:'both', note:'Engineering Mathematics II — SSS' },
+//     ],
+//     '3': [
+//       { time:'10:00–10:50', subj:'DTI',  room:'MB305',   batch:'both', note:'Design Thinking & Innovation — RS' },
+//       { time:'10:55–11:45', subj:'DECO', room:'MB305',   batch:'both', note:'Digital Electronics & CO — ANG' },
+//       { time:'11:50–12:40', subj:'EC',   room:'MB415',   batch:'G1',   note:'Engineering Chemistry — TD' },
+//       { time:'11:50–12:40', subj:'EM2',  room:'MB415',   batch:'G2',   note:'Engineering Mathematics II — SSS' },
+//       { time:'12:45–13:35', subj:'EM2',  room:'MB416',   batch:'G1',   note:'Engineering Mathematics II — SSS' },
+//       { time:'12:45–13:35', subj:'EC',   room:'MB416',   batch:'G2',   note:'Engineering Chemistry — TD' },
+//       { time:'14:05–14:55', subj:'DSA',  room:'MB305',   batch:'both', note:'Data Structure and Algorithms — SG' },
+//       { time:'15:55–16:45', subj:'IDEA', room:'Idea Lab', batch:'both', note:'Idea Lab / Workshop — RS' },
+//     ],
+//     '4': [
+//       { time:'10:55–11:45', subj:'DECO',  room:'MB306',          batch:'both', note:'Digital Electronics & CO — ANG' },
+//       { time:'11:50–12:40', subj:'EM2',   room:'MB306',          batch:'both', note:'Engineering Mathematics II — SSS' },
+//       { time:'12:45–13:35', subj:'OTHER', room:'Library',        batch:'both', note:'Library' },
+//       { time:'14:05–14:55', subj:'DSA',   room:'MB414',          batch:'G1',   note:'Data Structure and Algorithms — SG' },
+//       { time:'14:05–14:55', subj:'AI',    room:'MB415',          batch:'G2',   note:'Introduction to AI — NF1' },
+//       { time:'15:00–15:50', subj:'AI',    room:'MB414',          batch:'G1',   note:'Introduction to AI — NF1' },
+//       { time:'15:00–15:50', subj:'DSA',   room:'MB415',          batch:'G2',   note:'Data Structure and Algorithms — SG' },
+//     ],
+//     '5': [
+//       { time:'10:00–10:50', subj:'EC',    room:'MB420',          batch:'both', note:'Engineering Chemistry — TD' },
+//       { time:'10:55–11:45', subj:'DSA',   room:'MB420',          batch:'both', note:'Data Structure and Algorithms — SG' },
+//       { time:'11:50–12:40', subj:'CIPE',  room:'CMS Auditorium', batch:'both', note:'Constitution & Professional Ethics — PK' },
+//       { time:'12:45–13:35', subj:'AI',    room:'MB420',          batch:'both', note:'Introduction to AI — NF1' },
+//       { time:'14:05–14:55', subj:'OTHER', room:'',               batch:'both', note:'Mentorship' },
+//       { time:'15:55–16:45', subj:'DSA_L', room:'NPTEL Lab',      batch:'G1',   note:'DSA Lab — SG' },
+//       { time:'15:55–16:45', subj:'IDEA',  room:'Idea Lab',       batch:'G2',   note:'Idea Lab / Workshop — RS' },
+//     ],
+//   },
+// };
+/* ─── GENERIC FALLBACK ROUTINE ─── */
+const GENERIC_ROUTINE = {
   meta: {
-    college: 'JIS College of Engineering',
-    routineId: 'y1s2', routineName: 'Year 1 · Semester 2',
-    academicYear: '2025-26', section: '1A', branch: 'CSE (AIML)',
-    batches: ['G1', 'G2'],
+    college: 'New College', routineId: 'generic_sem', routineName: 'My Semester',
+    academicYear: '2025-26', section: '1A', branch: 'CSE', batches: ['G1', 'G2']
   },
   subjects: [
-    { id:'DSA',    label:'Data Structure and Algorithms',               color:'#4f8ef7', bg:'rgba(79,142,247,.14)' },
-    { id:'AI',     label:'Introduction to Artificial Intelligence',     color:'#a78bfa', bg:'rgba(167,139,250,.14)' },
-    { id:'DECO',   label:'Digital Electronics & CO',                   color:'#fb923c', bg:'rgba(251,146,60,.14)' },
-    { id:'EC',     label:'Engineering Chemistry',                      color:'#2ecc71', bg:'rgba(46,204,113,.14)' },
-    { id:'EM2',    label:'Engineering Mathematics II',                  color:'#2dd4bf', bg:'rgba(45,212,191,.14)' },
-    { id:'DTI',    label:'Design Thinking & Innovation',                color:'#f472b6', bg:'rgba(244,114,182,.14)' },
-    { id:'CIPE',   label:'Constitution & Professional Ethics',          color:'#ef4444', bg:'rgba(239,68,68,.14)' },
-    { id:'IDEA',   label:'Idea Lab / Workshop',                        color:'#f0a500', bg:'rgba(240,165,0,.14)' },
-    { id:'DSA_L',  label:'DSA Lab',                                    color:'#7ab0ff', bg:'rgba(122,176,255,.14)' },
-    { id:'AI_L',   label:'AI Lab',                                     color:'#c4b5fd', bg:'rgba(196,181,253,.14)' },
-    { id:'DECO_L', label:'DECO Lab',                                   color:'#fdba74', bg:'rgba(253,186,116,.14)' },
-    { id:'EC_L',   label:'Engineering Chemistry Lab',                  color:'#86efac', bg:'rgba(134,239,172,.14)' },
-    { id:'NPTEL',  label:'NPTEL / Online Course',                      color:'#ff9500', bg:'rgba(255,149,0,.14)' },
-    { id:'OTHER',  label:'Other / General',                            color:'#8b92a8', bg:'rgba(139,146,168,.14)' },
+    { id:'OTHER', label:'Other / General', color:'#8b92a8', bg:'rgba(139,146,168,.14)' }
   ],
-  schedule: {
-    '1': [
-      { time:'10:00–11:45', subj:'DECO_L', room:'MB326',            batch:'G1',   note:'DECO Lab — ANG' },
-      { time:'10:00–11:45', subj:'DSA_L',  room:'NPTEL Lab',        batch:'G2',   note:'DSA Lab — SG' },
-      { time:'11:50–12:40', subj:'DECO',   room:'MB416',            batch:'both', note:'Digital Electronics & CO — ANG' },
-      { time:'14:05–14:55', subj:'EC_L',   room:'Chem Lab (A001)',  batch:'G1',   note:'Engineering Chemistry Lab — TD' },
-      { time:'14:05–14:55', subj:'AI_L',   room:'NPTEL Lab',        batch:'G2',   note:'AI Lab — NF1' },
-    ],
-    '2': [
-      { time:'10:00–11:45', subj:'AI_L',   room:'NPTEL Lab',        batch:'G1',   note:'AI Lab — NF1' },
-      { time:'10:00–11:45', subj:'EC_L',   room:'Chem Lab (A001)',  batch:'G2',   note:'Engineering Chemistry Lab — TD' },
-      { time:'11:50–13:35', subj:'DECO_L', room:'MB326',            batch:'G2',   note:'DECO Lab — MD' },
-      { time:'14:05–14:55', subj:'EM2',    room:'MB317',            batch:'both', note:'Engineering Mathematics II — SSS' },
-    ],
-    '3': [
-      { time:'10:00–10:50', subj:'DTI',  room:'MB305',   batch:'both', note:'Design Thinking & Innovation — RS' },
-      { time:'10:55–11:45', subj:'DECO', room:'MB305',   batch:'both', note:'Digital Electronics & CO — ANG' },
-      { time:'11:50–12:40', subj:'EC',   room:'MB415',   batch:'G1',   note:'Engineering Chemistry — TD' },
-      { time:'11:50–12:40', subj:'EM2',  room:'MB415',   batch:'G2',   note:'Engineering Mathematics II — SSS' },
-      { time:'12:45–13:35', subj:'EM2',  room:'MB416',   batch:'G1',   note:'Engineering Mathematics II — SSS' },
-      { time:'12:45–13:35', subj:'EC',   room:'MB416',   batch:'G2',   note:'Engineering Chemistry — TD' },
-      { time:'14:05–14:55', subj:'DSA',  room:'MB305',   batch:'both', note:'Data Structure and Algorithms — SG' },
-      { time:'15:55–16:45', subj:'IDEA', room:'Idea Lab', batch:'both', note:'Idea Lab / Workshop — RS' },
-    ],
-    '4': [
-      { time:'10:55–11:45', subj:'DECO',  room:'MB306',          batch:'both', note:'Digital Electronics & CO — ANG' },
-      { time:'11:50–12:40', subj:'EM2',   room:'MB306',          batch:'both', note:'Engineering Mathematics II — SSS' },
-      { time:'12:45–13:35', subj:'OTHER', room:'Library',        batch:'both', note:'Library' },
-      { time:'14:05–14:55', subj:'DSA',   room:'MB414',          batch:'G1',   note:'Data Structure and Algorithms — SG' },
-      { time:'14:05–14:55', subj:'AI',    room:'MB415',          batch:'G2',   note:'Introduction to AI — NF1' },
-      { time:'15:00–15:50', subj:'AI',    room:'MB414',          batch:'G1',   note:'Introduction to AI — NF1' },
-      { time:'15:00–15:50', subj:'DSA',   room:'MB415',          batch:'G2',   note:'Data Structure and Algorithms — SG' },
-    ],
-    '5': [
-      { time:'10:00–10:50', subj:'EC',    room:'MB420',          batch:'both', note:'Engineering Chemistry — TD' },
-      { time:'10:55–11:45', subj:'DSA',   room:'MB420',          batch:'both', note:'Data Structure and Algorithms — SG' },
-      { time:'11:50–12:40', subj:'CIPE',  room:'CMS Auditorium', batch:'both', note:'Constitution & Professional Ethics — PK' },
-      { time:'12:45–13:35', subj:'AI',    room:'MB420',          batch:'both', note:'Introduction to AI — NF1' },
-      { time:'14:05–14:55', subj:'OTHER', room:'',               batch:'both', note:'Mentorship' },
-      { time:'15:55–16:45', subj:'DSA_L', room:'NPTEL Lab',      batch:'G1',   note:'DSA Lab — SG' },
-      { time:'15:55–16:45', subj:'IDEA',  room:'Idea Lab',       batch:'G2',   note:'Idea Lab / Workshop — RS' },
-    ],
-  },
+  schedule: { '1': [], '2': [], '3': [], '4': [], '5': [] }
 };
   
 /* ═══════════════════════════════════
@@ -3252,7 +3420,7 @@ async function findOrCreateGist() {
     public: false,
     files: {
       [GIST_FILENAME]: { content: JSON.stringify({ version: 7, entries: [], saved: new Date().toISOString() }) },
-      [ROUTINE_FILENAME]: { content: JSON.stringify(DEFAULT_ROUTINE) },
+      [ROUTINE_FILENAME]: { content: JSON.stringify(activeRoutine || GENERIC_ROUTINE) },
     },
   });
   if (created && created.id) {
@@ -3263,26 +3431,29 @@ async function findOrCreateGist() {
   return null;
 }
 
-async function saveToGist(data, routineData) {
+async function saveToGist(data, syncRoutines = false) {
   if (!ghToken || ghSyncing) return false;
   ghSyncing = true;
   try {
     if (!gistId) await findOrCreateGist();
     if (!gistId) throw new Error('No gist ID');
-    const payload = { ...data, deletedIds };
+        const payload = { ...data, deletedIds, activeRoutineId: currentRoutineId };
     const files = { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } };
-    if (routineData) files[ROUTINE_FILENAME] = { content: JSON.stringify(routineData, null, 2) };
-const res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
+    
+    // If syncRoutines is true, sync the whole routines object
+    if (syncRoutines) {
+      files[ROUTINE_FILENAME] = { content: JSON.stringify(routines, null, 2) };
+    }
+    
+    const res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
     if (!res) {
       if (res && res.status === 401) throw new Error('GitHub token invalid');
       throw new Error('GitHub API error');
     }
-    // Remember our own save timestamp so we don't re-download our own changes
     if (res.updated_at) lastGistUpdatedAt = res.updated_at;
     return true;
   } catch (err) {
     console.error('GitHub sync failed:', err);
-    // If token invalid, disconnect automatically
     if (err.message.includes('token') || err.message.includes('401')) {
       disconnectGitHub();
       toast('GitHub token expired – please reconnect', 'err');
@@ -3300,25 +3471,62 @@ async function loadFromGist() {
     if (!gistId) return null;
     const gist = await ghFetch('GET', `/gists/${gistId}`);
     if (!gist || !gist.files) return null;
-    // Load entries data
+    
     let data = null;
     if (gist.files[GIST_FILENAME]?.raw_url) {
-    const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-    if (res.ok) data = await res.json();
+      const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
+      if (res.ok) data = await res.json();
     }
-    // Load routine if present
+    
+    // Load ALL routines if present
     if (gist.files[ROUTINE_FILENAME]?.raw_url) {
       try {
         const res = await fetch(gist.files[ROUTINE_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
         if (res.ok) {
-          const r = await res.json();
-          if (r.meta && r.subjects && r.schedule) {
-            applyRoutine(r, true);
-            localStorage.setItem('slp_routine', JSON.stringify(r));
+          const cloudRoutines = await res.json();
+          if (cloudRoutines && typeof cloudRoutines === 'object') {
+            // 1. MERGE: Save cloud routines into local storage and state
+            let localRoutines = JSON.parse(localStorage.getItem('studylog_routines') || '{}');
+            Object.assign(localRoutines, cloudRoutines);
+            localStorage.setItem('studylog_routines', JSON.stringify(localRoutines));
+            routines = localRoutines;
+            cleanUpRoutines(); // <--- ADD THIS LINE to deduplicate merged routines
           }
         }
-      } catch (e) {}
+      } catch (e) { console.error('Error loading routines from gist', e); }
     }
+    
+    // SYNC ACTIVE ROUTINE
+    let routineChanged = false;
+    if (data && data.activeRoutineId && routines[data.activeRoutineId]) {
+      if (currentRoutineId !== data.activeRoutineId) {
+        currentRoutineId = data.activeRoutineId;
+        activeRoutine = routines[currentRoutineId];
+        localStorage.setItem('studylog_current_routine', currentRoutineId);
+        applyRoutine(activeRoutine, true);
+        routineChanged = true;
+        toast('Switched to ' + activeRoutine.meta.routineName, 'info');
+      }
+    } else if (currentRoutineId === 'generic_sem' || !routines[currentRoutineId]) {
+      // Fallback: If no active ID in cloud, but we have real routines locally, switch to the first one
+      const realRoutineIds = Object.keys(routines).filter(id => id !== 'generic_sem');
+      if (realRoutineIds.length > 0) {
+        currentRoutineId = realRoutineIds[0];
+        activeRoutine = routines[currentRoutineId];
+        localStorage.setItem('studylog_current_routine', currentRoutineId);
+        applyRoutine(activeRoutine, true);
+        routineChanged = true;
+      }
+    } else if (currentRoutineId && routines[currentRoutineId] && !activeRoutine) {
+      // Safety fallback: If activeRoutine is null but we have a valid ID, load it
+      activeRoutine = routines[currentRoutineId];
+      applyRoutine(activeRoutine, true);
+    }
+    
+    if (routineChanged) {
+      render(); buildSubjList(); updateSideTagCloud();
+    }
+    
     return data;
   } catch (e) { return null; }
 }
@@ -3332,27 +3540,35 @@ async function pollForChanges() {
   if (!ghToken || isPolling || !gistId) return;
   isPolling = true;
   try {
-    // Step 1: lightweight metadata check — one API call, no file download
+    // Step 1: lightweight metadata check
     const gist = await ghFetch('GET', `/gists/${gistId}`);
     if (!gist) return;
 
-    // If timestamp unchanged since our last known state, nothing to do
     if (gist.updated_at === lastGistUpdatedAt) return;
 
-    // Step 2: something changed — fetch only the raw file content
+    // Step 2: fetch only the raw file content
     const rawUrl = gist.files[GIST_FILENAME]?.raw_url;
     if (!rawUrl) return;
     const res = await fetch(rawUrl + '?t=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) return;
     const gistData = await res.json();
 
-    // Mark as seen AFTER successful fetch
     lastGistUpdatedAt = gist.updated_at;
 
     if (!gistData || !gistData.entries) return;
 
-    // Merge cloud changes into local state
+    // Merge tombstones first
     if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+    
+    // SYNC ACTIVE ROUTINE in background polling
+    if (gistData.activeRoutineId && routines[gistData.activeRoutineId] && currentRoutineId !== gistData.activeRoutineId) {
+      currentRoutineId = gistData.activeRoutineId;
+      activeRoutine = routines[currentRoutineId];
+      localStorage.setItem('studylog_current_routine', currentRoutineId);
+      applyRoutine(activeRoutine, true);
+      toast('Switched to ' + activeRoutine.meta.routineName, 'info');
+    }
+
     const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
     const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
     const merged = {};
@@ -3366,13 +3582,27 @@ async function pollForChanges() {
         merged[id] = newer;
       } else {
         merged[id] = l || c;
-        if (c && !l) changed = true;
+        if (c && !l) changed = true; // New entry from cloud
+      }
+    }
+
+    // CRITICAL FIX: Apply tombstones BEFORE checking if changed
+    const newEntries = applyTombstones(Object.values(merged));
+    
+    // Check if deletion occurred (length mismatch or ID mismatch)
+    if (!changed && newEntries.length !== entries.length) {
+      changed = true;
+    }
+    if (!changed) {
+      const oldIds = new Set(entries.map(e=>e.id));
+      for (const e of newEntries) {
+        if (!oldIds.has(e.id)) { changed = true; break; }
       }
     }
 
     if (!changed) return;
 
-    entries = applyTombstones(Object.values(merged));
+    entries = newEntries;
     lsSave({ version: 7, entries });
     render();
     buildSubjList();
@@ -3382,6 +3612,77 @@ async function pollForChanges() {
     console.debug('Background sync error', e);
   } finally {
     isPolling = false;
+  }
+}
+
+async function syncNow() {
+  if (!ghToken) {
+    toast('Connect GitHub first', 'err');
+    openGHConnectModal();
+    return;
+  }
+
+  setSyncStatus('syncing', 'Syncing...');
+
+  // 1. PULL first
+  const gistData = await loadFromGist();
+  if (gistData && gistData.entries) {
+    if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+
+    const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
+    const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
+    const merged = {};
+
+    for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
+      const l = localMap[id];
+      const c = cloudMap[id];
+      if (l && c) {
+        merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
+      } else {
+        merged[id] = l || c;
+      }
+    }
+
+    const afterTombstone = applyTombstones(Object.values(merged));
+    const survivingIds = new Set(afterTombstone.map(e => e.id));
+    // Only rescue entries that are NOT in deletedIds
+    const rescued = entries.filter(e => !survivingIds.has(e.id) && !deletedIds[e.id]);
+    const next = [...afterTombstone, ...rescued];
+    entries = next;
+  }
+
+  // 2. GLOBAL MIGRATION: Fix orphaned entries before pushing to cloud
+  if (currentRoutineId && currentRoutineId !== 'generic_sem' && routines[currentRoutineId]) {
+    let migrated = 0;
+    entries.forEach(e => {
+      if (!e.semesterId || e.semesterId === 'generic_sem' || !routines[e.semesterId]) {
+        if (e.semesterId !== currentRoutineId) {
+          e.semesterId = currentRoutineId;
+          e.updatedAt = Date.now();
+          migrated++;
+        }
+      }
+    });
+    if (migrated > 0) {
+      toast(`Migrated ${migrated} entries to active routine.`, 'info');
+    }
+  }
+
+  lsSave({ version: 7, entries });
+
+  // 3. PUSH the merged & migrated result
+  const pushOk = await saveData();
+
+  render();
+  buildSubjList();
+  updateSideTagCloud();
+
+  if (pushOk) {
+    toast('Synced successfully!', 'ok');
+    setSyncStatus('ok', 'Synced ');
+  } else {
+    toast('Pull done, push failed — check token', 'err');
+    setSyncStatus('ok', 'Partial sync');
   }
 }
 
@@ -3489,10 +3790,15 @@ function disconnectGitHub() {
 /* ═══════════════════════════════════
    LOCAL STORAGE FALLBACK
 ═══════════════════════════════════ */
-function lsSave(d) { try { localStorage.setItem('studylog_v7', JSON.stringify(d)); } catch (e) {} saveDeletedIds(); }
-
+function lsSave(d) { 
+  try { 
+    const data = d || { version: 7, entries, settings: appSettings, saved: new Date().toISOString() };
+    localStorage.setItem('studylog_v7', JSON.stringify(data)); 
+  } catch (e) {} 
+  saveDeletedIds(); 
+}
 async function saveData() {
-  const data = { version: 7, entries, saved: new Date().toISOString() };
+  const data = { version: 7, entries, settings: appSettings, saved: new Date().toISOString() };
   lsSave(data);
   if (ghToken) {
     setSyncStatus('syncing', 'Saving…');
@@ -3513,7 +3819,7 @@ async function syncNow() {
 
   setSyncStatus('syncing', 'Syncing...');
 
-  // 1. PULL first — so we never overwrite cloud-only entries
+  // 1. PULL first
   const gistData = await loadFromGist();
   if (gistData && gistData.entries) {
     if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
@@ -3532,15 +3838,33 @@ async function syncNow() {
       }
     }
 
-const afterTombstone = applyTombstones(Object.values(merged));
+    const afterTombstone = applyTombstones(Object.values(merged));
     const survivingIds = new Set(afterTombstone.map(e => e.id));
     const rescued = entries.filter(e => !survivingIds.has(e.id) && !deletedIds[e.id]);
     const next = [...afterTombstone, ...rescued];
     entries = next;
-    lsSave({ version: 7, entries });
   }
 
-  // 2. PUSH the merged result — now cloud gets everything
+  // 2. GLOBAL MIGRATION: Fix orphaned entries before pushing to cloud
+  if (currentRoutineId && currentRoutineId !== 'generic_sem' && routines[currentRoutineId]) {
+    let migrated = 0;
+    entries.forEach(e => {
+      if (!e.semesterId || e.semesterId === 'generic_sem' || !routines[e.semesterId]) {
+        if (e.semesterId !== currentRoutineId) {
+          e.semesterId = currentRoutineId;
+          e.updatedAt = Date.now();
+          migrated++;
+        }
+      }
+    });
+    if (migrated > 0) {
+      toast(`Migrated ${migrated} entries to active routine.`, 'info');
+    }
+  }
+
+  lsSave({ version: 7, entries });
+
+  // 3. PUSH the merged & migrated result
   const pushOk = await saveData();
 
   render();
@@ -3548,7 +3872,7 @@ const afterTombstone = applyTombstones(Object.values(merged));
   updateSideTagCloud();
 
   if (pushOk) {
-    toast('Synced ', 'ok');
+    toast('Synced successfully!', 'ok');
     setSyncStatus('ok', 'Synced ');
   } else {
     toast('Pull done, push failed — check token', 'err');
@@ -3559,13 +3883,25 @@ const afterTombstone = applyTombstones(Object.values(merged));
 async function loadData() {
   let data = null;
   try { data = JSON.parse(localStorage.getItem('studylog_v7') || localStorage.getItem('studylog_v6') || localStorage.getItem('studylog_v5') || 'null'); } catch (e) {}
-  // Apply local tombstones immediately so deleted entries don't flash on screen
+  
+  // Restore settings
+  if (data?.settings) {
+    appSettings = data.settings;
+    localStorage.setItem('slp_settings', JSON.stringify(appSettings));
+  }
+  
+  // Apply local tombstones immediately
   if (data && data.entries) data.entries = applyTombstones(data.entries);
   if (ghToken) {
     const gistData = await loadFromGist();
     if (gistData && gistData.entries) {
-      // Merge tombstones first – union of local + cloud deleted IDs
       if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
+      
+      if (gistData.settings && !data?.settings) {
+        appSettings = gistData.settings;
+        localStorage.setItem('slp_settings', JSON.stringify(appSettings));
+      }
+      
       const localMap = Object.fromEntries((data?.entries || []).map(e => [e.id, e]));
       const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
       const merged = {};
@@ -3574,8 +3910,26 @@ async function loadData() {
         if (l && c) merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
         else merged[id] = l || c;
       }
-      // Apply combined tombstones – any entry deleted on any device is removed everywhere
-      data = { version: 7, entries: applyTombstones(Object.values(merged)) };
+      data = { version: 7, entries: applyTombstones(Object.values(merged)), settings: appSettings };
+      
+      // GLOBAL MIGRATION: Move orphaned entries to the active routine
+      if (currentRoutineId && routines[currentRoutineId]) {
+        let migrated = 0;
+        data.entries.forEach(e => {
+          // Only migrate if the semesterId is completely unknown/orphaned
+          if (!e.semesterId || !routines[e.semesterId]) {
+            if (e.semesterId !== currentRoutineId) {
+              e.semesterId = currentRoutineId;
+              e.updatedAt = Date.now();
+              migrated++;
+            }
+          }
+        });
+        if (migrated > 0) {
+          toast(`Migrated ${migrated} orphaned entries.`, 'info');
+        }
+      }
+      
       lsSave(data);
     }
   }
@@ -3591,7 +3945,7 @@ async function loadFile(f) {
 /* ═══════════════════════════════════
    ROUTINE MANAGEMENT
 ═══════════════════════════════════ */
-let ROUTINE = DEFAULT_ROUTINE, SUBJECTS = [], SCHEDULE = {}, META = {};
+let ROUTINE = GENERIC_ROUTINE, SUBJECTS = GENERIC_ROUTINE.subjects, SCHEDULE = GENERIC_ROUTINE.schedule, META = GENERIC_ROUTINE.meta;
 let semesterFolder = localStorage.getItem('slp_semester_folder') || '2_Semester';
 
 function computeAcademicYear(routineId) {
@@ -3604,13 +3958,445 @@ function computeAcademicYear(routineId) {
   const acadEnd   = (acadStart + 1).toString().slice(-2);
   return `${acadStart}-${acadEnd}`;
 }
+// STATE: Store multiple routines
+let routines = JSON.parse(localStorage.getItem('studylog_routines') || '{}');
+let currentRoutineId = localStorage.getItem('studylog_current_routine') || Object.keys(routines)[0] || null;
+let activeRoutine = routines[currentRoutineId] || null;
+
+cleanUpRoutines(); // <--- ADD THIS LINE to clean up local duplicates on startup
+// --- SETTINGS LOGIC ---
+let appSettings = JSON.parse(localStorage.getItem('slp_settings') || '{}');
+if (Object.keys(appSettings).length === 0) {
+  appSettings = { haptics: true, autoSync: true, goalNotifs: true, calendarWeekends: true };
+}
+
+function openSettings() {
+  // Render Toggles
+  const togglesWrap = document.getElementById('settingsToggles');
+  togglesWrap.innerHTML = `
+    <div class="setting-row">
+      <span>📳 Haptic Feedback (Mobile)</span>
+      <div class="toggle-sw ${appSettings.haptics ? 'on' : ''}" onclick="toggleSetting('haptics', this)"></div>
+    </div>
+    <div class="setting-row">
+      <span>🔄 Auto-Sync (Background)</span>
+      <div class="toggle-sw ${appSettings.autoSync ? 'on' : ''}" onclick="toggleSetting('autoSync', this)"></div>
+    </div>
+    <div class="setting-row">
+      <span>🎯 Goal Notifications</span>
+      <div class="toggle-sw ${appSettings.goalNotifs ? 'on' : ''}" onclick="toggleSetting('goalNotifs', this)"></div>
+    </div>
+    <div class="setting-row">
+      <span>📅 Show Weekends (Calendar)</span>
+      <div class="toggle-sw ${appSettings.calendarWeekends ? 'on' : ''}" onclick="toggleSetting('calendarWeekends', this)"></div>
+    </div>
+  `;
+  
+  // Load Routine JSON
+  const jsonArea = document.getElementById('settingsRoutineJson');
+  jsonArea.value = JSON.stringify(activeRoutine, null, 2);
+  jsonArea.style.borderColor = 'var(--border2)'; // Reset border
+  
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+function toggleSetting(key, el) {
+  appSettings[key] = !appSettings[key];
+  el.classList.toggle('on');
+  localStorage.setItem('slp_settings', JSON.stringify(appSettings));
+  
+  // Apply immediate effects
+  if (key === 'autoSync') {
+    if (appSettings.autoSync) startBackgroundSync();
+    else stopBackgroundSync();
+  }
+  if (key === 'goalNotifs' && appSettings.goalNotifs) {
+    requestNotifPermission();
+  }
+  if (key === 'calendarWeekends' && currentView === 'calendar') {
+    renderCal();
+  }
+}
+
+function saveSettings() {
+  // 1. Save Toggles (already saved on click, but ensure persistence)
+  localStorage.setItem('slp_settings', JSON.stringify(appSettings));
+  
+  // 2. Parse and Save Routine JSON
+  const jsonArea = document.getElementById('settingsRoutineJson');
+  try {
+    const newRoutine = JSON.parse(jsonArea.value);
+    if (!newRoutine.meta || !newRoutine.subjects || !newRoutine.schedule) throw new Error('Invalid routine format');
+    
+    // Ensure routineId matches current context
+    newRoutine.meta.routineId = currentRoutineId;
+    
+    routines[currentRoutineId] = newRoutine;
+    activeRoutine = newRoutine;
+    localStorage.setItem('studylog_routines', JSON.stringify(routines));
+    localStorage.setItem('slp_routine', JSON.stringify(newRoutine));
+    
+    applyRoutine(newRoutine, true);
+    
+    // Sync everything
+    saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
+    
+    closeSettings();
+    render();
+    buildSubjList();
+    toast('Settings & Routine applied globally!', 'ok');
+  } catch (err) {
+    jsonArea.style.borderColor = 'var(--red)';
+    toast('Invalid JSON: ' + err.message, 'err');
+  }
+}
+// --- ROUTINE CLEANUP & DEDUPLICATION ---
+function cleanUpRoutines() {
+  if (!routines || typeof routines !== 'object') routines = {};
+  const cleaned = {};
+  let needsSave = false;
+  
+  for (const key in routines) {
+    const r = routines[key];
+    if (!r || !r.meta) continue;
+    
+    // The true ID must be the one inside meta.routineId
+    const trueId = r.meta.routineId || key;
+    
+    // If we already have an entry for this trueId, keep the newer one (merge sync)
+    if (!cleaned[trueId] || (r.meta.updatedAt || 0) > (cleaned[trueId].meta.updatedAt || 0)) {
+      r.meta.routineId = trueId; // Force internal ID to match
+      cleaned[trueId] = r;
+    }
+    
+    // If the storage key was different from the trueId, we need to save the cleaned version
+    if (key !== trueId) needsSave = true;
+  }
+  
+  // If we removed duplicates or fixed keys, update local storage
+  if (Object.keys(cleaned).length !== Object.keys(routines).length || needsSave) {
+    routines = cleaned;
+    localStorage.setItem('studylog_routines', JSON.stringify(routines));
+    
+    // Ensure currentRoutineId still exists in the cleaned list
+    if (!routines[currentRoutineId]) {
+      const realIds = Object.keys(routines).filter(id => id !== 'generic_sem');
+      if (realIds.length > 0) {
+        currentRoutineId = realIds[0];
+        activeRoutine = routines[currentRoutineId];
+        localStorage.setItem('studylog_current_routine', currentRoutineId);
+      } else {
+        currentRoutineId = 'generic_sem';
+        activeRoutine = GENERIC_ROUTINE;
+      }
+    }
+  } else {
+    routines = cleaned;
+  }
+}
+// --- ROUTINE MANAGER LOGIC ---
+function openRoutineManager() {
+  if (!routines) routines = {}; // Ensure routines object exists
+  renderRoutineManagerList();
+  document.getElementById('routineManagerModal').classList.add('open');
+}
+function closeRoutineManager() {
+  document.getElementById('routineManagerModal').classList.remove('open');
+}
+
+function renderRoutineManagerList() {
+  const body = document.getElementById('routineManagerBody');
+  if (!body) return;
+  
+  let html = `
+    <div style="display:flex;gap:8px;margin-bottom:15px;">
+      <button class="btn-p" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;" onclick="uploadRoutinesToCloud()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M3 10v4h10v-4M8 12V4M5 7l3-3 3 3"/></svg>
+        Upload to Cloud
+      </button>
+      <button class="btn-c" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;" onclick="syncMergeRoutines()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M13.5 8A5.5 5.5 0 118 2.5"/><polyline points="12,1 14,3.5 11.5,5"/></svg>
+        Sync & Merge
+      </button>
+    </div>
+  `;
+  
+  const routineIds = Object.keys(routines);
+  if (routineIds.length === 0) {
+    html += '<p style="text-align:center;color:var(--text3);padding:20px;">No routines saved yet.<br>Click "+ New Semester" or "Import JSON" to start.</p>';
+    body.innerHTML = html;
+    return;
+  }
+  
+  html += routineIds.map(id => {
+    const r = routines[id];
+    if (!r || !r.meta) return '';
+    const isActive = id === currentRoutineId;
+    return `
+      <div style="background:var(--panel2);border:1px solid ${isActive ? 'var(--accent)' : 'var(--border)'};border-radius:10px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div style="flex:1;">
+          <div style="font-weight:bold;color:var(--text);">${esc(r.meta.routineName)}</div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px;">
+            ${esc(r.meta.branch)} · ${esc(r.meta.section)} · ${esc(r.meta.academicYear)}
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">
+          ${isActive ? '<span style="color:var(--accent);font-weight:bold;font-size:12px;padding:8px 12px;background:var(--accent-dim);border-radius:20px;">Active</span>' : `<button class="btn-p" style="padding:6px 12px;font-size:12px;" onclick="activateRoutine('${id}')">Switch</button>`}
+          <button class="btn-c" style="padding:6px 12px;font-size:12px;" onclick="openRoutineEditor(false, '${id}')">Edit</button>
+          ${!isActive ? `<button class="btn-c" style="padding:6px 12px;font-size:12px;color:var(--red);border-color:var(--red);" onclick="deleteRoutine('${id}')">Del</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  body.innerHTML = html;
+}
+
+// The Upload function
+async function uploadRoutinesToCloud() {
+  if (!ghToken) {
+    toast('Connect GitHub first to upload.', 'err');
+    closeRoutineManager();
+    openGHConnectModal();
+    return;
+  }
+  toast('Uploading current routines to cloud...', 'info');
+  cleanUpRoutines(); // <--- ADD THIS LINE to ensure no duplicates are uploaded
+  await saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
+  toast('Routines uploaded successfully!', 'ok');
+}
+
+// The updated Sync & Merge function
+async function syncMergeRoutines() {
+  if (!ghToken) {
+    toast('Connect GitHub first to sync.', 'err');
+    closeRoutineManager();
+    openGHConnectModal();
+    return;
+  }
+  toast('Syncing routines from GitHub...', 'info');
+  await loadFromGist(); // Pulls and auto-migrates
+  
+  // Re-apply current routine to refresh UI
+  if (currentRoutineId && routines[currentRoutineId]) {
+    applyRoutine(routines[currentRoutineId], true);
+  }
+  
+  render(); buildSubjList(); updateSideTagCloud();
+  renderRoutineManagerList();
+  toast('Routines synced successfully!', 'ok');
+}
+
+function activateRoutine(id) {
+  if (!routines[id]) return;
+  
+  // MIGRATE ENTRIES: If switching from the generic fallback to a real routine, 
+  // move any unassigned/generic entries to the new routine so they don't get hidden.
+  if (currentRoutineId === 'generic_sem' && id !== 'generic_sem') {
+    let migrated = 0;
+    entries.forEach(e => {
+      if (!e.semesterId || e.semesterId === 'generic_sem') {
+        e.semesterId = id;
+        e.updatedAt = Date.now();
+        migrated++;
+      }
+    });
+    if (migrated > 0) {
+      toast(`${migrated} entries moved to new routine.`, 'info');
+      saveData(); // Save the migrated entries to local and cloud
+    }
+  }
+
+  currentRoutineId = id;
+  activeRoutine = routines[id];
+  localStorage.setItem('studylog_current_routine', currentRoutineId);
+  
+  applyRoutine(activeRoutine, true);
+  render();
+  buildSubjList();
+  updateSideTagCloud();
+  updateStats();
+  closeRoutineManager();
+  toast('Switched to ' + activeRoutine.meta.routineName, 'ok');
+}
+
+function deleteRoutine(id) {
+  if (id === currentRoutineId) {
+    toast('Cannot delete active routine. Switch to another first.', 'err');
+    return;
+  }
+  if (!confirm('Delete this routine? Entries associated with it will be kept but hidden until the routine is re-imported.')) return;
+  delete routines[id];
+  localStorage.setItem('studylog_routines', JSON.stringify(routines));
+  cleanUpRoutines();
+  saveToGist({ version: 7, entries, saved: new Date().toISOString() }, true);
+  renderRoutineManagerList();
+  toast('Routine deleted', 'info');
+}
+
+// --- ROUTINE EDITOR LOGIC ---
+function openRoutineEditor(isNew = false, editId = null) {
+  const modal = document.getElementById('routineEditorModal');
+  const body = modal.querySelector('.routine-editor-body');
+  const title = document.getElementById('routineEditorTitle');
+  
+  if (isNew) {
+    title.textContent = "Create New Semester";
+    activeRoutine = {
+      meta: { college: 'New College', routineId: 'sem_' + Date.now(), routineName: 'New Semester', academicYear: '2025-26', section: '1A', branch: 'CSE', batches: ['G1', 'G2'] },
+      subjects: [{ id:'SUB1', label:'Subject 1', color:'#4f8ef7', bg:'rgba(79,142,247,.14)' }],
+      schedule: { '1': [], '2': [], '3': [], '4': [], '5': [] }
+    };
+  } else {
+    title.textContent = "Edit Routine";
+    const idToEdit = editId || currentRoutineId;
+    if (!routines[idToEdit]) {
+      toast('No routine found to edit', 'err');
+      return;
+    }
+    activeRoutine = JSON.parse(JSON.stringify(routines[idToEdit])); // Deep copy for editing
+  }
+
+  let html = `
+    <div class="routine-meta-editor" style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+      <input id="rt_name" value="${activeRoutine.meta.routineName}" placeholder="Semester Name">
+      <input id="rt_college" value="${activeRoutine.meta.college}" placeholder="College">
+      <input id="rt_branch" value="${activeRoutine.meta.branch}" placeholder="Branch">
+    </div>
+    <div id="subjectsEditor"></div>
+    <hr>
+    <div id="scheduleEditor"></div>
+  `;
+  body.innerHTML = html;
+  
+  renderSubjectsEditor();
+  renderScheduleEditor();
+  modal.classList.add('active');
+}
+
+function closeRoutineEditor() {
+  document.getElementById('routineEditorModal').classList.remove('active');
+}
+
+function renderSubjectsEditor() {
+  const container = document.getElementById('subjectsEditor');
+  let html = '<h4>Subjects</h4>';
+  activeRoutine.subjects.forEach((sub, i) => {
+    html += `
+      <div class="routine-slot">
+        <input value="${sub.id}" onchange="updateSubject(${i}, 'id', this.value)" placeholder="ID (e.g. DSA)" style="width: 80px;">
+        <input value="${sub.label}" onchange="updateSubject(${i}, 'label', this.value)" placeholder="Subject Name" style="flex: 1;">
+        <input type="color" value="${sub.color}" onchange="updateSubject(${i}, 'color', this.value); updateSubject(${i}, 'bg', hexToRgba(this.value, 0.14))" style="width: 40px; padding: 2px;">
+        <button onclick="activeRoutine.subjects.splice(${i},1); renderSubjectsEditor();">❌</button>
+      </div>`;
+  });
+  html += `<button class="add-row-btn" onclick="activeRoutine.subjects.push({id:'NEW', label:'New Subject', color:'#ffffff', bg:'rgba(255,255,255,.14)'}); renderSubjectsEditor();">+ Add Subject</button>`;
+  container.innerHTML = html;
+}
+
+function calcNextTime(prevTime, durationMins) {
+  if (!prevTime || !prevTime.includes('–')) return '10:00–10:50';
+  const endTimeStr = prevTime.split('–')[1].trim();
+  const [h, m] = endTimeStr.split(':').map(Number);
+  let totalMin = h * 60 + m + 5; 
+  if (totalMin >= 815 && totalMin < 845) { totalMin = 845; }
+  let nh = Math.floor(totalMin / 60) % 24;
+  let nm = totalMin % 60;
+  const startStr = `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`;
+  totalMin += durationMins;
+  nh = Math.floor(totalMin / 60) % 24;
+  nm = totalMin % 60;
+  const endStr = `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`;
+  return `${startStr}–${endStr}`;
+}
+
+function addScheduleSlot(day, isLab) {
+  const sched = activeRoutine.schedule[day] || [];
+  const lastSlot = sched[sched.length - 1];
+  const duration = isLab ? 100 : 50;
+  let nextTime = isLab ? '10:00–11:40' : '10:00–10:50';
+  if (lastSlot) { nextTime = calcNextTime(lastSlot.time, duration); }
+  sched.push({ time: nextTime, subj: activeRoutine.subjects[0].id, room: '', batch: 'both', teacher: '', note: '' });
+  renderScheduleEditor();
+}
+
+function renderScheduleEditor() {
+  const container = document.getElementById('scheduleEditor');
+  const days = ['1','2','3','4','5'];
+  let html = '<h4>Schedule</h4><p style="font-size:0.8rem;opacity:0.7; margin-bottom: 15px;">To merge classes (e.g. G1 & G2 labs), add multiple slots with the EXACT SAME Time.</p>';
+  days.forEach(day => {
+    const dayName = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][day];
+    html += `<div class="routine-day-group"><div class="routine-day-title">${dayName}</div>`;
+    if (!activeRoutine.schedule[day]) activeRoutine.schedule[day] = [];
+    activeRoutine.schedule[day].forEach((slot, i) => {
+      const subOptions = activeRoutine.subjects.map(s => `<option value="${s.id}" ${slot.subj === s.id ? 'selected' : ''}>${s.label}</option>`).join('');
+      html += `
+        <div class="routine-slot">
+          <input value="${slot.time}" onchange="updateSlot('${day}', ${i}, 'time', this.value)" placeholder="10:00–11:45" style="flex: 1 1 100px; min-width: 100px;">
+          <select onchange="updateSlot('${day}', ${i}, 'subj', this.value)" style="flex: 1 1 150px; min-width: 120px;">${subOptions}</select>
+          <input value="${slot.room || ''}" onchange="updateSlot('${day}', ${i}, 'room', this.value)" placeholder="Room" style="flex: 1 1 100px; min-width: 80px;">
+          <select onchange="updateSlot('${day}', ${i}, 'batch', this.value)" style="flex: 1 1 80px; min-width: 80px;">
+            <option value="both" ${slot.batch === 'both' ? 'selected' : ''}>Both</option>
+            <option value="G1" ${slot.batch === 'G1' ? 'selected' : ''}>G1</option>
+            <option value="G2" ${slot.batch === 'G2' ? 'selected' : ''}>G2</option>
+          </select>
+          <input value="${slot.teacher || ''}" onchange="updateSlot('${day}', ${i}, 'teacher', this.value)" placeholder="Teacher" style="flex: 1 1 100px; min-width: 80px;">
+          <input value="${slot.note || ''}" onchange="updateSlot('${day}', ${i}, 'note', this.value)" placeholder="Note" style="flex: 2 1 150px; min-width: 120px;">
+          <button onclick="activeRoutine.schedule['${day}'].splice(${i},1); renderScheduleEditor();">❌ Delete</button>
+        </div>`;
+    });
+    html += `<div class="add-slot-btns">
+      <button class="add-row-btn" style="flex: 1;" onclick="addScheduleSlot('${day}', false)">+ Add Lecture (50m)</button>
+      <button class="add-row-btn" style="flex: 1;" onclick="addScheduleSlot('${day}', true)">+ Add Lab (100m)</button>
+    </div>`;
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function updateSubject(i, key, val) { activeRoutine.subjects[i][key] = val; }
+function updateSlot(day, i, key, val) { activeRoutine.schedule[day][i][key] = val; }
+function saveRoutineFromEditor() {
+  activeRoutine.meta.routineName = document.getElementById('rt_name').value;
+  activeRoutine.meta.college = document.getElementById('rt_college').value;
+  activeRoutine.meta.branch = document.getElementById('rt_branch').value;
+  
+  // If new semester was created, separate logs
+  if (!routines[activeRoutine.meta.routineId]) {
+    currentRoutineId = activeRoutine.meta.routineId;
+    localStorage.setItem('studylog_current_routine', currentRoutineId);
+  }
+  
+  routines[activeRoutine.meta.routineId] = activeRoutine;
+  localStorage.setItem('studylog_routines', JSON.stringify(routines));
+  
+  // Apply the routine to the active app state
+  applyRoutine(activeRoutine, true);
+  
+  // Sync the whole routines object to Gist
+  saveToGist({ version: 7, entries, saved: new Date().toISOString() }, true);
+  
+  closeRoutineEditor();
+  render(); // Refresh UI
+  toast('Routine saved successfully!', 'ok');
+}
 
 function applyRoutine(r, silent = false) {
+  if (!r || !r.meta) return;
   ROUTINE = r; SUBJECTS = r.subjects; SCHEDULE = r.schedule; META = r.meta;
+  
+  // FORCE SYNC: Ensure the global currentRoutineId and activeRoutine always match the applied routine
+  currentRoutineId = r.meta.routineId;
+  activeRoutine = r; // <--- CRITICAL FIX
+  localStorage.setItem('studylog_current_routine', currentRoutineId);
+  
   semesterFolder = getSemesterFolder(META.routineId || '');
   localStorage.setItem('slp_semester_folder', semesterFolder);
 
-  // Auto-correct academic year from routineId — overrides any stale cached value
   const computedYear = computeAcademicYear(META.routineId);
   if (computedYear) META.academicYear = computedYear;
 
@@ -3621,21 +4407,69 @@ function applyRoutine(r, silent = false) {
   if (!silent) toast(`Routine: ${META.routineName}`, 'ok');
 }
 
+
 function loadRoutineFile() {
   const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json';
   inp.onchange = async e => {
     try {
-      const r = JSON.parse(await e.target.files[0].text());
+      let r = JSON.parse(await e.target.files[0].text());
       if (!r.meta || !r.subjects || !r.schedule) throw new Error('Invalid routine format');
-      applyRoutine(r);
+      
+      // 1. Ensure subjects have background colors
+      r.subjects.forEach(s => { if(!s.bg) s.bg = hexToRgba(s.color || '#888', 0.14); });
+      
+      // 2. Migrate format: split "Note — Teacher" into separate fields
+      for (const day in r.schedule) {
+        r.schedule[day].forEach(slot => {
+          if (slot.teacher === undefined) slot.teacher = ''; // Ensure field exists
+          
+          // If teacher is empty, try to extract it from the note (e.g., "Operating System Lab — MMD")
+          if (!slot.teacher && slot.note) {
+            if (slot.note.includes('—')) {
+              const parts = slot.note.split('—').map(p => p.trim());
+              if (parts.length >= 2) {
+                const lastPart = parts[parts.length - 1];
+                // If the last part is a valid acronym (1-6 chars, uppercase letters/numbers)
+                if (lastPart.length >= 1 && lastPart.length <= 6 && /^[A-Z0-9]+$/.test(lastPart)) {
+                  slot.teacher = lastPart;
+                  slot.note = parts.slice(0, -1).join('—').trim();
+                }
+              }
+            }
+          }
+          
+          // Fallback: If teacher is still empty, check the subject's instructor field (e.g., "Dr. Monish Das (MMD)")
+          if (!slot.teacher) {
+            const subInfo = r.subjects.find(s => s.id === slot.subj);
+            if (subInfo && subInfo.instructor) {
+              const match = subInfo.instructor.match(/\(([A-Z0-9]+)\)/);
+              if (match && match[1]) {
+                slot.teacher = match[1];
+              }
+            }
+          }
+        });
+      }
+      
+      // 3. Register in the routines state
+      if (!r.meta.routineId) r.meta.routineId = 'sem_' + Date.now();
+      currentRoutineId = r.meta.routineId;
+      activeRoutine = r;
+      routines[currentRoutineId] = activeRoutine;
+      
+      localStorage.setItem('studylog_current_routine', currentRoutineId);
+      localStorage.setItem('studylog_routines', JSON.stringify(routines));
       localStorage.setItem('slp_routine', JSON.stringify(r));
-      // Upload routine to gist so other devices get it too
+      
+      applyRoutine(r);
+      
       if (ghToken) {
         setSyncStatus('syncing', 'Uploading routine…');
-        await saveToGist({ version: 7, entries, saved: new Date().toISOString() }, r);
+                await saveToGist({ version: 7, entries, saved: new Date().toISOString() }, true);
         setSyncStatus('ok', 'Routine synced ');
       }
       await loadData(); render(); buildSubjList(); updateSideTagCloud();
+      toast('Routine loaded & fields separated successfully!', 'ok');
     } catch (err) { toast('Routine load failed: ' + err.message, 'err'); }
   };
   inp.click();
@@ -3733,7 +4567,7 @@ function renderSuStep() {
         <input class="finp" id="suTokenInp" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;font-family:var(--mono);font-size:12px">
         <button class="su-btn" style="width:auto;padding:8px 16px;margin:0" onclick="suConnectGH()">Connect</button>
       </div>
-      <button class="su-btn-sec" onclick="skipToLocal(none)">Login as guest</button>
+      <button class="su-btn-sec" onclick="skipToLocal()">Login as guest</button>
       <div class="su-note">Welcome to StudyLog Pro. Pick up where you left off.</div>`;
     // Allow Enter key in token input
     setTimeout(() => {
@@ -3745,10 +4579,10 @@ function renderSuStep() {
       <div class="su-progress">${dots(1)}</div>
       <div class="su-step">Step 2 of 2</div>
       <div class="su-title">Load your timetable</div>
-      <div class="su-sub">Upload your routine JSON. The app reads the filename to auto-select the semester.<br><br>
+      <div class="su-sub">Upload your routine JSON. You can also create one from scratch in the app.<br><br>
 
       <button class="su-btn" onclick="suLoadRoutine()">⚙ Load routine JSON</button>
-      <button class="su-btn-sec" onclick="finishSetup()">Use default (Y1 Semester 2)</button>
+      <button class="su-btn-sec" onclick="skipToLocal()">Use Blank Routine (Start Fresh)</button>
       <div class="su-note">📋 Once loaded, the routine syncs to GitHub – all devices get it automatically.</div>`;
   }
 }
@@ -3786,7 +4620,8 @@ async function suLoadRoutine() {
 async function skipToLocal() {
   localStorage.setItem('slp_setup_done', '1');
   const savedR = localStorage.getItem('slp_routine');
-  if (savedR) { try { applyRoutine(JSON.parse(savedR), true); } catch (e) { applyRoutine(DEFAULT_ROUTINE, true); } }
+  if (savedR) { try { applyRoutine(JSON.parse(savedR), true); } catch (e) { applyRoutine(GENERIC_ROUTINE, true); } }
+  else { applyRoutine(GENERIC_ROUTINE, true); }
   await loadData();
   document.getElementById('setupOverlay')?.classList.add('hidden');
   render(); buildSubjList(); updateSideTagCloud();
@@ -3796,8 +4631,17 @@ async function skipToLocal() {
 async function finishSetup() {
   localStorage.setItem('slp_setup_done', '1');
   await loadData();
+  
+  // If connected to GitHub, loadFromGist inside loadData will have pulled the routines.
+  // Ensure we apply the correct active routine.
+  if (ghToken && routines[currentRoutineId]) {
+    applyRoutine(routines[currentRoutineId], true);
+  } else if (activeRoutine) {
+    applyRoutine(activeRoutine, true);
+  }
+  
   document.getElementById('setupOverlay')?.classList.add('hidden');
-  render(); buildSubjList(); updateSideTagCloud();
+  render(); buildSubjList(); updateSideTagCloud(); updateStats();
   const gm = localStorage.getItem('slp_group'); if (gm) groupMode = gm;
   updateSyncUI();
   toast('All set! ' + (ghToken ? 'Syncing with GitHub ' : 'Running offline'), 'ok');
@@ -3890,25 +4734,51 @@ document.addEventListener('mousedown', e => { overlayMousedownTarget = e.target;
    INIT
 ═══════════════════════════════════ */
 async function init() {
+  // Restore settings before anything else
+  appSettings = JSON.parse(localStorage.getItem('slp_settings') || '{}');
+  if (Object.keys(appSettings).length === 0) appSettings = { haptics: true, autoSync: true, goalNotifs: true, calendarWeekends: true };
+  
   applyTheme(localStorage.getItem('slp_theme') === 'light' ? false : true);
   semesterFolder = localStorage.getItem('slp_semester_folder') || '2_Semester';
 const savedR = localStorage.getItem('slp_routine');
-if (savedR) {
+const fallbackRoutine = GENERIC_ROUTINE; // Point to the generic one
+
+if (currentRoutineId && routines[currentRoutineId]) {
+  activeRoutine = routines[currentRoutineId];
+  applyRoutine(activeRoutine, true);
+} else if (savedR) {
   try {
     const parsedR = JSON.parse(savedR);
-    // Patch stale academicYear before applying
+    if (!parsedR.meta.routineId) parsedR.meta.routineId = 'migrated_sem';
     const fixedYear = computeAcademicYear(parsedR.meta?.routineId);
-    if (fixedYear && parsedR.meta) {
-      parsedR.meta.academicYear = fixedYear;
-      localStorage.setItem('slp_routine', JSON.stringify(parsedR)); // write fix back
-    }
+    if (fixedYear && parsedR.meta) parsedR.meta.academicYear = fixedYear;
+    
+    currentRoutineId = parsedR.meta.routineId;
+    activeRoutine = parsedR;
+    routines[currentRoutineId] = activeRoutine;
+    
+    localStorage.setItem('studylog_current_routine', currentRoutineId);
+    localStorage.setItem('studylog_routines', JSON.stringify(routines));
+    localStorage.setItem('slp_routine', JSON.stringify(parsedR)); 
     applyRoutine(parsedR, true);
   } catch (e) {
-    applyRoutine(DEFAULT_ROUTINE, true);
+    activeRoutine = fallbackRoutine;
+    currentRoutineId = fallbackRoutine.meta.routineId;
+    routines[currentRoutineId] = activeRoutine;
+    applyRoutine(activeRoutine, true);
   }
 } else {
-  applyRoutine(DEFAULT_ROUTINE, true);
+  activeRoutine = fallbackRoutine;
+  currentRoutineId = fallbackRoutine.meta.routineId;
+  routines[currentRoutineId] = activeRoutine;
+  localStorage.setItem('studylog_current_routine', currentRoutineId);
+  localStorage.setItem('studylog_routines', JSON.stringify(routines));
+  applyRoutine(activeRoutine, true);
 }
+
+// Apply saved sort preference
+const sortSel = document.getElementById('sortSel');
+if (sortSel) sortSel.value = localStorage.getItem('slp_sort') || 'desc';
   populateTagSuggestions(); startClock();
   const setupDone = localStorage.getItem('slp_setup_done');
   if (setupDone) {
@@ -3950,6 +4820,7 @@ if (ghToken) {
         console.warn('Background sync failed silently', e);
       }
       setSyncStatus('ok', 'Synced ');
+      if (appSettings.autoSync) startBackgroundSync();
     }
 } else {
     showSetup();
@@ -4452,7 +5323,7 @@ function applyFilters() {
   const q = document.getElementById('searchInp')?.value || '';
   const from = document.getElementById('dateFrom')?.value || '';
   const to = document.getElementById('dateTo')?.value || '';
-  const sort = document.getElementById('sortSel')?.value || 'desc';
+  const sort = localStorage.getItem('slp_sort') || 'desc';
   const today = new Date().toISOString().split('T')[0];
   const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().split('T')[0];
   let f=entries.filter(e=>{
@@ -4501,39 +5372,79 @@ function renderList(items){
   const tokens=parseSearchTokens(q);
   const tokenBadges=tokens.map(t=>`<span class="search-token">${t.type==='tag'?'#':''}${t.val}</span>`).join('');
   const resultInfo=q?`<mark>${items.length}</mark> result${items.length!==1?'s':''} ${tokenBadges}`:`${items.length} entr${items.length!==1?'ies':'y'}`;
-  const today=new Date().toISOString().split('T')[0];
   const ctrlBar=`<div class="view-ctrl-bar"><span class="vc-lbl">Group:</span><button class="vc-btn${groupMode==='none'?' active':''}" onclick="setGroupMode('none')">None</button><button class="vc-btn${groupMode==='day'?' active':''}" onclick="setGroupMode('day')">Day</button><button class="vc-btn${groupMode==='week'?' active':''}" onclick="setGroupMode('week')">Week</button><div class="vc-divider"></div><span class="result-bar" style="padding:0;margin:0">${resultInfo}</span></div>`;
-  let listHTML='';
+  
+  // Split items by semester (use primitive currentRoutineId to avoid object reference issues)
+  const activeId = currentRoutineId;
+  const currentEntries = items.filter(e => !e.semesterId || e.semesterId === activeId);
+  const prevEntries = items.filter(e => e.semesterId && e.semesterId !== activeId);
+
+  let html = ctrlBar;
+
+  // 1. Current Semester
+  html += generateListHTML(currentEntries);
+
+  // 2. Previous Semesters (Collapsible)
+  if (prevEntries.length) {
+    const groupedBySem = {};
+    prevEntries.forEach(e => {
+      const sid = e.semesterId;
+      if(!groupedBySem[sid]) groupedBySem[sid] = [];
+      groupedBySem[sid].push(e);
+    });
+    
+    for(const sid in groupedBySem) {
+       const semInfo = routines[sid];
+       const semName = semInfo ? semInfo.meta.routineName : `Semester ${sid}`;
+       const semItems = groupedBySem[sid];
+       html += `<details class="prev-semester-group" ${q ? 'open' : ''}>`;
+       html += `<summary>${esc(semName)} (${semItems.length} entries)</summary>`;
+       html += generateListHTML(semItems);
+       html += `</details>`;
+    }
+  }
+
+  c.innerHTML=html;
+  c.querySelectorAll('.entry-row').forEach(el=>{
+    el.addEventListener('click', ev => {
+      if (selIds.size > 0 || ev.ctrlKey || ev.metaKey) {
+        toggleSel(el.dataset.id);
+        return;
+      }
+      openDetailPanel(el.dataset.id);
+    });
+    el.addEventListener('contextmenu',ev=>{
+      ev.preventDefault();
+      if(selIds.size === 0) showCtx(ev,el.dataset.id);
+    });
+  });
+}
+
+function generateListHTML(items) {
+  const today = new Date().toISOString().split('T')[0];
+  if (items.length === 0) return '';
+  
   if(groupMode==='none'){
-    listHTML=`<div class="entry-rows-wrap"><div class="entry-rows">${items.map(buildEntryRow).join('')}</div></div>`;
+    return `<div class="entry-rows-wrap"><div class="entry-rows">${items.map(buildEntryRow).join('')}</div></div>`;
   } else if(groupMode==='day'){
     const byDay={};items.forEach(e=>(byDay[e.date]||(byDay[e.date]=[])).push(e));
-    listHTML=Object.keys(byDay).sort().reverse().map(d=>{
+    return Object.keys(byDay).sort().reverse().map(d=>{
       const dt=new Date(d+'T00:00:00'),isToday=d===today;
       return `<div class="dg-head"><span class="dg-day">${isToday?'Today':DAYSFULL[dt.getDay()]}</span>${isToday?'<span class="dg-today">today</span>':''}<span class="dg-date">${d}</span><div class="dg-line"></div><span class="dg-cnt">${byDay[d].length}</span></div><div class="entry-rows-wrap"><div class="entry-rows">${byDay[d].map(buildEntryRow).join('')}</div></div>`;
     }).join('');
   } else {
     const byWeek={};items.forEach(e=>{const dt=new Date(e.date+'T00:00:00'),mon=new Date(dt);mon.setDate(dt.getDate()-((dt.getDay()+6)%7));const wk=mon.toISOString().split('T')[0];(byWeek[wk]||(byWeek[wk]=[])).push(e);});
-    listHTML=Object.keys(byWeek).sort().reverse().map(wk=>{
+    return Object.keys(byWeek).sort().reverse().map(wk=>{
       const start=new Date(wk+'T00:00:00'),end=new Date(start);end.setDate(start.getDate()+6);
       const isThisWeek=today>=wk&&today<=end.toISOString().split('T')[0];
       return `<div class="wg-head"><span class="wg-lbl">${isThisWeek?'This Week':'Week of '+MSHORT[start.getMonth()]+' '+start.getDate()}</span><span class="wg-range">${MSHORT[start.getMonth()]} ${start.getDate()} – ${MSHORT[end.getMonth()]} ${end.getDate()}</span><div class="wg-line"></div><span class="wg-cnt">${byWeek[wk].length}</span></div><div class="entry-rows-wrap"><div class="entry-rows">${byWeek[wk].map(buildEntryRow).join('')}</div></div>`;
     }).join('');
   }
-  c.innerHTML=ctrlBar+listHTML;
-c.querySelectorAll('.entry-row').forEach(el=>{
-el.addEventListener('click', ev => {
-  if (selIds.size > 0 || ev.ctrlKey || ev.metaKey) {
-    toggleSel(el.dataset.id);
-    return;
-  }
-  openDetailPanel(el.dataset.id);
-});
-  el.addEventListener('contextmenu',ev=>{
-    ev.preventDefault();
-    if(selIds.size === 0) showCtx(ev,el.dataset.id);
-  });
-});
+}
+
+function changeSort(val) {
+  localStorage.setItem('slp_sort', val);
+  applyFilters();
 }
 /* ── ENTRY ROW (compact) ── */
 function buildEntryRow(e){
@@ -4578,8 +5489,10 @@ const ATTEND_ICO = { present:'✓', late:'⏰', absent:'✗' };
   const isReviewDue = e.reviewDate && e.reviewDate <= new Date().toISOString().split('T')[0];
   if (isReviewDue) badges += `<span class="er-badge" style="background:var(--amber-bg);color:var(--amber)">📅</span>`;
   const dateLabel=isToday?'Today':`${d.getDate()} ${MSHORT[d.getMonth()]}`;
-const iconHTML = `<div class="er-icon" style="background:${isSel ? 'var(--accent)' : s.bg}; color:${isSel ? '#fff' : s.color}">
-  ${isSel ? '' : e.subject.slice(0,4)}
+const checkSvg = `<svg class="er-checkmark" viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg>`;
+const iconHTML = `<div class="er-icon" style="background:${s.bg}; color:${s.color}">
+  ${e.subject.slice(0,4)}
+  ${isSel ? '<div class="er-sel-check">✓</div>' : ''}
 </div>`;
   return `<div class="entry-row${e.pinned?' pinned':''}${isSel?' selected':''}" data-id="${e.id}">
     <div class="er-accent" style="background:${s.color}"></div>
@@ -4685,11 +5598,16 @@ function closeDetailPanelAnimated(){
   const ov=document.getElementById('detailOverlay');
   if(!panel||!ov||!ov.classList.contains('open')){closeDetailPanel();return;}
   const row=detailId?document.querySelector(`.entry-row[data-id="${detailId}"]`):null;
-  panel.style.transition='transform .3s cubic-bezier(.4,0,1,1),opacity .22s ease';
-  panel.style.transform='translateY(80px)';
+  
+  // YouTube-style fast drop with slight scale down
+  panel.style.transition='transform .35s cubic-bezier(0.4, 0, 1, 1), opacity .2s ease, border-radius .35s ease';
+  panel.style.transform='translateY(100%) scale(0.95)';
   panel.style.opacity='0';
-  ov.style.transition='opacity .28s ease';
+  
+  ov.style.transition='opacity .25s ease, backdrop-filter .25s ease';
   ov.style.opacity='0';
+  ov.style.backdropFilter='blur(0px)';
+  
   setTimeout(()=>{
     closeDetailPanel();
     if(row){
@@ -4699,7 +5617,7 @@ function closeDetailPanelAnimated(){
       row.classList.add('dp-land-flash');
       setTimeout(()=>row.classList.remove('dp-land-flash'),950);
     }
-  },300);
+  },350);
 }
 function closeDetailPanel(){
   const panel=document.querySelector('.detail-panel');
@@ -4842,7 +5760,7 @@ function renderCal(){
   for(let i=fd-1;i>=0;i--)cells+=`<div class="cal-cell other-m"><div class="cal-num">${dp-i}</div></div>`;
   for(let d=1;d<=dm;d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dow=new Date(ds+'T00:00:00').getDay(),isHol=dow===0||dow===6;
+    const dow=new Date(ds+'T00:00:00').getDay(),isHol=appSettings.calendarWeekends?(dow===0||dow===6):false;
     const de=byDate[ds]||[],pendTodos=(todoByDate[ds]||[]).filter(t=>!t.done);
     const dots=de.slice(0,6).map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{color:'#8b92a8'};return`<div class="cal-dot" style="background:${s.color}"></div>`;}).join('');
     cells+=`<div class="cal-cell${ds===today?' today':''}${isHol?' holiday':''}" data-date="${ds}" onclick="calCellClick('${ds}')" onmouseenter="showCalTip(event,'${ds}')" onmouseleave="hideCalTip()"><div class="cal-num">${d}</div>${isHol?'<div class="cal-hday">Wknd</div>':''}<div class="cal-dots">${dots}</div>${de.length?`<div class="cal-count">${de.length}</div>`:''}${pendTodos.length?`<div class="cal-todo-badge">${pendTodos.length}</div>`:''}</div>`;
@@ -4872,76 +5790,80 @@ function showCalTip(event,dateStr){
 function hideCalTip(){clearTimeout(calTipTimeout);document.getElementById('calTip').classList.remove('show');}
 
 /* ── STATS ── */
-function renderStats(){
-  const c=document.getElementById('statsCont');
-  const wk=new Date(Date.now()-7*864e5).toISOString().split('T')[0];
-  const tw=entries.filter(e=>e.date>=wk).length,st=calcStreak();
-  const totalWords=entries.reduce((a,e)=>a+wCount(e.notes||''),0);
-  const tT=entries.reduce((a,e)=>a+(e.todos||[]).length,0);
-  const dT=entries.reduce((a,e)=>a+(e.todos||[]).filter(t=>t.done).length,0);
-  const compRate=tT?Math.round(dT/tT*100):0;
-  const sc={};entries.forEach(e=>sc[e.subject]=(sc[e.subject]||0)+1);
-  const ms=Math.max(...Object.values(sc),1);
-  const dc=[0,0,0,0,0,0,0];entries.forEach(e=>dc[new Date(e.date+'T00:00:00').getDay()]++);
-  const md=Math.max(...dc,1);
-  const mc={};entries.forEach(e=>{if(e.mood)mc[e.mood]=(mc[e.mood]||0)+1;});
-  const tc={};entries.forEach(e=>(e.tags||[]).forEach(t=>tc[t]=(tc[t]||0)+1));
-  const topTags=Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const avgRated=entries.filter(e=>e.rating);
-  const avgRating=avgRated.length?( avgRated.reduce((a,e)=>a+e.rating,0)/avgRated.length).toFixed(1):0;
-  // Heatmap
-  const dateMap={};entries.forEach(e=>dateMap[e.date]=(dateMap[e.date]||0)+1);
-  const now=new Date();let hmHTML='';
-  for(let i=363;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];const cnt=dateMap[ds]||0;const lv=cnt===0?0:cnt===1?1:cnt===2?2:cnt<=4?3:4;hmHTML+=`<div class="hmc hml${lv}" title="${ds}: ${cnt}"></div>`;}
-  // Weekly trend last 8 weeks
-  const weekT=[];
-  for(let i=7;i>=0;i--){const ws=new Date(Date.now()-(i*7+7)*864e5),we=new Date(Date.now()-i*7*864e5);const wss=ws.toISOString().split('T')[0],wes=we.toISOString().split('T')[0];weekT.push({cnt:entries.filter(e=>e.date>=wss&&e.date<wes).length,lbl:`W${8-i}`});}
-  const maxWT=Math.max(...weekT.map(w=>w.cnt),1);
-  // Subject donut
-  const subjD=SUBJECTS.filter(s=>sc[s.id]).sort((a,b)=>(sc[b.id]||0)-(sc[a.id]||0)).slice(0,6);
-  const totalSD=subjD.reduce((a,s)=>a+(sc[s.id]||0),0)||1;
-  let dp=0;
-  const dStops=subjD.map(s=>{const start=dp;dp+=(sc[s.id]||0)/totalSD*100;return`${s.color} ${start.toFixed(1)}% ${dp.toFixed(1)}%`;});
-  const donutCSS=dStops.length?`conic-gradient(${dStops.join(',')})`:' var(--panel3)';
-  // SVG completion ring
-  const r=32,circ=2*Math.PI*r,dash=circ*(compRate/100);
-  const svgRing=`<svg width="80" height="80" viewBox="0 0 80 80" class="comp-ring"><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--panel3)" stroke-width="8"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--green)" stroke-width="8" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-dashoffset="${circ/4}" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="44" text-anchor="middle" font-size="14" font-weight="800" fill="var(--green)" font-family="var(--mono)">${compRate}%</text></svg>`;
-  c.innerHTML=`<div>
+function renderStats() {
+  const c = document.getElementById('statsCont');
+  
+  // FILTER: Only show entries for the CURRENT active semester
+  const semEntries = entries.filter(e => e.semesterId === currentRoutineId || (!e.semesterId && !currentRoutineId));
+  
+  const wk = new Date(Date.now() - 7 * 864e5).toISOString().split('T')[0];
+  const tw = semEntries.filter(e => e.date >= wk).length, st = calcStreak(semEntries);
+  const totalWords = semEntries.reduce((a, e) => a + wCount(e.notes || ''), 0);
+  const tT = semEntries.reduce((a, e) => a + (e.todos || []).length, 0);
+  const dT = semEntries.reduce((a, e) => a + (e.todos || []).filter(t => t.done).length, 0);
+  const compRate = tT ? Math.round(dT / tT * 100) : 0;
+  const sc = {}; semEntries.forEach(e => sc[e.subject] = (sc[e.subject] || 0) + 1);
+  const ms = Math.max(...Object.values(sc), 1);
+  const dc = [0, 0, 0, 0, 0, 0, 0]; semEntries.forEach(e => dc[new Date(e.date + 'T00:00:00').getDay()]++);
+  const md = Math.max(...dc, 1);
+  const mc = {}; semEntries.forEach(e => { if (e.mood) mc[e.mood] = (mc[e.mood] || 0) + 1; });
+  const tc = {}; semEntries.forEach(e => (e.tags || []).forEach(t => tc[t] = (tc[t] || 0) + 1));
+  const topTags = Object.entries(tc).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const avgRated = semEntries.filter(e => e.rating);
+  const avgRating = avgRated.length ? (avgRated.reduce((a, e) => a + e.rating, 0) / avgRated.length).toFixed(1) : 0;
+  
+  const dateMap = {}; semEntries.forEach(e => dateMap[e.date] = (dateMap[e.date] || 0) + 1);
+  const now = new Date(); let hmHTML = '';
+  for (let i = 363; i >= 0; i--) { const d = new Date(now); d.setDate(d.getDate() - i); const ds = d.toISOString().split('T')[0]; const cnt = dateMap[ds] || 0; const lv = cnt === 0 ? 0 : cnt === 1 ? 1 : cnt === 2 ? 2 : cnt <= 4 ? 3 : 4; hmHTML += `<div class="hmc hml${lv}" title="${ds}: ${cnt}"></div>`; }
+  
+  const weekT = [];
+  for (let i = 7; i >= 0; i--) { const ws = new Date(Date.now() - (i * 7 + 7) * 864e5), we = new Date(Date.now() - i * 7 * 864e5); const wss = ws.toISOString().split('T')[0], wes = we.toISOString().split('T')[0]; weekT.push({ cnt: semEntries.filter(e => e.date >= wss && e.date < wes).length, lbl: `W${8 - i}` }); }
+  const maxWT = Math.max(...weekT.map(w => w.cnt), 1);
+  
+  const subjD = SUBJECTS.filter(s => sc[s.id]).sort((a, b) => (sc[b.id] || 0) - (sc[a.id] || 0)).slice(0, 6);
+  const totalSD = subjD.reduce((a, s) => a + (sc[s.id] || 0), 0) || 1;
+  let dp = 0;
+  const dStops = subjD.map(s => { const start = dp; dp += (sc[s.id] || 0) / totalSD * 100; return `${s.color} ${start.toFixed(1)}% ${dp.toFixed(1)}%`; });
+  const donutCSS = dStops.length ? `conic-gradient(${dStops.join(',')})` : ' var(--panel3)';
+  
+  const r = 32, circ = 2 * Math.PI * r, dash = circ * (compRate / 100);
+  const svgRing = `<svg width="80" height="80" viewBox="0 0 80 80" class="comp-ring"><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--panel3)" stroke-width="8"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--green)" stroke-width="8" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-dashoffset="${circ / 4}" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="44" text-anchor="middle" font-size="14" font-weight="800" fill="var(--green)" font-family="var(--mono)">${compRate}%</text></svg>`;
+  
+  c.innerHTML = `<div>
   <div class="stat-top-grid">
-    <div class="sb-stat"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${entries.length}" data-stat-format="int">0</div><div class="stc-l">Total Entries</div></div>
+    <div class="sb-stat"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${semEntries.length}" data-stat-format="int">0</div><div class="stc-l">Total Entries</div></div>
     <div class="sb-stat"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${st}" data-stat-format="int">0</div><div class="stc-l">Day Streak</div></div>
     <div class="sb-stat"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${totalWords}" data-stat-format="compactk1">0</div><div class="stc-l">Words Written</div></div>
     <div class="sb-stat"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${tw}" data-stat-format="int">0</div><div class="stc-l">This Week</div></div>
     <div class="sb-stat"><div class="stc-ico"></div><div class="stc-n" data-stat-value="${dT}" data-stat-format="int">0</div><div class="stc-l">Tasks Done</div><div class="stc-s">${tT} total</div></div>
-    <div class="sb-stat"><div class="stc-ico"></div><div class="stc-n"${avgRated.length?` data-stat-value="${avgRating}" data-stat-format="decimal1"`:''}>${avgRated.length?'0.0':'—'}</div><div class="stc-l">Avg Rating</div><div class="stc-s">${avgRated.length} rated</div></div>
+    <div class="sb-stat"><div class="stc-ico"></div><div class="stc-n"${avgRated.length ? ` data-stat-value="${avgRating}" data-stat-format="decimal1"` : ''}>${avgRated.length ? '0.0' : '—'}</div><div class="stc-l">Avg Rating</div><div class="stc-s">${avgRated.length} rated</div></div>
   </div>
   <div class="chart-sec"><div class="chart-title">Weekly Trend (Last 8 Weeks)</div>
-    <div class="trend-bars">${weekT.map(w=>`<div class="tb-col"><div class="tb-bar" style="height:${Math.max(3,(w.cnt/maxWT*76))}px"></div><div class="tb-lbl">${w.lbl}</div><div class="tb-val">${w.cnt||''}</div></div>`).join('')}</div>
+    <div class="trend-bars">${weekT.map(w => `<div class="tb-col"><div class="tb-bar" style="height:${Math.max(3, (w.cnt / maxWT * 76))}px"></div><div class="tb-lbl">${w.lbl}</div><div class="tb-val">${w.cnt || ''}</div></div>`).join('')}</div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
     <div class="chart-sec" style="margin:0"><div class="chart-title">Task Completion</div>
       <div class="completion-row">${svgRing}<div class="comp-info"><div class="comp-pct">${dT}/${tT}</div><div class="comp-lbl">tasks completed</div></div></div>
     </div>
-    
     <div class="chart-sec" style="margin:0"><div class="chart-title">Subject Mix</div>
       <div class="donut-row">
         <div class="donut-el"><div style="width:80px;height:80px;border-radius:50%;background:${donutCSS}"><div class="donut-hole" style="inset:18px;font-size:12px">${subjD.length}</div></div></div>
-        <div class="dl-table">${subjD.slice(0,4).map(s=>`<div class="dl-r"><div class="dl-d" style="background:${s.color}"></div><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;font-size:11px">${s.label}</span><span class="dl-n">${sc[s.id]}</span></div>`).join('')}</div>
+        <div class="dl-table">${subjD.slice(0, 4).map(s => `<div class="dl-r"><div class="dl-d" style="background:${s.color}"></div><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;font-size:11px">${s.label}</span><span class="dl-n">${sc[s.id]}</span></div>`).join('')}</div>
       </div>
     </div>
   </div>
-    <div class="chart-sec"><div class="chart-title">Activity — Last 52 Weeks</div>
-    <div style="display:flex;gap:5px;align-items:center;margin-bottom:7px;font-size:9.5px;color:var(--text4)"><span>Less</span><div style="display:flex;gap:2px">${[0,1,2,3,4].map(l=>`<div class="hmc hml${l}" style="width:11px;height:11px"></div>`).join('')}</div><span>More</span></div>
+  <div class="chart-sec"><div class="chart-title">Activity — Last 52 Weeks</div>
+    <div style="display:flex;gap:5px;align-items:center;margin-bottom:7px;font-size:9.5px;color:var(--text4)"><span>Less</span><div style="display:flex;gap:2px">${[0, 1, 2, 3, 4].map(l => `<div class="hmc hml${l}" style="width:11px;height:11px"></div>`).join('')}</div><span>More</span></div>
     <div class="hmap-scroll"><div class="hmap-grid weeks-52">${hmHTML}</div></div>
   </div>
   <div class="chart-sec"><div class="chart-title">Entries per Subject</div>
-    <div class="bar-chart">${SUBJECTS.filter(s=>sc[s.id]).sort((a,b)=>(sc[b.id]||0)-(sc[a.id]||0)).map(s=>`<div class="bar-row"><div class="bar-lbl" title="${s.label}">${s.label}</div><div class="bar-track"><div class="bar-fill" style="width:${(sc[s.id]/ms*100).toFixed(1)}%;background:${s.color}"></div></div><div class="bar-cnt">${sc[s.id]}</div></div>`).join('')||'<div style="color:var(--text3);font-size:13px">No data yet</div>'}</div>
+    <div class="bar-chart">${SUBJECTS.filter(s => sc[s.id]).sort((a, b) => (sc[b.id] || 0) - (sc[a.id] || 0)).map(s => `<div class="bar-row"><div class="bar-lbl" title="${s.label}">${s.label}</div><div class="bar-track"><div class="bar-fill" style="width:${(sc[s.id] / ms * 100).toFixed(1)}%;background:${s.color}"></div></div><div class="bar-cnt">${sc[s.id]}</div></div>`).join('') || '<div style="color:var(--text3);font-size:13px">No data yet</div>'}</div>
   </div>
   <div class="chart-sec"><div class="chart-title">Activity by Day of Week</div>
-    <div class="bar-chart">${DAYS.map((d,i)=>`<div class="bar-row"><div class="bar-lbl">${d}</div><div class="bar-track"><div class="bar-fill" style="width:${(dc[i]/md*100).toFixed(1)}%;background:var(--accent)"></div></div><div class="bar-cnt">${dc[i]}</div></div>`).join('')}</div>
+    <div class="bar-chart">${DAYS.map((d, i) => `<div class="bar-row"><div class="bar-lbl">${d}</div><div class="bar-track"><div class="bar-fill" style="width:${(dc[i] / md * 100).toFixed(1)}%;background:var(--accent)"></div></div><div class="bar-cnt">${dc[i]}</div></div>`).join('')}</div>
   </div>
-  ${Object.keys(mc).length?`<div class="chart-sec"><div class="chart-title">Mood Distribution</div><div style="display:flex;gap:8px;flex-wrap:wrap">${Object.entries(mc).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px"><span style="font-size:26px">${moodEmo(m)}</span><span style="font-size:13px;font-weight:700;color:var(--text)">${n}</span><span style="font-size:10px;color:var(--text3)">${m}</span></div>`).join('')}</div></div>`:''}
-  ${topTags.length?`<div class="chart-sec"><div class="chart-title">Top Tags</div><div class="top-tags-wrap">${topTags.map(([t,n])=>`<span class="ttag">#${esc(t)}<span class="ttag-cnt">${n}</span></span>`).join('')}</div></div>`:''}
+  ${Object.keys(mc).length ? `<div class="chart-sec"><div class="chart-title">Mood Distribution</div><div style="display:flex;gap:8px;flex-wrap:wrap">${Object.entries(mc).sort((a, b) => b[1] - a[1]).map(([m, n]) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px"><span style="font-size:26px">${moodEmo(m)}</span><span style="font-size:13px;font-weight:700;color:var(--text)">${n}</span><span style="font-size:10px;color:var(--text3)">${m}</span></div>`).join('')}</div></div>` : ''}
+  ${topTags.length ? `<div class="chart-sec"><div class="chart-title">Top Tags</div><div class="top-tags-wrap">${topTags.map(([t, n]) => `<span class="ttag">#${esc(t)}<span class="ttag-cnt">${n}</span></span>`).join('')}</div></div>` : ''}
   </div>`;
   animateStatsPanelNumbers();
 }
@@ -5299,7 +6221,7 @@ function renderSchedPicker(dateStr, batch) {
 
   const d = new Date(dateStr + 'T00:00:00');
   const dow = d.getDay();
-  if (dow === 0 || dow === 6) {
+      if (appSettings.calendarWeekends && (dow === 0 || dow === 6)) {
     wrap.innerHTML = `<div class="sch-holiday"><strong>🏖 ${DAYSFULL[dow]} – Weekend</strong>No classes.</div>`;
     selSubj = 'OTHER';
     selTime = '';
@@ -5320,7 +6242,7 @@ function renderSchedPicker(dateStr, batch) {
         const sub = SUBJECTS.find(x => x.id === sl.subj) || { color: '#8b92a8', id: sl.subj };
         return `<div class="sch-card" data-subj="${sl.subj}" data-time="${sl.time}" id="sch_${i}" onclick="selectSch(${i},'${sl.subj}','${sl.time}')">
           <div class="sch-time-col"><div class="sch-t-main">${sl.time.split('–')[0]}</div><div class="sch-t-end">–${sl.time.split('–')[1] || ''}</div></div>
-          <div class="sch-info"><div class="sch-subj-id" style="color:${sub.color}">${sl.subj}</div><div class="sch-subj-name">${sl.note}</div>${sl.room ? `<div class="sch-room">${sl.room}</div>` : ''}</div>
+          <div class="sch-info"><div class="sch-subj-id" style="color:${sub.color}">${sl.subj}</div><div class="sch-subj-name">${sl.note || ''} ${sl.teacher ? '— ' + sl.teacher : ''}</div>${sl.room ? `<div class="sch-room">${sl.room}</div>` : ''}</div>
           <div class="sch-side">${sl.batch !== 'both' ? `<span class="sch-batch">${sl.batch}</span>` : ''}<span class="sch-sel-ico"></span></div>
         </div>`;
       }).join('')}
@@ -5405,6 +6327,7 @@ const entry = {
     date,
     subject:     selSubj,
     time:        selTime,
+    semesterId:  currentRoutineId,
     batch:       document.getElementById('fBatch').value,
     titles,
     notes:       document.getElementById('fNotes').value.trim(),
@@ -5611,6 +6534,8 @@ function exportAll() {
   const data = {
     version: 7,
     entries: entries,
+    settings: appSettings,
+    routines: routines,
     exported: new Date().toISOString()
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -5619,7 +6544,7 @@ function exportAll() {
   a.download = `studylog_export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('Exported JSON ', 'ok');
+  toast('Exported JSON (Entries, Settings, Routines) ', 'ok');
 }
 function expEntries(list,fname){
   const md=list.map(e=>{const s=SUBJECTS.find(x=>x.id===e.subject)||{label:e.subject};const d=new Date(e.date+'T00:00:00');let o=`# ${e.date} – ${s.label}${e.time?' ('+e.time+')':''}\n\n**Date:** ${d.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;if(e.mood)o+=`**Mood:** ${moodEmo(e.mood)}\n`;if(e.rating)o+=`**Rating:** ${e.rating}/10\n`;o+='\n';if((e.titles||[]).length){o+='## Topics\n\n';e.titles.forEach(t=>{o+=t.url?`- [${t.text}](${t.url})\n`:`- ${t.text}\n`;});o+='\n';}if(e.notes)o+=`## Notes\n\n${e.notes}\n\n`;if((e.todos||[]).length){o+='## Tasks\n\n';e.todos.forEach(t=>{o+=`- [${t.done?'x':' '}] ${t.text}${t.due?' (due '+t.due+')':''}\n`;});o+='\n';}if((e.tags||[]).length)o+=`**Tags:** ${e.tags.map(t=>'#'+t).join(' ')}\n\n`;if((e.youtubes||[]).length){o+='## Videos\n\n';e.youtubes.forEach(y=>o+=`- https://youtube.com/watch?v=${y}\n`);}return o+'---\n';}).join('\n');
@@ -5634,41 +6559,50 @@ async function importData() {
       const file = e.target.files[0];
       const text = await file.text();
       const d = JSON.parse(text);
+      
+      // 1. Import Settings if present
+      if (d.settings) {
+        appSettings = d.settings;
+        localStorage.setItem('slp_settings', JSON.stringify(appSettings));
+      }
+      
+      // 2. Import Routines if present
+      if (d.routines) {
+        let localRoutines = JSON.parse(localStorage.getItem('studylog_routines') || '{}');
+        Object.assign(localRoutines, d.routines);
+        routines = localRoutines;
+        localStorage.setItem('studylog_routines', JSON.stringify(routines));
+      }
+      
       if (!d.entries) throw new Error('Invalid format: missing entries array');
 
-      // Filter new entries
+      // 3. Import Entries
       const newEntries = d.entries.filter(n => !entries.find(x => x.id === n.id));
       if (newEntries.length === 0) {
         toast('No new entries to import (all already exist)', 'info');
         return;
       }
 
-      // Ensure each new entry has valid timestamps
-// Ensure each new entry has valid timestamps AND wins in merge
-const now = Date.now();
-newEntries.forEach(entry => {
-  entry.updatedAt = now;                 // always fresh so local wins merge
-  if (!entry.createdAt) entry.createdAt = now;
-  delete deletedIds[entry.id];          // un-tombstone if previously deleted
-});
-saveDeletedIds();
+      const now = Date.now();
+      newEntries.forEach(entry => {
+        entry.updatedAt = now;
+        if (!entry.createdAt) entry.createdAt = now;
+        delete deletedIds[entry.id];
+      });
+      saveDeletedIds();
 
-      // Merge into current entries
       entries = [...entries, ...newEntries];
-
-      // Save to localStorage and sync to GitHub
       setSyncStatus('syncing', 'Importing and syncing...');
-      const syncOk = await saveData(); // wait for sync to finish
+      const syncOk = await saveData();
 
-      // Refresh UI
       render();
       buildSubjList();
       updateSideTagCloud();
 
       if (syncOk) {
-        toast(`Imported ${newEntries.length} new entries and synced `, 'ok');
+        toast(`Imported ${newEntries.length} entries, settings, and routines!`, 'ok');
       } else {
-        toast(`Imported ${newEntries.length} new entries but sync failed. Data saved locally.`, 'err');
+        toast(`Imported ${newEntries.length} entries but sync failed.`, 'err');
       }
     } catch (err) {
       console.error('Import error:', err);
@@ -5777,7 +6711,10 @@ function initDetailDrag() {
   /* ── 1:1 finger tracking ── */
   function applyY(dy) {
     const y = dy >= 0 ? dy : dy * 0.11;  /* down=1:1, up=rubber-band */
-    panel.style.transform = `translateY(${y}px)`;
+    
+    // Add subtle scaling based on how far it's dragged
+    const scale = 1 - (y / window.innerHeight) * 0.1;
+    panel.style.transform = `translateY(${y}px) scale(${Math.max(0.95, scale)})`;
 
     /* opacity: full until 20% of screen, then gentle fade */
     const fadeStart = window.innerHeight * 0.20;
@@ -5969,7 +6906,17 @@ function updateStats(){
   const sT=document.getElementById('statusTodos');if(sT){sT.textContent=`${pT} task${pT!==1?'s':''} pending`;sT.style.color=pT>=1?'red':'';}
   updateNavCounts();buildSubjList();
 }
-function calcStreak(){const dates=[...new Set(entries.map(e=>e.date))].sort().reverse();if(!dates.length)return 0;let streak=0,cur=new Date();cur.setHours(0,0,0,0);for(const ds of dates){const d=new Date(ds+'T00:00:00');if((cur-d)/864e5<1.5){streak++;cur=d;}else break;}return streak;}
+function calcStreak(list = entries) {
+  const dates = [...new Set(list.map(e => e.date))].sort().reverse();
+  if (!dates.length) return 0;
+  let streak = 0, cur = new Date();
+  cur.setHours(0, 0, 0, 0);
+  for (const ds of dates) {
+    const d = new Date(ds + 'T00:00:00');
+    if ((cur - d) / 864e5 < 1.5) { streak++; cur = d; } else break;
+  }
+  return streak;
+}
 function setSaveStatus(s){const dot=document.getElementById('saveDot'),txt=document.getElementById('saveStatus');if(s==='saving'){if(dot)dot.classList.add('saving');if(txt)txt.textContent='Saving…';}else{if(dot)dot.classList.remove('saving');if(txt)txt.textContent='Saved';}}
 function startClock(){const tick=()=>{const el=document.getElementById('statusTime');if(el)el.textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});};tick();setInterval(tick,15000);}
 function showEmpty(v) {
@@ -6582,7 +7529,7 @@ let ptrStartX = 0;
 
 /* ── 1. HAPTIC FEEDBACK ── */
 function haptic(type='light'){
-  if(!navigator.vibrate)return;
+  if(!appSettings.haptics || !navigator.vibrate) return;
   if(type==='light')   navigator.vibrate(8);
   else if(type==='medium') navigator.vibrate(18);
   else if(type==='heavy')  navigator.vibrate([20,30,20]);
@@ -7208,45 +8155,31 @@ function renderGoalPanel() {
 /* ── TODAY tab ── */
 function renderGoalTodayTab(body) {
   const today = gpToday();
-  const todayGoals = goals; // show all goals in today tab
+  const todayGoals = goals;
   const done = todayGoals.filter(g => isGoalDoneToday(g));
   const pending = todayGoals.filter(g => !isGoalDoneToday(g));
   const pct = todayGoals.length ? Math.round(done.length / todayGoals.length * 100) : 0;
 
-  // Progress ring
-  const r = 22, circ = 2 * Math.PI * r;
-const dash = pct >= 100 ? circ : circ * pct / 100;
-const ringColor = pct === 100 ? 'var(--green)' : 'var(--accent)';
-
-  const arcAttrs = pct >= 100
-    ? `stroke-dasharray="${circ + 10} ${circ + 10}" stroke-linecap="butt"`
-    : `stroke-dasharray="${dash} ${circ}" stroke-linecap="round"`;
-
   let html = `<div class="gp-today-header">
-    <svg width="60" height="60" viewBox="0 0 60 60">
-      <circle cx="30" cy="30" r="${r}" fill="none" stroke="var(--panel4)" stroke-width="5"/>
-      <circle cx="30" cy="30" r="${r}" fill="none" stroke="${ringColor}" stroke-width="5"
-        ${arcAttrs} transform="rotate(-90 30 30)"
-        style="transition:stroke-dasharray .6s ease"/>
-      <text x="30" y="34" text-anchor="middle" font-size="11" font-weight="800"
-        fill="${ringColor}" font-family="var(--mono)">${pct}%</text>
-    </svg>
     <div class="gp-today-stats">
-      <div class="gp-ts-n">${done.length}/${todayGoals.length}</div>
-      <div class="gp-ts-l">Goals completed</div>
-      <div class="gp-ts-date">${new Date().toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'})}</div>
+      <div class="gp-ts-n">${done.length} / ${todayGoals.length}</div>
+      <div class="gp-ts-l">Goals Completed Today</div>
+      <div class="gp-ts-date">${new Date().toLocaleDateString('en-IN',{weekday:'long',month:'short',day:'numeric'})}</div>
+    </div>
+    <div style="width: 64px; height: 64px; border-radius: 50%; background: conic-gradient(var(--accent) ${pct*3.6}deg, var(--panel3) 0deg); display:flex; align-items:center; justify-content:center; flex-shrink: 0;">
+      <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--panel); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-weight:800; color:var(--accent); font-size: 14px;">${pct}%</div>
     </div>
   </div>`;
 
   if (!todayGoals.length) {
-    html += `<div class="gp-empty"><div style="font-size:40px;opacity:.18">🎯</div><p>No goals yet.<br>Tap <strong>+ Add</strong> to create your first goal.</p></div>`;
+    html += `<div class="gp-empty"><div style="font-size:48px;opacity:.18">🎯</div><p style="margin-top:12px;font-size:14px;">No goals yet.<br>Tap <strong>+ Add</strong> to start your journey.</p></div>`;
   } else {
     if (pending.length) {
       html += `<div class="gp-section-lbl">Pending · ${pending.length}</div>`;
       html += pending.map(g => buildGoalItem(g, false)).join('');
     }
     if (done.length) {
-      html += `<div class="gp-section-lbl" style="margin-top:14px">Completed · ${done.length}</div>`;
+      html += `<div class="gp-section-lbl" style="margin-top:20px;">Completed · ${done.length} 🎉</div>`;
       html += done.map(g => buildGoalItem(g, true)).join('');
     }
   }
@@ -7254,15 +8187,13 @@ const ringColor = pct === 100 ? 'var(--green)' : 'var(--accent)';
   html += `<button class="gp-add-fab" onclick="setGoalTab('add')">+ Add New Goal</button>`;
   body.innerHTML = html;
 
-  // Attach check button handlers
   body.querySelectorAll('.gp-check-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = btn.dataset.id;
       const item = document.getElementById('gpi_' + id);
-      const isDone = item?.classList.contains('gp-done');
-      if (!isDone && item) {
+      if (item && !item.classList.contains('gp-done')) {
         item.classList.add('gp-completing');
-        await new Promise(r => setTimeout(r, 380));
+        await new Promise(r => setTimeout(r, 400));
       }
       await toggleGoalDone(id);
     });
@@ -7273,10 +8204,29 @@ function buildGoalItem(goal, isDone) {
   const today = gpToday();
   const comp = (goal.completions||[]).find(c => c.date === today);
   const compTime = comp ? new Date(comp.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}) : '';
+  
+  // Calculate Streak
+  let streak = 0;
+  let curDate = new Date();
+  while(true) {
+    const ds = curDate.toISOString().split('T')[0];
+    if ((goal.completions||[]).some(c => c.date === ds)) {
+      streak++;
+      curDate.setDate(curDate.getDate() - 1);
+    } else {
+      if (ds === today && !isDone) {
+        // Don't break streak if today isn't done yet, just don't count it
+        curDate.setDate(curDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+  }
+
   return `<div class="gp-item${isDone?' gp-done':''}" id="gpi_${goal.id}">
     <button class="gp-check-btn" data-id="${goal.id}" title="${isDone?'Mark undone':'Mark done'}">
       <div class="gp-chk-circle${isDone?' done':''}">
-        ${isDone ? `<svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="2,6 5,9 10,3"/></svg>` : ''}
+        ${isDone ? `<svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="2,6 5,9 10,3"/></svg>` : ''}
       </div>
     </button>
     <div class="gp-item-info">
@@ -7285,11 +8235,12 @@ function buildGoalItem(goal, isDone) {
       <div class="gp-item-meta">
         ${goal.reminderTime ? `<span class="gp-meta-chip">🔔 ${goal.reminderTime}</span>` : ''}
         ${goal.repeatDaily ? `<span class="gp-meta-chip">🔁 Daily</span>` : ''}
+        ${streak > 1 ? `<span class="gp-meta-chip streak">🔥 ${streak} days</span>` : ''}
         ${isDone && compTime ? `<span class="gp-meta-chip" style="color:var(--green);border-color:rgba(63,185,80,.3);background:var(--green-bg)">✓ ${compTime}</span>` : ''}
       </div>
     </div>
     <button class="gp-item-edit" onclick="editGoal('${goal.id}')" title="Edit goal">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg>
     </button>
   </div>`;
 }
@@ -7315,6 +8266,32 @@ async function toggleGoalDone(id) {
   if (currentView === 'stats') renderStats();
 }
 
+function getNotifButtonHTML() {
+  if (!('Notification' in window)) {
+    return '<div style="font-size:11px;color:var(--text3);margin-top:4px">🔔 Notifications not supported in this browser.</div>';
+  } else if (Notification.permission === 'granted') {
+    return '<div style="font-size:11px;color:var(--green);margin-top:4px">🔔 Browser notifications enabled.</div>';
+  } else if (Notification.permission !== 'denied') {
+    return '<button class="tag-add-btn" style="margin-top:5px" onclick="enableNotif()">Enable Browser Notifications</button>';
+  } else {
+    return '<div style="font-size:11px;color:var(--red);margin-top:4px">🔔 Notifications blocked. Please enable in browser settings.</div>';
+  }
+}
+
+function enableNotif() {
+  if (!('Notification' in window)) return;
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') {
+      toast('Notifications enabled!', 'ok');
+      new Notification('StudyLog Pro', { body: 'Notifications are now enabled for task reminders.' });
+    } else {
+      toast('Notification permission denied', 'err');
+    }
+    // Update UI
+    const wrap = document.getElementById('notifStatusWrap');
+    if (wrap) wrap.innerHTML = getNotifButtonHTML();
+  });
+}
 /* ── ADD / EDIT tab ── */
 function renderGoalAddTab(body) {
   const isEdit = !!editGoalId;
@@ -7332,6 +8309,9 @@ function renderGoalAddTab(body) {
 <div class="fg" style="margin-bottom:11px">
   <label class="flbl">Reminder Time <span class="flbl-note">optional — triggers notification</span></label>
   <input class="finp" type="time" id="gfTime" value="${g ? (g.reminderTime||'') : ''}">
+  <div id="notifStatusWrap" style="margin-top: 8px;">
+    ${getNotifButtonHTML()}
+  </div>
 </div>
 
 <div class="fg" style="margin-bottom:18px">
@@ -7551,6 +8531,7 @@ function updateGoalBadge() {
 
 /* ── REMINDERS ── */
 function requestNotifPermission() {
+  if (!appSettings.goalNotifs) return;
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') { notifPermission = 'granted'; return; }
   if (Notification.permission === 'denied')  { notifPermission = 'denied';  return; }
