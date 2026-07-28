@@ -906,6 +906,7 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .manual-subject-chip.on{border-color:var(--accent);background:var(--accent-dim2);color:var(--text)}
 .manual-subject-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .manual-subject-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.legacy-entry-field{display:none!important}
 /* yt form */
 .yt-form-rows{display:flex;flex-direction:column;gap:5px;margin-top:5px}
 .yt-form-row{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:5px 9px}
@@ -2353,14 +2354,17 @@ button, select, input[type="date"] {
   #entryModal .m-head {
     padding:14px 14px 10px;
     gap:8px;
-    flex-wrap:wrap;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 40px;
+    grid-template-areas:"title close" "tabs tabs";
+    align-items:center;
     flex-shrink:0;
   }
-  #entryModal .m-head h2 { flex-basis:100%; font-size:15px; }
-  #entryModal .m-tabs { width:calc(100% - 44px); overflow-x:auto; scrollbar-width:none; }
+  #entryModal .m-head h2 { grid-area:title; min-width:0; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #entryModal .m-tabs { grid-area:tabs; width:100%; overflow-x:auto; scrollbar-width:none; display:flex; flex-wrap:nowrap; }
   #entryModal .m-tabs::-webkit-scrollbar { display:none; }
-  #entryModal .m-tab { min-height:38px; flex:1 0 auto; padding:7px 10px; }
-  #entryModal .m-close { min-width:38px; min-height:38px; }
+  #entryModal .m-tab { min-height:38px; flex:1 0 auto; padding:7px 10px; white-space:nowrap; }
+  #entryModal .m-close { grid-area:close; justify-self:end; min-width:38px; min-height:38px; }
   #entryModal .m-foot {
     position:sticky;
     bottom:0;
@@ -2688,6 +2692,13 @@ button, select, input[type="date"] {
         Sync now
       </button>
 
+      <button id="clearLocalCacheBtn" class="ws-row-btn" onclick="clearLocalCache()">
+        <span class="ws-row-ico">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M3 4h10M6 4V2h4v2M5 6v7M8 6v7M11 6v7M4 4l1 10h6l1-10"/></svg>
+        </span>
+        Clear history/cache
+      </button>
+
       <!-- Import JSON -->
       <button class="ws-row-btn" onclick="importData()">
         <span class="ws-row-ico">
@@ -2831,7 +2842,7 @@ button, select, input[type="date"] {
             <button class="attend-btn" id="att-absent"  onclick="setAttend('absent')">✗ Absent</button>
           </div>
         </div>
-        <div class="fg" style="margin-bottom:0">
+        <div class="fg legacy-entry-field" style="margin-bottom:0">
           <label class="flbl">Session Type</label>
           <select class="fsel" id="fStype">
             <option value="">— select —</option>
@@ -2846,7 +2857,7 @@ button, select, input[type="date"] {
         </div>
       </div>
 
-      <div class="f2" style="margin-top:11px">
+      <div class="f2 legacy-entry-field" style="margin-top:11px">
         <div class="fg" style="margin-bottom:0">
           <label class="flbl">Duration</label>
           <div class="dur-row">
@@ -2859,7 +2870,7 @@ button, select, input[type="date"] {
           <input type="hidden" id="fDuration" value="">
         </div>
       </div>
-      <div class="fg" style="margin-bottom:0">
+      <div class="fg legacy-entry-field" style="margin-bottom:0">
         <label class="flbl">Difficulty</label>
         <div class="diff-row" id="diffRow">
           <span class="diff-star" data-v="1" onclick="setDiff(1)">★</span>
@@ -5372,8 +5383,17 @@ if (sortSel) sortSel.value = localStorage.getItem('slp_sort') || 'desc';
     // Background sync from GitHub
 if (ghToken) {
       setSyncStatus('syncing', 'Syncing…');
+      let startupSyncOk = false;
       try {
-        const gistData = await loadFromGist();
+        const pull = await pullAndMergeFromGist();
+        const migrated = migrateEntriesToActiveRoutine();
+        startupSyncOk = !!pull.ok;
+        lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
+        if (pull.ok && (pull.changed || migrated)) {
+          await saveData({ mergeFirst: false, quiet: true });
+        }
+        refreshDataViews();
+        const gistData = null;
         if (gistData && gistData.entries) {
           // mergeDeletedIds now respects live entries (Change 1)
           if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
@@ -5397,7 +5417,7 @@ if (ghToken) {
       } catch(e) {
         console.warn('Background sync failed silently', e);
       }
-      setSyncStatus('ok', 'Synced ');
+      setSyncStatus(startupSyncOk ? 'ok' : 'err', startupSyncOk ? 'Synced' : 'Saved locally');
       if (appSettings.autoSync) startBackgroundSync();
     }
 } else {
@@ -6090,7 +6110,7 @@ const ATTEND_ICO = { present:'✓', late:'⏰', absent:'✗' };
   let badges = '';
   if (e.pinned) badges += `<span style="font-size:11px">📌</span>`;
   if (e.attendance && e.attendance !== 'present') badges += `<span style="font-size:11px;color:${ATTEND_COL[e.attendance]}">${ATTEND_ICO[e.attendance]}</span>`;
-  if (e.difficulty) badges += `<span class="er-badge" style="background:var(--panel3);color:var(--text3)" title="Difficulty ${'★'.repeat(e.difficulty)}">★${e.difficulty}</span>`;
+  if (false && e.difficulty) badges += `<span class="er-badge" style="background:var(--panel3);color:var(--text3)" title="Difficulty ${'★'.repeat(e.difficulty)}">★${e.difficulty}</span>`;
   if (e.mood) badges += `<span style="font-size:11px">${moodEmo(e.mood)}</span>`;
   if (e.rating) badges += `<span class="er-badge" style="background:var(--accent-dim);color:var(--accent)">★${e.rating}</span>`;
   const pend = (e.todos||[]).filter(t=>!t.done).length;
@@ -6168,12 +6188,12 @@ const metaItems = [];
     const acol = { present:'var(--green)', late:'var(--amber)', absent:'var(--red)' };
     metaItems.push({ k:'Attend', v:`<span style="color:${acol[e.attendance]};font-weight:700">${ac[e.attendance]}</span>` });
   }
-  if (e.sessionType) {
+  if (false && e.sessionType) {
     const stypes = { lecture:'📖 Lecture', lab:'🔬 Lab', tutorial:'✏️ Tutorial', seminar:'🎤 Seminar', selfstudy:'📚 Self Study', exam:'📝 Exam', revision:'🔄 Revision' };
     metaItems.push({ k:'Type', v: stypes[e.sessionType] || e.sessionType });
   }
-  if (e.duration) metaItems.push({ k:'Duration', v:`${e.duration >= 60 ? Math.floor(e.duration/60)+'h '+(e.duration%60?e.duration%60+'m':'') : e.duration+'m'}` });
-  if (e.difficulty) metaItems.push({ k:'Difficulty', v:`${'★'.repeat(e.difficulty)}${'☆'.repeat(5-e.difficulty)} (${['','Very Easy','Easy','Medium','Hard','Very Hard'][e.difficulty]})` });
+  if (false && e.duration) metaItems.push({ k:'Duration', v:`${e.duration >= 60 ? Math.floor(e.duration/60)+'h '+(e.duration%60?e.duration%60+'m':'') : e.duration+'m'}` });
+  if (false && e.difficulty) metaItems.push({ k:'Difficulty', v:`${'★'.repeat(e.difficulty)}${'☆'.repeat(5-e.difficulty)} (${['','Very Easy','Easy','Medium','Hard','Very Hard'][e.difficulty]})` });
   if (e.mood) metaItems.push({ k:'Mood', v:`${moodEmo(e.mood)} ${e.mood.charAt(0).toUpperCase()+e.mood.slice(1)}` });
   if (e.rating) metaItems.push({ k:'Rating', v:`<span style="font-size:15px;font-weight:800;color:var(--accent);font-family:var(--mono)">${e.rating}</span><div class="dp-rating-track"><div class="dp-rating-fill" style="width:${e.rating*10}%"></div></div><span style="font-size:11px;color:var(--text3)">/10</span>` });
   if (e.reviewDate) metaItems.push({ k:'Review', v: e.reviewDate + (e.reviewType && e.reviewType !== 'general' ? ` (${e.reviewType})` : '') });
@@ -7085,9 +7105,9 @@ const entry = {
     mood:        formMood,
     rating,
     attendance:  formAttend || '',
-    difficulty:  formDifficulty || 0,
-    duration:    parseInt(document.getElementById('fDuration').value) || 0,
-    sessionType: document.getElementById('fStype')?.value || '',
+    difficulty:  0,
+    duration:    0,
+    sessionType: '',
     reviewType:  document.getElementById('fReviewType')?.value || 'general',
     wordGoal:    parseInt(document.getElementById('fWordGoal')?.value) || 0,
     reviewDate:  document.getElementById('reviewDate').value,
@@ -7246,9 +7266,10 @@ async function togglePinSel() {
 async function delSel() {
   if (!selIds.size) return;
   if (!confirm(`Delete ${selIds.size} entries?`)) return;
-  const now = Date.now();
-  for (const id of selIds) { deletedIds[id] = now; }
-  saveDeletedIds();
+  for (const id of selIds) {
+    const entry = entries.find(e => entryKey(e) === entryKey(id));
+    markEntryDeleted(id, entry);
+  }
   entries = entries.filter(e => !selIds.has(String(e.id)));
   await saveData();
   clearSel();
@@ -7965,9 +7986,21 @@ let ptrStartX = 0;
 
   function idx(){ return VIEWS.indexOf(currentView); }
 
+  function openSidebarFromHome() {
+    if (window.innerWidth > 768 || currentView !== 'list') return false;
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar || sidebar.classList.contains('mobile-open')) return false;
+    toggleMobileSidebar();
+    return true;
+  }
+
   function goView(dir){
     const next = idx() + dir;
-    if(next < 0 || next >= VIEWS.length) return;
+    if(next < 0) {
+      if (dir < 0) openSidebarFromHome();
+      return;
+    }
+    if(next >= VIEWS.length) return;
     switchView(VIEWS[next]);
     const map = {list:'listCont',grid:'gridCont',calendar:'calCont',stats:'statsCont'};
     const el  = document.getElementById(map[VIEWS[next]]);
@@ -9679,6 +9712,239 @@ function _initGoalPanelSwipe() {
   });
 }
 /* ── KICK OFF ── */
+
+/* Final sync/cache overrides. Keep these last so older duplicate helpers above cannot win. */
+async function saveData(opts = {}) {
+  const { mergeFirst = true, quiet = false, syncRoutines = false } = opts;
+  let data = {
+    version: 7,
+    entries: applyTombstones(entries),
+    settings: appSettings,
+    saved: new Date().toISOString()
+  };
+  entries = data.entries;
+  lsSave(data);
+
+  if (!ghToken) {
+    if (!quiet) setSyncStatus('ok', 'Saved');
+    return true;
+  }
+
+  if (!quiet) setSyncStatus('syncing', 'Saving...');
+  try {
+    if (mergeFirst) {
+      await pullAndMergeFromGist();
+      migrateEntriesToActiveRoutine();
+      data = {
+        version: 7,
+        entries: applyTombstones(entries),
+        settings: appSettings,
+        saved: new Date().toISOString()
+      };
+      entries = data.entries;
+      lsSave(data);
+    }
+
+    const ok = await saveToGist(data, syncRoutines);
+    if (!quiet) setSyncStatus(ok ? 'ok' : 'err', ok ? 'Synced' : 'Saved locally');
+    return ok;
+  } catch (err) {
+    console.error('Save failed:', err);
+    if (!quiet) setSyncStatus('err', 'Saved locally');
+    return false;
+  } finally {
+    updateSyncUI();
+  }
+}
+
+async function syncNow() {
+  if (!ghToken) {
+    toast('Connect GitHub first', 'err');
+    openGHConnectModal();
+    return false;
+  }
+
+  setSyncStatus('syncing', 'Syncing...');
+  try {
+    const pull = await pullAndMergeFromGist();
+    const migrated = migrateEntriesToActiveRoutine();
+    entries = applyTombstones(entries);
+    lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
+
+    const pushOk = await saveData({ mergeFirst: false, quiet: true });
+    refreshDataViews();
+
+    if (pushOk) {
+      setSyncStatus('ok', 'Synced');
+      toast(pull.changed || migrated ? 'Synced changes across devices' : 'Already up to date', 'ok');
+    } else {
+      setSyncStatus('err', 'Sync failed');
+      toast('Sync failed - check GitHub token or connection', 'err');
+    }
+    return pushOk;
+  } catch (err) {
+    console.error('Manual sync failed:', err);
+    setSyncStatus('err', 'Sync failed');
+    toast('Sync failed - try again', 'err');
+    return false;
+  } finally {
+    updateSyncUI();
+  }
+}
+
+async function pollForChanges() {
+  if (!ghToken || isPolling) return;
+  isPolling = true;
+  try {
+    const gistData = await loadFromGist();
+    if (!gistData || !Array.isArray(gistData.entries)) return;
+
+    const result = mergeCloudEntries(gistData);
+    const migrated = migrateEntriesToActiveRoutine();
+    if (result.changed || migrated) {
+      refreshDataViews();
+      await saveData({ mergeFirst: false, quiet: true });
+      toast('Synced from another device', 'info');
+    }
+  } catch (err) {
+    console.debug('Background sync error', err);
+    setSyncStatus('err', 'Sync failed');
+  } finally {
+    isPolling = false;
+    updateSyncUI();
+  }
+}
+
+async function loadData() {
+  let data = null;
+  try {
+    data = JSON.parse(localStorage.getItem('studylog_v7') || localStorage.getItem('studylog_v6') || localStorage.getItem('studylog_v5') || 'null');
+  } catch (e) {}
+
+  if (data?.settings) {
+    appSettings = data.settings;
+    localStorage.setItem('slp_settings', JSON.stringify(appSettings));
+  }
+
+  entries = applyTombstones(data?.entries || []);
+  lsSave({ version: 7, entries, settings: appSettings, saved: data?.saved || new Date().toISOString() });
+
+  if (!ghToken) return;
+
+  setSyncStatus('syncing', 'Syncing...');
+  try {
+    const pull = await pullAndMergeFromGist();
+    const migrated = migrateEntriesToActiveRoutine();
+    entries = applyTombstones(entries);
+    lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
+    if (pull.ok && (pull.changed || migrated)) {
+      await saveData({ mergeFirst: false, quiet: true });
+    }
+    setSyncStatus(pull.ok ? 'ok' : 'err', pull.ok ? 'Synced' : 'Saved locally');
+  } catch (err) {
+    console.error('Load sync failed:', err);
+    setSyncStatus('err', 'Saved locally');
+  } finally {
+    updateSyncUI();
+  }
+}
+
+async function connectGitHub(token) {
+  setSyncStatus('syncing', 'Verifying token...');
+  const user = await validateToken(token);
+  if (!user) {
+    setSyncStatus('err', 'Invalid token');
+    toast('Invalid token - check and try again', 'err');
+    return false;
+  }
+
+  ghToken = token;
+  localStorage.setItem('slp_gh_token', token);
+  localStorage.setItem('slp_gh_user', user.login);
+  setSyncStatus('syncing', 'Loading from GitHub...');
+
+  try {
+    const pull = await pullAndMergeFromGist();
+    migrateEntriesToActiveRoutine();
+    entries = applyTombstones(entries);
+    lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
+    await saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
+
+    setSyncStatus('ok', 'Synced');
+    updateSyncUI();
+    refreshDataViews();
+    toast(pull.ok ? 'Connected to GitHub - syncing across devices' : 'Connected - local data uploaded', 'ok');
+    if (appSettings.autoSync) startBackgroundSync();
+    return true;
+  } catch (err) {
+    console.error('GitHub connect sync failed:', err);
+    setSyncStatus('err', 'Sync failed');
+    toast('Connected, but initial sync failed. Try Sync now.', 'err');
+    return false;
+  }
+}
+
+async function clearLocalCache() {
+  const ok = confirm(
+    'Clear local cache and UI history on this browser?\n\n' +
+    'This keeps synced entries, routines, goals, GitHub connection, and delete records.'
+  );
+  if (!ok) return;
+
+  const protectedKeys = new Set([
+    'studylog_v7', 'studylog_v6', 'studylog_v5',
+    'slp_deleted', 'slp_gh_token', 'slp_gist_id', 'slp_gh_user',
+    'studylog_routines', 'studylog_current_routine', 'slp_routine',
+    'slp_settings', 'slp_setup_done', 'slp_goals_v1'
+  ]);
+  const exactKeys = [
+    'slp_view', 'slp_group', 'slp_sort', 'slp_hist',
+    'subjListCollapsed', 'slp_sidebar_collapsed',
+    'slp_entry_draft', 'slp_filters', 'slp_last_search',
+    'slp_cmd_recent', 'slp_notif_asked'
+  ];
+  const prefixes = ['slp_draft_', 'slp_tmp_', 'slp_cache_', 'slp_recent_', 'slp_last_', 'slp_gnotif_'];
+  const removed = new Set();
+
+  function removeKey(key) {
+    if (!key || protectedKeys.has(key)) return;
+    localStorage.removeItem(key);
+    removed.add(key);
+  }
+
+  exactKeys.forEach(removeKey);
+  Object.keys(localStorage).forEach(key => {
+    if (!protectedKeys.has(key) && prefixes.some(prefix => key.startsWith(prefix))) {
+      removeKey(key);
+    }
+  });
+
+  try {
+    Object.keys(sessionStorage).forEach(key => {
+      if (key.startsWith('slp_') || key.startsWith('studylog_')) sessionStorage.removeItem(key);
+    });
+  } catch (e) {}
+
+  if ('caches' in window) {
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter(key => /studylog|slp/i.test(key)).map(key => caches.delete(key)));
+    } catch (e) {}
+  }
+
+  activeSubjs = [];
+  activeTagFilters = [];
+  activeNav = 'all';
+  groupMode = 'day';
+  if (selIds?.size) clearSel();
+  closeMobileSidebar();
+  document.querySelectorAll('#qInput, #toolbarSearchInput, input[type="search"]').forEach(input => { input.value = ''; });
+  history.replaceState({ slp: 'base' }, '');
+  switchView('list');
+  refreshDataViews();
+  updateSyncUI();
+  toast(`Local cache cleared. Synced data kept.`, 'ok');
+}
 
 init();
 
