@@ -3708,10 +3708,23 @@ async function saveToGist(data, routineData) {
   try {
     if (!gistId) await findOrCreateGist();
     if (!gistId) throw new Error('No gist ID');
+    
     const payload = { ...data, deletedIds };
     const files = { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } };
     if (routineData) files[ROUTINE_FILENAME] = { content: JSON.stringify(routineData, null, 2) };
-    const res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
+    
+    let res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
+    
+    // RECOVERY FIX: If push fails (e.g. 404 because the Gist was manually deleted), find/create a new one and try again!
+    if (!res) {
+      console.warn('Push failed, attempting to find or create a new Gist...');
+      gistId = '';
+      localStorage.removeItem('slp_gist_id');
+      await findOrCreateGist();
+      if (!gistId) throw new Error('No gist ID after retry');
+      res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
+    }
+    
     if (!res) throw new Error('GitHub API error');
     if (res.updated_at) lastGistUpdatedAt = res.updated_at;
     return true;
@@ -9297,7 +9310,10 @@ async function syncNow() {
   const pushOk = await saveToGist(data);
   refreshDataViews();
   if (pushOk) { toast('Synced ✓', 'ok'); setSyncStatus('ok', 'Synced ✓'); }
-  else { toast('Pull done, push failed — check token', 'err'); setSyncStatus('err', 'Partial sync'); }
+  else { 
+    toast(pull.ok ? 'Pull done, push failed — check token scope' : 'Sync failed — reconnect GitHub', 'err'); 
+    setSyncStatus('err', 'Partial sync'); 
+  }
 }
 
 async function pollForChanges() {
