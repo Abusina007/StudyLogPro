@@ -3646,8 +3646,15 @@ async function ghFetch(method, path, body) {
         localStorage.removeItem('slp_gh_token');
         updateSyncUI();
         toast('GitHub token expired – please reconnect', 'err');
-      } else if (res.status === 403 && res.headers.get('X-RateLimit-Remaining') !== '0') {
-        toast('GitHub sync error (403) – check token scope', 'err');
+      } else if (res.status === 403) {
+        const remaining = res.headers.get('X-RateLimit-Remaining');
+        if (remaining === '0') {
+          toast('GitHub rate limit reached. Try again later.', 'err');
+        } else {
+          toast('403 Forbidden: Token missing "gist" scope', 'err');
+        }
+      } else if (res.status === 404) {
+        console.warn('Gist not found (404)');
       }
       return null;
     }
@@ -9303,16 +9310,29 @@ async function saveData() {
 async function syncNow() {
   if (!ghToken) { toast('Connect GitHub first', 'err'); openGHConnectModal(); return; }
   setSyncStatus('syncing', 'Syncing…');
-  const pull = await pullAndMergeFromGist();
+  
+  // Try to pull, but don't block the push if pull fails
+  let pullOk = false;
+  try {
+    const pull = await pullAndMergeFromGist();
+    pullOk = pull.ok;
+  } catch (e) {
+    console.warn("Pull failed, attempting push anyway", e);
+  }
+
   const data = { version: 7, entries: applyTombstones(entries), saved: new Date().toISOString() };
   entries = data.entries;
   lsSave(data);
+  
   const pushOk = await saveToGist(data);
   refreshDataViews();
-  if (pushOk) { toast('Synced ✓', 'ok'); setSyncStatus('ok', 'Synced ✓'); }
-  else { 
-    toast(pull.ok ? 'Pull done, push failed — check token scope' : 'Sync failed — reconnect GitHub', 'err'); 
-    setSyncStatus('err', 'Partial sync'); 
+  
+  if (pushOk) { 
+    toast('Synced ✓', 'ok'); 
+    setSyncStatus('ok', 'Synced ✓'); 
+  } else { 
+    toast('Push failed — your token is missing the "gist" permission', 'err'); 
+    setSyncStatus('err', 'Sync failed'); 
   }
 }
 
@@ -9395,6 +9415,19 @@ async function connectGitHub(token) {
   ghToken = token;
   localStorage.setItem('slp_gh_token', token);
   localStorage.setItem('slp_gh_user', user.login);
+  setSyncStatus('syncing', 'Connecting to GitHub...');
+
+  // Force find or create the gist to test write permissions early!
+  const gist = await findOrCreateGist();
+  if (!gist) {
+    setSyncStatus('err', 'Token missing gist scope');
+    toast('Token is missing the "gist" permission. Regenerate it with the gist box checked.', 'err');
+    ghToken = '';
+    localStorage.removeItem('slp_gh_token');
+    updateSyncUI();
+    return false;
+  }
+
   setSyncStatus('syncing', 'Loading from GitHub...');
 
   try {
