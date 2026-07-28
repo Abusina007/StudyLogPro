@@ -9305,14 +9305,20 @@ async function pollForChanges() {
   isPolling = true;
   try {
     const gist = await ghFetch('GET', `/gists/${gistId}`);
-    if (!gist) return;
+    if (!gist || !gist.files) return;
     if (gist.updated_at === lastGistUpdatedAt) return;
 
-    const rawUrl = gist.files[GIST_FILENAME]?.raw_url;
-    if (!rawUrl) return;
-    const res = await fetch(rawUrl + '?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) return;
-    const gistData = await res.json();
+    let gistData = null;
+    // FIX: Use API content directly to bypass GitHub's 5-minute raw_url CDN cache!
+    if (gist.files[GIST_FILENAME]?.content) {
+      try { gistData = JSON.parse(gist.files[GIST_FILENAME].content); } catch(e) {}
+    } else if (gist.files[GIST_FILENAME]?.raw_url) {
+      const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      gistData = await res.json();
+    }
+    
+    if (!gistData) return;
     lastGistUpdatedAt = gist.updated_at;
 
     const { changed } = mergeCloudEntries(gistData);
