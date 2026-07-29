@@ -3628,7 +3628,7 @@ function migrateEntriesToActiveRoutine() {
 
 
 async function ghFetch(method, path, body) {
-  if (!ghToken) return null;
+  if (!ghToken) return { err: 'no_token' };
   try {
     const opts = {
       method,
@@ -3641,26 +3641,34 @@ async function ghFetch(method, path, body) {
     if (body !== undefined) opts.body = JSON.stringify(body);
     const res = await fetch('https://api.github.com' + path, opts);
     if (!res.ok) {
+      const err = { status: res.status, err: 'http' };
       if (res.status === 401) {
+        err.reason = 'token_expired';
         ghToken = '';
         localStorage.removeItem('slp_gh_token');
         updateSyncUI();
         toast('GitHub token expired – please reconnect', 'err');
       } else if (res.status === 403) {
         const remaining = res.headers.get('X-RateLimit-Remaining');
+        err.reason = remaining === '0' ? 'rate_limited' : 'forbidden';
         if (remaining === '0') {
           toast('GitHub rate limit reached. Try again later.', 'err');
         } else {
           toast('403 Forbidden: Token missing "gist" scope', 'err');
         }
       } else if (res.status === 404) {
+        err.reason = 'not_found';
         console.warn('Gist not found (404)');
+      } else if (res.status >= 500) {
+        err.reason = 'server_error';
+      } else {
+        err.reason = 'unknown';
       }
-      return null;
+      return err;
     }
     if (method === 'DELETE') return true;
     return await res.json();
-  } catch (e) { return null; }
+  } catch (e) { return { err: 'network', reason: 'fetch_failed' }; }
 }
 
 // Validate token and get username
@@ -3678,12 +3686,12 @@ async function validateToken(token) {
 async function findOrCreateGist() {
   if (gistId) {
     const g = await ghFetch('GET', `/gists/${gistId}`);
-    if (g && g.id) { if (g.updated_at) lastGistUpdatedAt = g.updated_at; return g; }
+    if (g && !g.err && g.id) { if (g.updated_at) lastGistUpdatedAt = g.updated_at; return g; }
     gistId = '';
     localStorage.removeItem('slp_gist_id');
   }
   const gists = await ghFetch('GET', '/gists?per_page=100');
-  if (gists) {
+  if (Array.isArray(gists)) {
     const found = gists.find(g => g.description === GIST_DESC);
     if (found) {
       gistId = found.id;
@@ -3710,7 +3718,12 @@ async function findOrCreateGist() {
 }
 
 async function saveToGist(data, routineData) {
-  if (!ghToken || ghSyncing) return false;
+  if (!ghToken) return false;
+  // Wait for any in-flight sync to finish, then retry
+  if (ghSyncing) {
+    while (ghSyncing) await new Promise(r => setTimeout(r, 100));
+    return saveToGist(data, routineData);
+  }
   ghSyncing = true;
   try {
     if (!gistId) await findOrCreateGist();
@@ -3722,9 +3735,9 @@ async function saveToGist(data, routineData) {
     
     let res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
     
-    // RECOVERY FIX: If push fails (e.g. 404 because the Gist was manually deleted), find/create a new one and try again!
-    if (!res) {
-      console.warn('Push failed, attempting to find or create a new Gist...');
+    // Recovery: only recreate gist on actual 404 (manually deleted)
+    if (res && res.err === 'http' && res.reason === 'not_found') {
+      console.warn('Gist deleted, creating a new one...');
       gistId = '';
       localStorage.removeItem('slp_gist_id');
       await findOrCreateGist();
@@ -3732,15 +3745,23 @@ async function saveToGist(data, routineData) {
       res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
     }
     
-    if (!res) throw new Error('GitHub API error');
+    if (!res || res.err) {
+      if (res && res.reason === 'token_expired') {
+        disconnectGitHub();
+        toast('GitHub token expired – please reconnect', 'err');
+      } else if (res && res.reason === 'rate_limited') {
+        toast('GitHub rate limit hit. Data saved locally, will retry.', 'err');
+        return false;
+      } else if (res && (res.reason === 'server_error' || res.reason === 'network')) {
+        toast('GitHub sync temporarily unavailable. Data saved locally.', 'err');
+        return false;
+      }
+      return false;
+    }
     if (res.updated_at) lastGistUpdatedAt = res.updated_at;
     return true;
   } catch (err) {
     console.error('GitHub sync failed:', err);
-    if (err.message.includes('token') || err.message.includes('401')) {
-      disconnectGitHub();
-      toast('GitHub token expired – please reconnect', 'err');
-    }
     return false;
   } finally {
     ghSyncing = false;
@@ -9311,11 +9332,10 @@ async function syncNow() {
   if (!ghToken) { toast('Connect GitHub first', 'err'); openGHConnectModal(); return; }
   setSyncStatus('syncing', 'Syncing…');
   
-  // Try to pull, but don't block the push if pull fails
-  let pullOk = false;
+  let pulled = false;
   try {
     const pull = await pullAndMergeFromGist();
-    pullOk = pull.ok;
+    pulled = pull.ok;
   } catch (e) {
     console.warn("Pull failed, attempting push anyway", e);
   }
@@ -9327,13 +9347,17 @@ async function syncNow() {
   const pushOk = await saveToGist(data);
   refreshDataViews();
   
-  if (pushOk) { 
-    toast('Synced ✓', 'ok'); 
-    setSyncStatus('ok', 'Synced ✓'); 
-  } else { 
-    toast('Push failed — your token is missing the "gist" permission', 'err'); 
-    setSyncStatus('err', 'Sync failed'); 
+  if (pushOk) {
+    toast('Synced ✓', 'ok');
+    setSyncStatus('ok', 'Synced ✓');
+  } else {
+    pushFailedToast();
+    setSyncStatus('err', 'Sync failed');
   }
+}
+
+function pushFailedToast() {
+  toast('Sync failed — check your connection and token permissions', 'err');
 }
 
 async function pollForChanges() {
