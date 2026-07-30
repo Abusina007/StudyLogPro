@@ -3499,8 +3499,10 @@ function syncSignature(list = entries, tombstones = deletedIds) {
 function markEntryDeleted(id, entry) {
   const key = entryKey(id);
   if (!key) return 0;
-  const prev = Number(deletedIds[key] || 0);
-  const ts = Math.max(Date.now(), entryStamp(entry) + 1, prev + 1);
+  const prev = Number(deletedIds[key] || 0) || 0;
+  const entryTs = entryStamp(entry);
+  // Ensure ts is always a valid, finite number greater than the entry's stamp
+  const ts = Math.max(Date.now(), isFinite(entryTs) ? entryTs + 1 : 0, prev + 1);
   deletedIds[key] = ts;
   saveDeletedIds();
   return ts;
@@ -3509,13 +3511,15 @@ function markEntryDeleted(id, entry) {
 function reviveEntry(entry) {
   const key = entryKey(entry);
   if (!key) return entry;
-  const tombstone = Number(deletedIds[key] || 0);
+  const tombstone = Number(deletedIds[key] || 0) || 0;
   delete deletedIds[key];
   saveDeletedIds();
+  const entryTs = entryStamp(entry);
+  // Ensure updatedAt is strictly greater than the tombstone so it resurrects properly
   return {
     ...entry,
     id: entry.id,
-    updatedAt: Math.max(Date.now(), tombstone + 1, entryStamp(entry) + 1),
+    updatedAt: Math.max(Date.now(), tombstone + 1, isFinite(entryTs) ? entryTs + 1 : 0),
   };
 }
 
