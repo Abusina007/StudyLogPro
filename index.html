@@ -6241,7 +6241,18 @@ async function handleFiles(files){
         renderFilePrevs();
         toast('Image compressed & added!', 'ok');
       } catch (err) {
-        toast('Image compression failed.', 'err');
+        // Fallback: If compression fails (e.g., SVG or unsupported format), 
+        // check raw size and add it if under 850KB
+        if(f.size > 850 * 1024){ 
+          toast(f.name + ' is too large and could not be compressed.', 'err');
+        } else {
+          const r = new FileReader();
+          r.onload = ev => {
+            formFiles.push({name:f.name, type:f.type, data:ev.target.result, size:f.size, _new:true});
+            renderFilePrevs();
+          };
+          r.readAsDataURL(f);
+        }
       }
     } else {
       // Non-images (PDFs, docs) cannot be easily compressed, enforce hard limit
@@ -6286,8 +6297,8 @@ async function saveEntry() {
     return;
   }
 
-  // Duplicate check for new entries (not editing)
-  if (!editId) {
+  // Duplicate check for new entries (skip check for 'OTHER' to allow multiple self-study/quick notes)
+  if (!editId && selSubj !== 'OTHER') {
     const existing = entries.find(e => e.date === date && e.subject === selSubj);
     if (existing) {
       toast(`An entry for ${selSubj} on ${date} already exists. Use edit instead.`, 'err');
@@ -6585,6 +6596,13 @@ async function importData() {
 
       const now = Date.now();
       newEntries.forEach(entry => {
+        // CRITICAL FIX: Ensure every imported entry has a valid, unique string ID
+        // so tombstones don't get dropped by Firestore sync normalization
+        if (!entry.id || entry.id === 'undefined' || entry.id === 'null') {
+          entry.id = Date.now().toString() + Math.random().toString(36).slice(2);
+        }
+        entry.id = String(entry.id); // Force it to be a string
+        
         entry.updatedAt = now;
         if (!entry.createdAt) entry.createdAt = now;
         delete deletedIds[entry.id];
@@ -6910,11 +6928,16 @@ function updateStats(){
 function calcStreak(list = entries) {
   const dates = [...new Set(list.map(e => e.date))].sort().reverse();
   if (!dates.length) return 0;
-  let streak = 0, cur = new Date();
-  cur.setHours(0, 0, 0, 0);
+  let streak = 0;
+  // Use local date to prevent timezone streak breaks
+  let cur = new Date();
+  const tzOffset = cur.getTimezoneOffset() * 60000;
+  let curLocal = new Date(cur.getTime() - tzOffset).toISOString().split('T')[0];
+  
   for (const ds of dates) {
     const d = new Date(ds + 'T00:00:00');
-    if ((cur - d) / 864e5 < 1.5) { streak++; cur = d; } else break;
+    const c = new Date(curLocal + 'T00:00:00');
+    if ((c - d) / 864e5 < 1.5) { streak++; curLocal = ds; } else break;
   }
   return streak;
 }
@@ -7149,7 +7172,7 @@ document.addEventListener('touchend', e => {
       if (typeof render === 'function') render();
       if (typeof buildSubjList === 'function') buildSubjList();
       if (typeof updateSideTagCloud === 'function') updateSideTagCloud();
-      if (typeof toast === 'function') toast('Refreshed ', 'ok');
+      if (typeof toast === 'function') toast('Offline mode: Data refreshed locally', 'info');
       setTimeout(finish, 750);
     }
   }
