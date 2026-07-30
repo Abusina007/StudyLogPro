@@ -2499,8 +2499,7 @@ button, select, input[type="date"] {
   </div>
 
   <!-- Workspace badge (hidden on small screens) -->
-  <div class="tb-ws" id="wsChip" onclick="ghToken ? syncNow() : openGHConnectModal()" title="Workspace sync">
-    <span class="tb-ws-ico" style="font-size:10px">●</span>
+<div class="tb-ws" id="wsChip" onclick="ghToken ? syncNow() : connectGitHub()" title="Workspace sync">    <span class="tb-ws-ico" style="font-size:10px">●</span>
     <span class="tb-ws-name" id="wsName">Browser Only</span>
     <span class="tb-ws-badge local" id="wsBadge">local</span>
   </div>
@@ -2671,19 +2670,18 @@ button, select, input[type="date"] {
     <!-- Workspace action buttons -->
     <div style="display:flex;flex-direction:column;gap:4px">
 
-      <!-- Connect / Disconnect GitHub -->
-      <button id="ghConnectBtn" class="ws-row-btn git-h-c" onclick="openGHConnectModal()">
-        <span class="ws-row-ico">
-          <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        </span>
-        Connect GitHub Sync
-      </button>
-      <button id="ghDisconnectBtn" class="ws-row-btn ws-row-btn-danger" style="display:none" onclick="disconnectGitHub()">
-        <span class="ws-row-ico">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M10 8H6M3 8a5 5 0 1010 0A5 5 0 003 8z"/></svg>
-        </span>
-        Disconnect GitHub
-      </button>
+<button id="ghConnectBtn" class="ws-row-btn git-h-c" onclick="connectGitHub()">
+  <span class="ws-row-ico">
+    <svg viewBox="0 0 24 24" width="14" height="14"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+  </span>
+  Sign in with Google
+</button>
+<button id="ghDisconnectBtn" class="ws-row-btn ws-row-btn-danger" style="display:none" onclick="disconnectGitHub()">
+  <span class="ws-row-ico">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M10 8H6M3 8a5 5 0 1010 0A5 5 0 003 8z"/></svg>
+  </span>
+  Sign Out
+</button>
 
       <button id="ghSyncNowBtn" class="ws-row-btn sync-now" style="display:none" onclick="syncNow()">
         <span class="ws-row-ico">
@@ -2976,7 +2974,7 @@ button, select, input[type="date"] {
           ondrop="handleDrop(event)">
           <div class="drop-ico">📎</div>
           <div style="font-size:13px;font-weight:500">Click or drag files here</div>
-          <div class="drop-sub">Images, PDFs, docs — max 10 MB each</div>
+          <div class="drop-sub">Images auto-compress. PDFs/docs max 850KB.</div>
           <div class="drop-sub" style="margin-top:3px;font-size:10px;opacity:.6">Ctrl+V to paste screenshots</div>
           <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this.files)">
         </div>
@@ -3111,9 +3109,9 @@ button, select, input[type="date"] {
           <div class="sc-row"><span class="sc-desc">Calendar</span><div class="sc-keys"><kbd>3</kbd></div></div>
           <div class="sc-row"><span class="sc-desc">Stats</span><div class="sc-keys"><kbd>4</kbd></div></div>
         </div></div>
-        <div class="help-sec"><h3>Semester Login</h3>
-          <p style="font-size:13px;color:var(--text2);line-height:1.75">You log in <strong>once per semester</strong>. The setup wizard runs only on first open (or after clicking <strong>↩ Logout</strong> in the sidebar workspace section). It saves your folder choice and routine persistently – no re-asking on every open.<br><br>On subsequent opens, your data loads instantly from browser storage, then silently reconnects to your folder in the background.</p>
-        </div>
+<div class="help-sec"><h3>Cloud Sync</h3>
+  <p style="font-size:13px;color:var(--text2);line-height:1.75">Sign in once with Google to sync across all devices. Your data is stored securely in Firebase Firestore. On subsequent opens, data loads instantly from browser storage, then syncs in real-time via Firestore listeners — changes on one device appear instantly on others.</p>
+</div>
         <div class="help-sec"><h3>Smart Search</h3>
           <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12.5px;color:var(--text2)">
             <code style="font-family:var(--mono);background:var(--panel3);padding:1px 6px;border-radius:4px;font-size:11px;color:var(--accent)">mon</code><span>Day name</span>
@@ -3328,10 +3326,38 @@ button, select, input[type="date"] {
   </div>
 </div>
 
-<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
-<script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script>
 'use strict';
 
+// ═══════════════════════════════════════════════════════
+//  FIREBASE INITIALIZATION
+// ═══════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyAZyCdFqk7EVla2jB9Y_-eSWF87gEd4i9c",
+  authDomain: "studylog-pro.firebaseapp.com",
+  projectId: "studylog-pro",
+  storageBucket: "studylog-pro.firebasestorage.app",
+  messagingSenderId: "576724406380",
+  appId: "1:576724406380:web:01c085f199dc82e9678849",
+  measurementId: "G-PCM7EZ3N23"
+};
+if (!window._fbInit) {
+  firebase.initializeApp(firebaseConfig);
+  window._fbInit = true;
+}
+const fbAuth = firebase.auth();
+const fbDb   = firebase.firestore();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+let fbUser = null;
+let fbUnsubMain = null;
+let fbUnsubGoals = null;
+
+function fbUserRef() {
+  if (!fbUser) return null;
+  return fbDb.collection('users').doc(fbUser.uid);
+}
 /* ─── SEMESTER FOLDER HELPER ─── */
 function getSemesterFolder(filenameOrId) {
   const str = (filenameOrId || '').toLowerCase();
@@ -3422,13 +3448,11 @@ const GENERIC_ROUTINE = {
 };
   
 /* ═══════════════════════════════════
-   GITHUB GIST SYNC
+SYNC
 ═══════════════════════════════════ */
-const GIST_FILENAME = 'studylog_data.json';
-const ROUTINE_FILENAME = 'studylog_routine.json';
-const GIST_DESC = 'StudyLog Pro – Academic Journal Data';
-let ghToken = localStorage.getItem('slp_gh_token') || '';
-let gistId   = localStorage.getItem('slp_gist_id')  || '';
+// Sync state — ghToken/gistId now hold Firebase UID (kept for code compatibility)
+let ghToken = localStorage.getItem('slp_fb_uid') || '';
+let gistId   = localStorage.getItem('slp_fb_uid') || '';
 let ghSyncing = false;
 let gistSaveQueue = Promise.resolve();
 let deletedIds = {};
@@ -3613,567 +3637,14 @@ function migrateEntriesToActiveRoutine() {
   return migrated;
 }
 
-
-async function ghFetch(method, path, body) {
-  if (!ghToken) return null;
-  try {
-    const opts = {
-      method,
-      headers: {
-        Authorization: `token ${ghToken}`,
-        Accept: 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-      },
-    };
-    if (body !== undefined) opts.body = JSON.stringify(body);
-    const res = await fetch('https://api.github.com' + path, opts);
-if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
-        ghToken = '';
-        localStorage.removeItem('slp_gh_token');
-        updateSyncUI();
-        toast('GitHub token expired – please reconnect', 'err');
-      }
-      return null;
-    }
-    if (method === 'DELETE') return true;
-    return await res.json();
-  } catch (e) {
-    return null;
-  }
-}
-
-// Validate token and get username
-async function validateToken(token) {
-  try {
-    const res = await fetch('https://api.github.com/user', {
-      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (e) { return null; }
-}
-
-// Find existing StudyLog gist or create new one
-async function findOrCreateGist() {
-  if (gistId) {
-    // Verify it still exists
-    const g = await ghFetch('GET', `/gists/${gistId}`);
-    if (g && g.id) return g;
-    gistId = '';
-    localStorage.removeItem('slp_gist_id');
-  }
-  // Search existing gists for StudyLog
-  const gists = await ghFetch('GET', '/gists?per_page=100');
-  if (gists) {
-    const found = gists.find(g => g.description === GIST_DESC);
-    if (found) {
-      gistId = found.id;
-      localStorage.setItem('slp_gist_id', gistId);
-      return found;
-    }
-  }
-  // Create new gist
-  const created = await ghFetch('POST', '/gists', {
-    description: GIST_DESC,
-    public: false,
-    files: {
-      [GIST_FILENAME]: { content: JSON.stringify({ version: 7, entries: [], saved: new Date().toISOString() }) },
-      [ROUTINE_FILENAME]: { content: JSON.stringify(activeRoutine || GENERIC_ROUTINE) },
-    },
-  });
-  if (created && created.id) {
-    gistId = created.id;
-    localStorage.setItem('slp_gist_id', gistId);
-    return created;
-  }
-  return null;
-}
-
-async function saveToGist(data, syncRoutines = false) {
-  if (!ghToken || ghSyncing) return false;
-  ghSyncing = true;
-  try {
-    if (!gistId) await findOrCreateGist();
-    if (!gistId) throw new Error('No gist ID');
-        const payload = { ...data, deletedIds, activeRoutineId: currentRoutineId };
-    const files = { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } };
-    
-    // If syncRoutines is true, sync the whole routines object
-    if (syncRoutines) {
-      files[ROUTINE_FILENAME] = { content: JSON.stringify(routines, null, 2) };
-    }
-    
-    const res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
-    if (!res) {
-      if (res && res.status === 401) throw new Error('GitHub token invalid');
-      throw new Error('GitHub API error');
-    }
-    if (res.updated_at) lastGistUpdatedAt = res.updated_at;
-    return true;
-  } catch (err) {
-    console.error('GitHub sync failed:', err);
-    if (err.message.includes('token') || err.message.includes('401')) {
-      disconnectGitHub();
-      toast('GitHub token expired – please reconnect', 'err');
-    }
-    return false;
-  } finally {
-    ghSyncing = false;
-  }
-}
-
-// Override the legacy saver above: never drop writes just because another sync is active.
-async function saveToGist(data, syncRoutines = false) {
-  if (!ghToken) return false;
-
-  const job = async () => {
-    ghSyncing = true;
-    try {
-      if (!gistId) await findOrCreateGist();
-      if (!gistId) throw new Error('No gist ID');
-
-      saveDeletedIds();
-      const payload = {
-        ...data,
-        entries: applyTombstones(data.entries || entries),
-        deletedIds: normalizeDeletedIds(deletedIds),
-        activeRoutineId: currentRoutineId,
-        saved: new Date().toISOString(),
-      };
-      const files = { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } };
-
-      if (syncRoutines) {
-        files[ROUTINE_FILENAME] = { content: JSON.stringify(routines, null, 2) };
-      }
-
-      const res = await ghFetch('PATCH', `/gists/${gistId}`, { files });
-      if (!res) throw new Error('GitHub API error');
-      if (res.updated_at) lastGistUpdatedAt = res.updated_at;
-      updateSyncUI();
-      return true;
-    } catch (err) {
-      console.error('GitHub sync failed:', err);
-      setSyncStatus('err', 'Sync failed');
-      return false;
-    } finally {
-      ghSyncing = false;
-      updateSyncUI();
-    }
-  };
-
-  const run = gistSaveQueue.then(job, job);
-  gistSaveQueue = run.catch(() => {});
-  return run;
-}
-
-async function loadFromGist() {
-  if (!ghToken) return null;
-  try {
-    if (!gistId) await findOrCreateGist();
-    if (!gistId) return null;
-    const gist = await ghFetch('GET', `/gists/${gistId}`);
-    if (!gist || !gist.files) return null;
-    if (gist.updated_at) lastGistUpdatedAt = gist.updated_at;
-    
-    let data = null;
-    if (gist.files[GIST_FILENAME]?.content) {
-      try { data = JSON.parse(gist.files[GIST_FILENAME].content); } catch(e) {}
-    } else if (gist.files[GIST_FILENAME]?.raw_url) {
-      const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-      if (res.ok) data = await res.json();
-    }
-    
-    // Load ALL routines if present
-    if (gist.files[ROUTINE_FILENAME]?.content || gist.files[ROUTINE_FILENAME]?.raw_url) {
-      try {
-        let cloudRoutines = null;
-        if (gist.files[ROUTINE_FILENAME]?.content) {
-          cloudRoutines = JSON.parse(gist.files[ROUTINE_FILENAME].content);
-        } else {
-          const res = await fetch(gist.files[ROUTINE_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-          if (res.ok) cloudRoutines = await res.json();
-        }
-        if (cloudRoutines && typeof cloudRoutines === 'object') {
-          let localRoutines = JSON.parse(localStorage.getItem('studylog_routines') || '{}');
-          Object.assign(localRoutines, cloudRoutines);
-          localStorage.setItem('studylog_routines', JSON.stringify(localRoutines));
-          routines = localRoutines;
-          cleanUpRoutines();
-        }
-      } catch (e) { console.error('Error loading routines from gist', e); }
-    }
-    
-    // SYNC ACTIVE ROUTINE
-    let routineChanged = false;
-    if (data && data.activeRoutineId && routines[data.activeRoutineId]) {
-      if (currentRoutineId !== data.activeRoutineId) {
-        currentRoutineId = data.activeRoutineId;
-        activeRoutine = routines[currentRoutineId];
-        localStorage.setItem('studylog_current_routine', currentRoutineId);
-        applyRoutine(activeRoutine, true);
-        routineChanged = true;
-        toast('Switched to ' + activeRoutine.meta.routineName, 'info');
-      }
-    } else if (currentRoutineId === 'generic_sem' || !routines[currentRoutineId]) {
-      const realRoutineIds = Object.keys(routines).filter(id => id !== 'generic_sem');
-      if (realRoutineIds.length > 0) {
-        currentRoutineId = realRoutineIds[0];
-        activeRoutine = routines[currentRoutineId];
-        localStorage.setItem('studylog_current_routine', currentRoutineId);
-        applyRoutine(activeRoutine, true);
-        routineChanged = true;
-      }
-    } else if (currentRoutineId && routines[currentRoutineId] && !activeRoutine) {
-      activeRoutine = routines[currentRoutineId];
-      applyRoutine(activeRoutine, true);
-    }
-    
-    if (routineChanged) {
-      render(); buildSubjList(); updateSideTagCloud();
-    }
-    
-    return data;
-  } catch (e) { return null; }
-}
-// ---------- BACKGROUND AUTO‑SYNC (polling) ----------
-let syncPollInterval = null;
-let isPolling = false;
-let lastKnownCloudTimestamp = null;
-let lastGistUpdatedAt = null;
-
-async function pollForChanges() {
-  if (!ghToken || isPolling || !gistId) return;
-  isPolling = true;
-  try {
-    const gist = await ghFetch('GET', `/gists/${gistId}`);
-    if (!gist) return;
-    if (gist.updated_at === lastGistUpdatedAt) return;
-
-    let gistData = null;
-    if (gist.files[GIST_FILENAME]?.content) {
-      try { gistData = JSON.parse(gist.files[GIST_FILENAME].content); } catch(e) {}
-    } else if (gist.files[GIST_FILENAME]?.raw_url) {
-      const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) return;
-      gistData = await res.json();
-    }
-    
-    lastGistUpdatedAt = gist.updated_at;
-    if (!gistData || !gistData.entries) return;
-
-    const gistUpdateTime = new Date(gist.updated_at).getTime();
-    
-    // 1. Sync tombstones directly
-    if (gistData.deletedIds) {
-      const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-      for (const id in gistData.deletedIds) {
-        if (!cloudMap[id]) {
-          if (!deletedIds[id] || gistData.deletedIds[id] > deletedIds[id]) {
-            deletedIds[id] = gistData.deletedIds[id];
-          }
-        } else {
-          delete deletedIds[id]; // Resurrected on cloud
-        }
-      }
-      saveDeletedIds();
-    }
-    
-    if (gistData.activeRoutineId && routines[gistData.activeRoutineId] && currentRoutineId !== gistData.activeRoutineId) {
-      currentRoutineId = gistData.activeRoutineId;
-      activeRoutine = routines[currentRoutineId];
-      localStorage.setItem('studylog_current_routine', currentRoutineId);
-      applyRoutine(activeRoutine, true);
-      toast('Switched to ' + activeRoutine.meta.routineName, 'info');
-    }
-
-    const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
-    const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-    const merged = {};
-    let changed = false;
-
-    for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
-      const l = localMap[id], c = cloudMap[id];
-      if (l && c) {
-        const newer = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
-        if (newer !== l) changed = true;
-        merged[id] = newer;
-      } else if (l) {
-        const lTime = l.updatedAt || l.createdAt || 0;
-        // If modified locally after the cloud update, keep it. (15s buffer for clock skew)
-        if (lTime > gistUpdateTime - 15000) {
-          merged[id] = l;
-          changed = true; 
-          if (deletedIds[id]) { delete deletedIds[id]; saveDeletedIds(); }
-        } else if (!deletedIds[id]) {
-          merged[id] = l; // New local entry
-        } else {
-          changed = true; // Dropped due to tombstone
-        }
-      } else if (c) {
-        if (!deletedIds[id]) {
-          merged[id] = c;
-          changed = true; // New from cloud
-        }
-      }
-    }
-
-    const newEntries = Object.values(merged);
-    if (!changed) return;
-
-    entries = newEntries;
-    lsSave({ version: 7, entries });
-    render();
-    buildSubjList();
-    updateSideTagCloud();
-    toast('✓ Synced from another device', 'info');
-    
-    // If we resurrected or merged something, push back to cloud
-    saveData(); 
-  } catch (e) {
-    console.debug('Background sync error', e);
-  } finally {
-    isPolling = false;
-  }
-}
-
-async function pollForChanges() {
-  if (!ghToken || isPolling || !gistId) return;
-  isPolling = true;
-  try {
-    const gist = await ghFetch('GET', `/gists/${gistId}`);
-    if (!gist || !gist.files) return;
-    if (gist.updated_at && gist.updated_at === lastGistUpdatedAt) return;
-
-    let gistData = null;
-    if (gist.files[GIST_FILENAME]?.content) {
-      try { gistData = JSON.parse(gist.files[GIST_FILENAME].content); } catch(e) {}
-    } else if (gist.files[GIST_FILENAME]?.raw_url) {
-      const res = await fetch(gist.files[GIST_FILENAME].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) return;
-      gistData = await res.json();
-    }
-
-    if (gist.updated_at) lastGistUpdatedAt = gist.updated_at;
-    if (!gistData || !Array.isArray(gistData.entries)) return;
-
-    const result = mergeCloudEntries(gistData);
-    if (result.changed) {
-      refreshDataViews();
-      toast('Synced from another device', 'info');
-      await saveData({ mergeFirst: false, quiet: true });
-    }
-  } catch (e) {
-    console.debug('Background sync error', e);
-    setSyncStatus('err', 'Sync failed');
-  } finally {
-    isPolling = false;
-    updateSyncUI();
-  }
-}
-
-async function saveData(opts = {}) {
-  const { mergeFirst = true, quiet = false, syncRoutines = false } = opts;
-  let data = { version: 7, entries: applyTombstones(entries), settings: appSettings, saved: new Date().toISOString() };
-  entries = data.entries;
-  lsSave(data);
-
-  if (ghToken) {
-    if (!quiet) setSyncStatus('syncing', 'Saving...');
-    if (mergeFirst) {
-      await pullAndMergeFromGist();
-      migrateEntriesToActiveRoutine();
-      data = { version: 7, entries: applyTombstones(entries), settings: appSettings, saved: new Date().toISOString() };
-      entries = data.entries;
-      lsSave(data);
-    }
-
-    const ok = await saveToGist(data, syncRoutines);
-    if (!quiet) setSyncStatus(ok ? 'ok' : 'err', ok ? 'Synced' : 'Saved locally');
-    return ok;
-  }
-
-  if (!quiet) setSyncStatus('ok', 'Saved');
-  return true;
-}
-
-async function syncNow() {
-  if (!ghToken) {
-    toast('Connect GitHub first', 'err');
-    openGHConnectModal();
-    return;
-  }
-
-  setSyncStatus('syncing', 'Syncing...');
-
-  // 1. PULL first
-  const gistData = await loadFromGist();
-  if (gistData && gistData.entries) {
-    if (gistData.deletedIds) mergeDeletedIds(gistData.deletedIds);
-
-    const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
-    const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-    const merged = {};
-
-    for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
-      const l = localMap[id];
-      const c = cloudMap[id];
-      if (l && c) {
-        merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
-      } else {
-        merged[id] = l || c;
-      }
-    }
-
-    const afterTombstone = applyTombstones(Object.values(merged));
-    const survivingIds = new Set(afterTombstone.map(e => e.id));
-    // Only rescue entries that are NOT in deletedIds
-    const rescued = entries.filter(e => !survivingIds.has(e.id) && !deletedIds[e.id]);
-    const next = [...afterTombstone, ...rescued];
-    entries = next;
-  }
-
-  // 2. GLOBAL MIGRATION: Fix orphaned entries before pushing to cloud
-  if (currentRoutineId && currentRoutineId !== 'generic_sem' && routines[currentRoutineId]) {
-    let migrated = 0;
-    entries.forEach(e => {
-      if (!e.semesterId || e.semesterId === 'generic_sem' || !routines[e.semesterId]) {
-        if (e.semesterId !== currentRoutineId) {
-          e.semesterId = currentRoutineId;
-          e.updatedAt = Date.now();
-          migrated++;
-        }
-      }
-    });
-    if (migrated > 0) {
-      toast(`Migrated ${migrated} entries to active routine.`, 'info');
-    }
-  }
-
-  lsSave({ version: 7, entries });
-
-  // 3. PUSH the merged & migrated result
-  const pushOk = await saveData();
-
-  render();
-  buildSubjList();
-  updateSideTagCloud();
-
-  if (pushOk) {
-    toast('Synced successfully!', 'ok');
-    setSyncStatus('ok', 'Synced ');
-  } else {
-    toast('Pull done, push failed — check token', 'err');
-    setSyncStatus('ok', 'Partial sync');
-  }
-}
-
-function _onVisChange() {
-  if (document.visibilityState === 'visible' && ghToken) pollForChanges();
-}
-function _onWindowFocus() {
-  if (ghToken) pollForChanges();
-}
-
-function startBackgroundSync() {
-  if (syncPollInterval) clearInterval(syncPollInterval);
-  syncPollInterval = setInterval(() => {
-    if (document.visibilityState === 'visible') pollForChanges();
-  }, 5000);
-  document.addEventListener('visibilitychange', _onVisChange);
-  window.addEventListener('focus', _onWindowFocus);
-}
-
-function stopBackgroundSync() {
-  if (syncPollInterval) { clearInterval(syncPollInterval); syncPollInterval = null; }
-  document.removeEventListener('visibilitychange', _onVisChange);
-  window.removeEventListener('focus', _onWindowFocus);
-  lastGistUpdatedAt = null;
-}
-function setSyncStatus(state, msg) {
-  const dot = document.getElementById('saveDot');
-  const txt = document.getElementById('saveStatus');
-  if (state === 'syncing') {
-    if (dot) dot.classList.add('saving');
-    if (txt) txt.textContent = msg || 'Syncing…';
-  } else {
-    if (dot) dot.classList.remove('saving');
-    if (txt) txt.textContent = msg || 'Saved';
-  }
-}
-
-function updateSyncUI() {
-  const connected = !!ghToken;
-  const wsNameEl = document.getElementById('wsName');
-  const wsBadgeEl = document.getElementById('wsBadge');
-  const wsPathEl  = document.getElementById('wsPathFull');
-  const connectBtn   = document.getElementById('ghConnectBtn');
-  const disconnectBtn= document.getElementById('ghDisconnectBtn');
-  const userEl    = document.getElementById('ghUser');
-
-  if (wsNameEl)  wsNameEl.textContent  = connected ? 'GitHub Gist' : 'Browser Only';
-  if (wsBadgeEl) { wsBadgeEl.textContent = connected ? 'synced' : 'local'; wsBadgeEl.className = connected ? 'tb-ws-badge folder' : 'tb-ws-badge local'; }
-  if (wsPathEl)  wsPathEl.textContent  = connected ? `github.com/gists · ${semesterFolder.replace('_',' ')}` : 'localStorage (browser)';
-  if (connectBtn)    connectBtn.style.display    = connected ? 'none' : '';
-  if (disconnectBtn) disconnectBtn.style.display = connected ? '' : 'none';
-  if (userEl) {
-    userEl.style.display = connected ? '' : 'none';
-    const name = localStorage.getItem('slp_gh_user');
-    if (name) userEl.textContent = '👤 ' + name;
-  }
-}
-
-async function connectGitHub(token) {
-  setSyncStatus('syncing', 'Verifying token…');
-  const user = await validateToken(token);
-  if (!user) { setSyncStatus('ok', 'Saved'); toast('Invalid token – check and try again', 'err'); return false; }
-  ghToken = token;
-  localStorage.setItem('slp_gh_token', token);
-  localStorage.setItem('slp_gh_user', user.login);
-  setSyncStatus('syncing', 'Loading from GitHub…');
-  const gistData = await loadFromGist();
-  if (gistData && gistData.entries) {
-    const gistUpdateTime = lastGistUpdatedAt ? new Date(lastGistUpdatedAt).getTime() : Date.now();
-    
-    if (gistData.deletedIds) {
-      const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-      for (const id in gistData.deletedIds) {
-        if (!cloudMap[id]) {
-          if (!deletedIds[id] || gistData.deletedIds[id] > deletedIds[id]) deletedIds[id] = gistData.deletedIds[id];
-        } else delete deletedIds[id];
-      }
-      saveDeletedIds();
-    }
-    
-    const cloudEntries = gistData.entries;
-    const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
-    const cloudMap = Object.fromEntries(cloudEntries.map(e => [e.id, e]));
-    const merged = {};
-    
-    for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
-      const l = localMap[id], c = cloudMap[id];
-      if (l && c) merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
-      else if (l) {
-        const lTime = l.updatedAt || l.createdAt || 0;
-        if (lTime > gistUpdateTime - 15000) { 
-          merged[id] = l; 
-          if (deletedIds[id]) { delete deletedIds[id]; saveDeletedIds(); } 
-        }
-        else if (!deletedIds[id]) merged[id] = l;
-      }
-      else if (c) { if (!deletedIds[id]) merged[id] = c; }
-    }
-    entries = Object.values(merged).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-    lsSave({ version: 7, entries });
-  } else {
-    await saveToGist({ version: 7, entries, saved: new Date().toISOString() });
-  }
-  setSyncStatus('ok', 'Synced ');
-  updateSyncUI();
-  render(); buildSubjList(); updateSideTagCloud();
-  toast('Connected to GitHub  Syncing across devices!', 'ok');
-  startBackgroundSync();
-  return true;
+// ── LOCAL STORAGE FALLBACK & SYNC UI ──
+// (These are kept here because they are used by UI elements before Firebase initializes)
+function lsSave(d) { 
+  try { 
+    const data = d || { version: 7, entries, settings: appSettings, saved: new Date().toISOString() };
+    localStorage.setItem('studylog_v7', JSON.stringify(data)); 
+  } catch (e) {} 
+  saveDeletedIds(); 
 }
 
 function setSyncStatus(state, msg) {
@@ -4215,319 +3686,26 @@ function updateSyncUI() {
   if (wsChip) wsChip.style.display = '';
   if (syncBtn) syncBtn.style.display = connected ? '' : 'none';
   if (syncNowBtn) syncNowBtn.style.display = connected ? '' : 'none';
-  if (wsNameEl)  wsNameEl.textContent  = connected ? 'GitHub Gist' : 'Browser Only';
+  if (wsNameEl)  wsNameEl.textContent  = connected ? 'Cloud Sync' : 'Browser Only';
   if (wsBadgeEl) {
     wsBadgeEl.textContent = connected ? (ghSyncing ? 'syncing' : 'synced') : 'local';
     wsBadgeEl.className = connected ? 'tb-ws-badge folder' : 'tb-ws-badge local';
   }
-  if (wsPathEl)  wsPathEl.textContent  = connected ? `github.com/gists - ${semesterFolder.replace('_',' ')}` : 'localStorage (browser)';
+  if (wsPathEl)  wsPathEl.textContent  = connected ? 'Firebase Firestore · cloud' : 'localStorage (browser)';
   if (connectBtn)    connectBtn.style.display    = connected ? 'none' : '';
   if (disconnectBtn) disconnectBtn.style.display = connected ? '' : 'none';
   if (userEl) {
     userEl.style.display = connected ? '' : 'none';
-    const name = localStorage.getItem('slp_gh_user');
-    if (name) userEl.textContent = 'Signed in as ' + name;
+    const name = localStorage.getItem('slp_gh_user') || fbUser?.displayName || fbUser?.email;
+    if (name) userEl.textContent = '👤 ' + name;
   }
 }
 
-async function connectGitHub(token) {
-  setSyncStatus('syncing', 'Verifying token...');
-  const user = await validateToken(token);
-  if (!user) {
-    setSyncStatus('err', 'Invalid token');
-    toast('Invalid token - check and try again', 'err');
-    return false;
-  }
-
-  ghToken = token;
-  localStorage.setItem('slp_gh_token', token);
-  localStorage.setItem('slp_gh_user', user.login);
-  setSyncStatus('syncing', 'Loading from GitHub...');
-
-  const pull = await pullAndMergeFromGist();
-  if (!pull.ok) {
-    await saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
-  } else {
-    migrateEntriesToActiveRoutine();
-    lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
-    await saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
-  }
-
-  setSyncStatus('ok', 'Synced');
-  updateSyncUI();
-  refreshDataViews();
-  toast('Connected to GitHub - syncing across devices', 'ok');
-  if (appSettings.autoSync) startBackgroundSync();
-  return true;
-}
-
-function disconnectGitHub() {
-  if (!confirm('Disconnect GitHub sync?\n\nYour data stays in browser storage. You can reconnect anytime with the same token.')) return;
-  ghToken = ''; gistId = '';
-  localStorage.removeItem('slp_gh_token');
-  localStorage.removeItem('slp_gist_id');
-  localStorage.removeItem('slp_gh_user');
-  updateSyncUI();
-  toast('Disconnected. Data safe in browser storage.', 'info');
-  
-  // Stop background polling
-  stopBackgroundSync();
-}
-
-/* ═══════════════════════════════════
-   LOCAL STORAGE FALLBACK
-═══════════════════════════════════ */
-function lsSave(d) { 
-  try { 
-    const data = d || { version: 7, entries, settings: appSettings, saved: new Date().toISOString() };
-    localStorage.setItem('studylog_v7', JSON.stringify(data)); 
-  } catch (e) {} 
-  saveDeletedIds(); 
-}
-async function saveData() {
-  const data = { version: 7, entries, settings: appSettings, saved: new Date().toISOString() };
-  lsSave(data);
-  if (ghToken) {
-    setSyncStatus('syncing', 'Saving…');
-    const ok = await saveToGist(data);
-    setSyncStatus('ok', ok ? 'Synced ' : 'Saved locally');
-    return ok;
-  }
-  setSyncStatus('ok', 'Saved');
-  return true;
-}
-
-async function syncNow() {
-  if (!ghToken) {
-    toast('Connect GitHub first', 'err');
-    openGHConnectModal();
-    return;
-  }
-
-  setSyncStatus('syncing', 'Syncing...');
-
-  // 1. PULL first
-  const gistData = await loadFromGist();
-  if (gistData && gistData.entries) {
-    const gistUpdateTime = lastGistUpdatedAt ? new Date(lastGistUpdatedAt).getTime() : Date.now();
-    
-    // Sync tombstones
-    if (gistData.deletedIds) {
-      const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-      for (const id in gistData.deletedIds) {
-        if (!cloudMap[id]) {
-          if (!deletedIds[id] || gistData.deletedIds[id] > deletedIds[id]) {
-            deletedIds[id] = gistData.deletedIds[id];
-          }
-        } else {
-          delete deletedIds[id];
-        }
-      }
-      saveDeletedIds();
-    }
-
-    const localMap = Object.fromEntries(entries.map(e => [e.id, e]));
-    const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-    const merged = {};
-
-    for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
-      const l = localMap[id], c = cloudMap[id];
-      if (l && c) {
-        merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
-      } else if (l) {
-        const lTime = l.updatedAt || l.createdAt || 0;
-        if (lTime > gistUpdateTime - 15000) {
-          merged[id] = l;
-          if (deletedIds[id]) { delete deletedIds[id]; saveDeletedIds(); }
-        } else if (!deletedIds[id]) {
-          merged[id] = l;
-        }
-      } else if (c) {
-        if (!deletedIds[id]) {
-          merged[id] = c;
-        }
-      }
-    }
-    entries = Object.values(merged);
-  }
-
-  // 2. GLOBAL MIGRATION
-  if (currentRoutineId && currentRoutineId !== 'generic_sem' && routines[currentRoutineId]) {
-    let migrated = 0;
-    entries.forEach(e => {
-      if (!e.semesterId || e.semesterId === 'generic_sem' || !routines[e.semesterId]) {
-        if (e.semesterId !== currentRoutineId) {
-          e.semesterId = currentRoutineId;
-          e.updatedAt = Date.now();
-          migrated++;
-        }
-      }
-    });
-    if (migrated > 0) toast(`Migrated ${migrated} entries to active routine.`, 'info');
-  }
-
-  lsSave({ version: 7, entries });
-
-  // 3. PUSH
-  const pushOk = await saveData();
-
-  render();
-  buildSubjList();
-  updateSideTagCloud();
-
-  if (pushOk) {
-    toast('Synced successfully!', 'ok');
-    setSyncStatus('ok', 'Synced ');
-  } else {
-    toast('Pull done, push failed — check token', 'err');
-    setSyncStatus('ok', 'Partial sync');
-  }
-}
-
-async function syncNow() {
-  if (!ghToken) {
-    toast('Connect GitHub first', 'err');
-    openGHConnectModal();
-    return false;
-  }
-
-  setSyncStatus('syncing', 'Syncing...');
-  try {
-    const pull = await pullAndMergeFromGist();
-    migrateEntriesToActiveRoutine();
-    lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
-
-    const pushOk = await saveData({ mergeFirst: false, quiet: true });
-    refreshDataViews();
-
-    if (pushOk) {
-      setSyncStatus('ok', 'Synced');
-      toast(pull.changed ? 'Synced changes across devices' : 'Already up to date', 'ok');
-    } else {
-      setSyncStatus('err', 'Sync failed');
-      toast('Pull done, push failed - check GitHub token', 'err');
-    }
-    return pushOk;
-  } catch (err) {
-    console.error('Manual sync failed:', err);
-    setSyncStatus('err', 'Sync failed');
-    toast('Sync failed - try again', 'err');
-    return false;
-  } finally {
-    updateSyncUI();
-  }
-}
-
-async function loadData() {
-  let data = null;
-  try { data = JSON.parse(localStorage.getItem('studylog_v7') || localStorage.getItem('studylog_v6') || localStorage.getItem('studylog_v5') || 'null'); } catch (e) {}
-  
-  if (data?.settings) {
-    appSettings = data.settings;
-    localStorage.setItem('slp_settings', JSON.stringify(appSettings));
-  }
-  
-  if (data && data.entries) {
-    // Filter out local tombstones initially
-    entries = data.entries.filter(e => !deletedIds[e.id]);
-  }
-  
-  if (ghToken) {
-    const gistData = await loadFromGist();
-    if (gistData && gistData.entries) {
-      const gistUpdateTime = lastGistUpdatedAt ? new Date(lastGistUpdatedAt).getTime() : Date.now();
-      
-      if (gistData.deletedIds) {
-        const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-        for (const id in gistData.deletedIds) {
-          if (!cloudMap[id]) {
-            if (!deletedIds[id] || gistData.deletedIds[id] > deletedIds[id]) {
-              deletedIds[id] = gistData.deletedIds[id];
-            }
-          } else {
-            delete deletedIds[id];
-          }
-        }
-        saveDeletedIds();
-      }
-      
-      if (gistData.settings && !data?.settings) {
-        appSettings = gistData.settings;
-        localStorage.setItem('slp_settings', JSON.stringify(appSettings));
-      }
-      
-      const localMap = Object.fromEntries((data?.entries || []).map(e => [e.id, e]));
-      const cloudMap = Object.fromEntries(gistData.entries.map(e => [e.id, e]));
-      const merged = {};
-      
-      for (const id of new Set([...Object.keys(localMap), ...Object.keys(cloudMap)])) {
-        const l = localMap[id], c = cloudMap[id];
-        if (l && c) {
-          merged[id] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
-        } else if (l) {
-          const lTime = l.updatedAt || l.createdAt || 0;
-          if (lTime > gistUpdateTime - 15000) {
-            merged[id] = l;
-            if (deletedIds[id]) { delete deletedIds[id]; saveDeletedIds(); }
-          } else if (!deletedIds[id]) {
-            merged[id] = l;
-          }
-        } else if (c) {
-          if (!deletedIds[id]) {
-            merged[id] = c;
-          }
-        }
-      }
-      entries = Object.values(merged);
-      
-      if (currentRoutineId && routines[currentRoutineId]) {
-        let migrated = 0;
-        entries.forEach(e => {
-          if (!e.semesterId || !routines[e.semesterId]) {
-            if (e.semesterId !== currentRoutineId) {
-              e.semesterId = currentRoutineId;
-              e.updatedAt = Date.now();
-              migrated++;
-            }
-          }
-        });
-        if (migrated > 0) toast(`Migrated ${migrated} orphaned entries.`, 'info');
-      }
-      
-      lsSave({ version: 7, entries });
-    }
-  }
-}
-
-async function loadData() {
-  let data = null;
-  try {
-    data = JSON.parse(localStorage.getItem('studylog_v7') || localStorage.getItem('studylog_v6') || localStorage.getItem('studylog_v5') || 'null');
-  } catch (e) {}
-
-  if (data?.settings) {
-    appSettings = data.settings;
-    localStorage.setItem('slp_settings', JSON.stringify(appSettings));
-  }
-
-  entries = applyTombstones(data?.entries || []);
-  lsSave({ version: 7, entries, settings: appSettings, saved: data?.saved || new Date().toISOString() });
-
-  if (ghToken) {
-    setSyncStatus('syncing', 'Syncing...');
-    const pull = await pullAndMergeFromGist();
-    const migrated = migrateEntriesToActiveRoutine();
-    lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
-    if (pull.ok && (pull.changed || migrated)) {
-      await saveData({ mergeFirst: false, quiet: true });
-    }
-    setSyncStatus(pull.ok ? 'ok' : 'err', pull.ok ? 'Synced' : 'Saved locally');
-  }
-}
+// [Legacy GitHub Gist sync code completely removed. Firebase overrides handle this at the bottom of the file.]
 
 async function loadFile(f) {
-  if (f.data) return f.data;
-  // Files stored as base64 in entry when no cloud storage for attachments
+  // Return data only if it exists and isn't the stripped placeholder string
+  if (f.data && f.data !== 'dropped_cloud_size_limit') return f.data;
   return null;
 }
 
@@ -4632,8 +3810,7 @@ function saveSettings() {
     applyRoutine(newRoutine, true);
     
     // Sync everything
-    saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
-    
+    if (fbUser) saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);    
     closeSettings();
     render();
     buildSubjList();
@@ -4746,35 +3923,33 @@ function renderRoutineManagerList() {
 }
 
 // The Upload function
+// The Upload function
 async function uploadRoutinesToCloud() {
-  if (!ghToken) {
-    toast('Connect GitHub first to upload.', 'err');
+  if (!fbUser) {
+    toast('Sign in first to upload.', 'err');
     closeRoutineManager();
-    openGHConnectModal();
+    openCloudModal();
     return;
   }
   toast('Uploading current routines to cloud...', 'info');
-  cleanUpRoutines(); // <--- ADD THIS LINE to ensure no duplicates are uploaded
+  cleanUpRoutines();
   await saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
   toast('Routines uploaded successfully!', 'ok');
 }
 
 // The updated Sync & Merge function
 async function syncMergeRoutines() {
-  if (!ghToken) {
-    toast('Connect GitHub first to sync.', 'err');
+  if (!fbUser) {
+    toast('Sign in first to sync.', 'err');
     closeRoutineManager();
-    openGHConnectModal();
+    openCloudModal();
     return;
   }
-  toast('Syncing routines from GitHub...', 'info');
+  toast('Syncing routines from cloud...', 'info');
   await loadFromGist(); // Pulls and auto-migrates
-  
-  // Re-apply current routine to refresh UI
   if (currentRoutineId && routines[currentRoutineId]) {
     applyRoutine(routines[currentRoutineId], true);
   }
-  
   render(); buildSubjList(); updateSideTagCloud();
   renderRoutineManagerList();
   toast('Routines synced successfully!', 'ok');
@@ -4822,7 +3997,7 @@ function deleteRoutine(id) {
   delete routines[id];
   localStorage.setItem('studylog_routines', JSON.stringify(routines));
   cleanUpRoutines();
-  saveToGist({ version: 7, entries, saved: new Date().toISOString() }, true);
+  saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
   renderRoutineManagerList();
   toast('Routine deleted', 'info');
 }
@@ -5052,11 +4227,11 @@ function loadRoutineFile() {
       
       applyRoutine(r);
       
-      if (ghToken) {
-        setSyncStatus('syncing', 'Uploading routine…');
-                await saveToGist({ version: 7, entries, saved: new Date().toISOString() }, true);
-        setSyncStatus('ok', 'Routine synced ');
-      }
+  if (fbUser) {
+    setSyncStatus('syncing', 'Uploading routine…');
+    await saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
+    setSyncStatus('ok', 'Routine synced');
+  }
       await loadData(); render(); buildSubjList(); updateSideTagCloud();
       toast('Routine loaded & fields separated successfully!', 'ok');
     } catch (err) { toast('Routine load failed: ' + err.message, 'err'); }
@@ -5150,14 +4325,14 @@ function renderSuStep() {
     c.innerHTML = `
       <div class="su-progress">${dots(0)}</div>
       <div class="su-step">Step 1 of 2</div>
-      <div class="su-title">Connect GitHub Sync</div>
-
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <input class="finp" id="suTokenInp" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;font-family:var(--mono);font-size:12px">
-        <button class="su-btn" style="width:auto;padding:8px 16px;margin:0" onclick="suConnectGH()">Connect</button>
-      </div>
-      <button class="su-btn-sec" onclick="skipToLocal()">Login as guest</button>
-      <div class="su-note">Welcome to StudyLog Pro. Pick up where you left off.</div>`;
+      <div class="su-title">Connect Cloud Sync</div>
+      <div class="su-sub" style="margin-bottom:20px">Sign in with Google to sync your study logs across all devices securely.</div>
+      <button class="su-btn" style="display:flex;align-items:center;justify-content:center;gap:8px" onclick="suConnectGH()">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Sign in with Google
+      </button>
+      <button class="su-btn-sec" onclick="skipToLocal()">Continue offline</button>
+      <div class="su-note">Your data is stored securely in Firebase Firestore.</div>`;
     // Allow Enter key in token input
     setTimeout(() => {
       const inp = document.getElementById('suTokenInp');
@@ -5172,17 +4347,12 @@ function renderSuStep() {
 
       <button class="su-btn" onclick="suLoadRoutine()">⚙ Load routine JSON</button>
       <button class="su-btn-sec" onclick="skipToLocal()">Use Blank Routine (Start Fresh)</button>
-      <div class="su-note">📋 Once loaded, the routine syncs to GitHub – all devices get it automatically.</div>`;
+      <div class="su-note">📋 Once loaded, the routine syncs to cloud – all devices get it automatically.</div>`;
   }
 }
 
 async function suConnectGH() {
-  const inp = document.getElementById('suTokenInp');
-  const token = (inp?.value || '').trim();
-  if (!token) { toast('Paste your GitHub token first', 'err'); return; }
-  inp.disabled = true;
-  const ok = await connectGitHub(token);
-  inp.disabled = false;
+  const ok = await connectGitHub();
   if (ok) { suStep = 1; renderSuStep(); }
 }
 
@@ -5195,10 +4365,10 @@ async function suLoadRoutine() {
       if (!r.meta || !r.subjects || !r.schedule) throw new Error('Invalid format');
       applyRoutine(r);
       localStorage.setItem('slp_routine', JSON.stringify(r));
-      if (ghToken) {
+      if (fbUser) {
         setSyncStatus('syncing', 'Uploading routine…');
-        await saveToGist({ version: 7, entries, saved: new Date().toISOString() }, r);
-        setSyncStatus('ok', 'Routine synced ');
+        await saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
+        setSyncStatus('ok', 'Routine synced');
       }
       await finishSetup();
     } catch (err) { toast('Load failed: ' + err.message, 'err'); }
@@ -5246,8 +4416,10 @@ function logoutSemester() {
   toast('Logged out. Set up for new semester.', 'info');
 }
 
-/* ─── CONNECT GITHUB MODAL (for already-set-up users) ─── */
-function openGHConnectModal() {
+// Keep original name aliased to prevent mobile back-button handler from crashing
+function openGHConnectModal() { openCloudModal(); }
+
+function openCloudModal() {
   let modal = document.getElementById('ghModal');
   if (!modal) {
     modal = document.createElement('div');
@@ -5256,43 +4428,33 @@ function openGHConnectModal() {
     modal.innerHTML = `
       <div class="modal" style="max-width:460px">
         <div class="m-head">
-          <h2>🐙 Connect GitHub Sync</h2>
-          <button class="m-close" onclick="closeGHModal()">✕</button>
+          <h2>☁️ Connect Cloud Sync</h2>
+          <button class="m-close" onclick="closeCloudModal()">✕</button>
         </div>
         <div class="m-body">
-          <p style="font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:14px">
-            Get a GitHub Personal Access Token with <strong>gist</strong> scope:<br>
-            <a href="https://github.com/settings/tokens" target="_blank" rel="noopener" style="color:var(--accent)">github.com/settings/tokens</a> → Generate new token (classic) → check ✅ gist
+          <p style="font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:20px;text-align:center">
+            Sign in with Google to sync your study logs across all devices.<br>
+            Your data is securely stored in Firebase Firestore.
           </p>
-          <div class="fg">
-            <label class="flbl">Token</label>
-            <input class="finp" id="ghTokenInp" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="font-family:var(--mono);font-size:12px">
-            
-          </div>
+          <button class="btn-p" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;font-size:14px" onclick="connectGitHub()">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Sign in with Google
+          </button>
         </div>
         <div class="m-foot">
           <div></div>
           <div class="m-foot-r">
-            
-            <button class="btn-c" onclick="closeGHModal()">Cancel</button>
-            <button class="btn-p" onclick="applyGHToken()">Connect & Sync</button>
+            <button class="btn-c" onclick="closeCloudModal()">Cancel</button>
           </div>
         </div>
       </div>`;
     document.body.appendChild(modal);
-    modal.addEventListener('mouseup', e => { if (e.target === modal && overlayMousedownTarget === modal) closeGHModal(); });
-    modal.querySelector('#ghTokenInp').addEventListener('keydown', e => { if (e.key === 'Enter') applyGHToken(); });
+    modal.addEventListener('mouseup', e => { if (e.target === modal && overlayMousedownTarget === modal) closeCloudModal(); });
   }
   modal.classList.add('open');
-  setTimeout(() => modal.querySelector('#ghTokenInp')?.focus(), 80);
 }
-function closeGHModal() { document.getElementById('ghModal')?.classList.remove('open'); }
-async function applyGHToken() {
-  const token = (document.getElementById('ghTokenInp')?.value || '').trim();
-  if (!token) { toast('Paste your token first', 'err'); return; }
-  closeGHModal();
-  await connectGitHub(token);
-}
+function closeCloudModal() { document.getElementById('ghModal')?.classList.remove('open'); }
+async function applyGHToken() { closeGHModal(); await connectGitHub(); }
 
 /* ═══════════════════════════════════
    GLOBAL STATE
@@ -7008,8 +6170,90 @@ function extractYTId(url){const m=url.match(/(?:youtube\.com\/(?:watch\?v=|embed
 function addYT(){const v=document.getElementById('ytInp').value.trim();if(!v)return;const id=extractYTId(v);if(!id){toast('Invalid YouTube URL','err');return;}if(formYTs.includes(id)){toast('Already added','err');return;}formYTs.push(id);addYTPreview(id);document.getElementById('ytInp').value='';}
 function addYTPreview(id){const row=document.createElement('div');row.className='yt-form-row';row.id='ytp_'+id;row.innerHTML=`<img class="yt-form-thumb" src="https://img.youtube.com/vi/${id}/mqdefault.jpg"><span class="yt-form-id">youtube.com/watch?v=${id}</span><button class="yt-form-del" onclick="removeYT('${id}')">✕</button>`;document.getElementById('ytFormRows').appendChild(row);}
 function removeYT(id){formYTs=formYTs.filter(x=>x!==id);document.getElementById('ytp_'+id)?.remove();}
+// ── IMAGE COMPRESSION ENGINE ──
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        // Scale down image if it's massive (max 2000px width/height)
+        let { width, height } = img;
+        const MAX_DIM = 2000;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        // Fill white background for transparent PNGs turning into JPEGs
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Try compressing with decreasing quality until under 850KB
+        let quality = 0.9;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        let byteSize = Math.floor((dataUrl.split(',')[1].length * 3) / 4);
+        
+        while (byteSize > 850 * 1024 && quality > 0.3) {
+          quality -= 0.1;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+          byteSize = Math.floor((dataUrl.split(',')[1].length * 3) / 4);
+        }
+
+        resolve({
+          name: file.name.replace(/\.[^/.]+$/, "") + ".jpg", // force jpg extension
+          type: 'image/jpeg',
+          data: dataUrl,
+          size: byteSize
+        });
+      };
+      img.onerror = () => reject(new Error('Image load error'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('File read error'));
+    reader.readAsDataURL(file);
+  });
+}
 function handleDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('over');handleFiles(e.dataTransfer.files);}
-function handleFiles(files){for(const f of files){if(f.size>10*1024*1024){toast(f.name+' >10 MB','err');continue;}const r=new FileReader();r.onload=ev=>{formFiles.push({name:f.name,type:f.type,data:ev.target.result,size:f.size,_new:true});renderFilePrevs();};r.readAsDataURL(f);}}
+async function handleFiles(files){
+  for(const f of files){
+    // If it's an image and larger than 850KB, auto-compress it
+    if (f.type.startsWith('image/') && f.size > 850 * 1024) {
+      try {
+        toast('Compressing image...', 'info');
+        const compressed = await compressImage(f);
+        formFiles.push({name:compressed.name, type:compressed.type, data:compressed.data, size:compressed.size, _new:true});
+        renderFilePrevs();
+        toast('Image compressed & added!', 'ok');
+      } catch (err) {
+        toast('Image compression failed.', 'err');
+      }
+    } else {
+      // Non-images (PDFs, docs) cannot be easily compressed, enforce hard limit
+      if(f.size > 850 * 1024){ 
+        toast(f.name + ' is too large. Non-images must be under 850KB.', 'err');
+        continue;
+      }
+      const r = new FileReader();
+      r.onload = ev => {
+        formFiles.push({name:f.name, type:f.type, data:ev.target.result, size:f.size, _new:true});
+        renderFilePrevs();
+      };
+      r.readAsDataURL(f);
+    }
+  }
+}
 function renderFilePrevs(){document.getElementById('filePrevs').innerHTML=formFiles.map((f,i)=>`<div class="fprev">${fIco(f.type)} <span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">${esc(f.name)}</span><button onclick="formFiles.splice(${i},1);renderFilePrevs()">✕</button></div>`).join('');}
 
 /* ── SAVE / DELETE / PIN ── */
@@ -7299,10 +6543,13 @@ async function importData() {
       const text = await file.text();
       const d = JSON.parse(text);
       
+      let hasNewData = false;
+      
       // 1. Import Settings if present
       if (d.settings) {
         appSettings = d.settings;
         localStorage.setItem('slp_settings', JSON.stringify(appSettings));
+        hasNewData = true;
       }
       
       // 2. Import Routines if present
@@ -7311,13 +6558,23 @@ async function importData() {
         Object.assign(localRoutines, d.routines);
         routines = localRoutines;
         localStorage.setItem('studylog_routines', JSON.stringify(routines));
+        hasNewData = true;
       }
       
-      if (!d.entries) throw new Error('Invalid format: missing entries array');
+      if (!d.entries) {
+        if (hasNewData) {
+          await saveData({ syncRoutines: true });
+          toast('Settings & Routines imported successfully!', 'ok');
+        } else {
+          throw new Error('Invalid format: missing entries array');
+        }
+        return;
+      }
 
       // 3. Import Entries
       const newEntries = d.entries.filter(n => !entries.find(x => x.id === n.id));
-      if (newEntries.length === 0) {
+      
+      if (newEntries.length === 0 && !hasNewData) {
         toast('No new entries to import (all already exist)', 'info');
         return;
       }
@@ -7332,7 +6589,8 @@ async function importData() {
 
       entries = [...entries, ...newEntries];
       setSyncStatus('syncing', 'Importing and syncing...');
-      const syncOk = await saveData();
+      // Pass syncRoutines: true so any imported routines push to cloud immediately
+      const syncOk = await saveData({ syncRoutines: true });
 
       render();
       buildSubjList();
@@ -7341,7 +6599,7 @@ async function importData() {
       if (syncOk) {
         toast(`Imported ${newEntries.length} entries, settings, and routines!`, 'ok');
       } else {
-        toast(`Imported ${newEntries.length} entries but sync failed.`, 'err');
+        toast(`Imported ${newEntries.length} entries but cloud sync failed.`, 'err');
       }
     } catch (err) {
       console.error('Import error:', err);
@@ -7398,8 +6656,8 @@ const CMDS=[
   {l:'Export JSON',i:'⬆',k:'Ctrl+E',fn:()=>exportAll()},
   {l:'Import JSON',i:'⬇',fn:()=>importData()},
   {l:'Load Routine JSON',i:'⚙',fn:()=>loadRoutineFile()},
-  {l:'Connect GitHub Sync',s:'Sync across all devices',i:'🐙',fn:()=>openGHConnectModal()},
-  {l:'Disconnect GitHub',i:'↩',fn:()=>disconnectGitHub()},
+  {l:'Sign in with Google',s:'Sync across all devices',i:'☁️',fn:()=>connectGitHub()},
+  {l:'Sign Out',i:'↩',fn:()=>disconnectGitHub()},
   {l:'Logout / New Semester',s:'Change semester',i:'🔄',fn:()=>logoutSemester()},
   {l:'Help',i:'?',k:'F1',fn:()=>openHelp()},
   {l:'Undo delete',i:'↩',k:'Ctrl+Z',fn:()=>undoDelete()},
@@ -8843,30 +8101,19 @@ function loadGoals() {
 async function saveGoals(pushToGist = true) {
   const data = { version: 1, goals, saved: new Date().toISOString() };
   try { localStorage.setItem(GOALS_LS_KEY, JSON.stringify(data)); } catch(e) {}
-  if (pushToGist && ghToken && gistId) {
+  if (pushToGist && fbUser) {
     try {
-      await ghFetch('PATCH', `/gists/${gistId}`, {
-        files: { [GOALS_GIST_FILE]: { content: JSON.stringify(data, null, 2) } }
-      });
-    } catch(e) { console.debug('Goal gist sync failed', e); }
+      await fbUserRef().set({ goals: data }, { merge: true });
+    } catch(e) { console.debug('Goal Firestore sync failed', e); }
   }
 }
 
 async function loadGoalsFromGist() {
-  if (!ghToken || !gistId) return;
+  if (!fbUser) return;
   try {
-    const gist = await ghFetch('GET', `/gists/${gistId}`);
-    if (!gist?.files?.[GOALS_GIST_FILE]) return;
-    
-    let data = null;
-    if (gist.files[GOALS_GIST_FILE]?.content) {
-      try { data = JSON.parse(gist.files[GOALS_GIST_FILE].content); } catch(e) {}
-    } else if (gist.files[GOALS_GIST_FILE]?.raw_url) {
-      const res = await fetch(gist.files[GOALS_GIST_FILE].raw_url + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) return;
-      data = await res.json();
-    }
-    
+    const snap = await fbUserRef().get();
+    if (!snap.exists) return;
+    const data = snap.data()?.goals;
     if (!data?.goals) return;
     
     const localMap = Object.fromEntries(goals.map(g => [g.id, g]));
@@ -8887,7 +8134,7 @@ async function loadGoalsFromGist() {
     }
     goals = merged.sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
     saveGoals(false);
-  } catch(e) { console.debug('Goal gist load failed', e); }
+  } catch(e) { console.debug('Goal Firestore load failed', e); }
 }
 
 /* ── helpers ── */
@@ -9218,15 +8465,13 @@ function renderGoalBackupTab(body) {
   const syncLbl = lastSync ? `Last saved ${new Date(lastSync).toLocaleString('en-IN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}` : 'Not yet saved';
   body.innerHTML = `
     <div class="gp-backup-sec">
-      <div class="gp-backup-title">GitHub Gist Sync</div>
+      <div class="gp-backup-title">Firebase Cloud Sync</div>
       <div class="gp-backup-row">${connected ? '🟢 Connected · ' + syncLbl : '🔴 Not connected - goals saved locally only'}</div>
       ${connected
         ? `<button class="gp-backup-btn" onclick="syncGoalsNow()">🔄 Sync goals now</button>`
-        : `      <button id="ghConnectBtn" class="gp-backup-btn" style="display: inline-flex; align-items: center; gap: 6px;" onclick="openGHConnectModal()">
-  <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13">
-    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-  </svg>
-  <span>Connect GitHub Sync</span>
+        : `<button class="gp-backup-btn" style="display:flex;align-items:center;gap:6px;justify-content:center" onclick="connectGitHub()">
+  <svg viewBox="0 0 24 24" width="14" height="14"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+  <span>Sign in with Google</span>
 </button>`}
     </div>
     <div class="gp-backup-sec">
@@ -9246,6 +8491,7 @@ function renderGoalBackupTab(body) {
 }
 
 async function syncGoalsNow() {
+  if (!fbUser) { toast('Sign in first', 'err'); return; }
   toast('Syncing goals…', 'info');
   await loadGoalsFromGist();
   await saveGoals(true);
@@ -9684,8 +8930,166 @@ function _initGoalPanelSwipe() {
   });
 }
 /* ── KICK OFF ── */
+/* ═══════════════════════════════════════════════════════
+   FINAL FIREBASE OVERRIDES
+   Replaces all GitHub Gist logic with Firestore.
+   ═══════════════════════════════════════════════════════ */
 
-/* Final sync/cache overrides. Keep these last so older duplicate helpers above cannot win. */
+// ── Stub out old GitHub helpers (called by mid-file code) ──
+async function ghFetch() { return null; }
+async function validateToken() { return null; }
+async function findOrCreateGist() { return fbUser ? { id: fbUser.uid } : null; }
+
+// ── Firestore save (Serialized to prevent race conditions) ──
+async function saveToGist(data, syncRoutines = false) {
+  if (!fbUser) return false;
+
+  const job = async () => {
+    ghSyncing = true;
+    updateSyncUI();
+    try {
+      // Prevent Firestore 1MB limit crash by dropping large files if payload is too big
+      let entriesToSync = applyTombstones(data.entries || entries);
+      let payload = {
+        mainData: {
+          ...data,
+          entries: entriesToSync,
+          deletedIds: normalizeDeletedIds(deletedIds),
+          activeRoutineId: currentRoutineId,
+          saved: new Date().toISOString()
+        },
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        uid: fbUser.uid
+      };
+      
+      if (syncRoutines) payload.routines = routines;
+
+      // Check size: If > 900KB, strip out file data (keep metadata) so text/notes still sync
+      if (JSON.stringify(payload).length > 900000) {
+        payload.mainData.entries = entriesToSync.map(e => ({
+          ...e,
+          files: (e.files || []).map(f => ({ name: f.name, type: f.type, size: f.size, data: 'dropped_cloud_size_limit' }))
+        }));
+        console.warn('Payload too large for Firestore. Dropped file attachments for cloud sync.');
+        toast('Some large attachments were not synced to cloud to prevent errors.', 'info');
+      }
+
+      await fbUserRef().set(payload, { merge: true });
+      return true;
+    } catch (err) {
+      console.error('Firebase save failed:', err);
+      if (err.code === 'resource-exhausted' || (err.message && err.message.includes('maximum'))) {
+        toast('Sync failed: Data too large. Remove large file attachments.', 'err');
+      }
+      setSyncStatus('err', 'Sync failed');
+      return false;
+    } finally {
+      ghSyncing = false;
+      updateSyncUI();
+    }
+  };
+
+  // Queue writes so rapid todo-checks don't drop data
+  const run = gistSaveQueue.then(job, job);
+  gistSaveQueue = run.catch(() => {});
+  return run;
+}
+
+// ── Firestore load ──
+async function loadFromGist() {
+  if (!fbUser) return null;
+  try {
+    const snap = await fbUserRef().get();
+    if (!snap.exists) return null;
+    const data = snap.data();
+
+    if (data.routines) {
+      let localRoutines = JSON.parse(localStorage.getItem('studylog_routines') || '{}');
+      Object.assign(localRoutines, data.routines);
+      localStorage.setItem('studylog_routines', JSON.stringify(localRoutines));
+      routines = localRoutines;
+      cleanUpRoutines();
+    }
+
+    if (data.mainData?.activeRoutineId && routines[data.mainData.activeRoutineId]) {
+      if (currentRoutineId !== data.mainData.activeRoutineId) {
+        currentRoutineId = data.mainData.activeRoutineId;
+        activeRoutine = routines[currentRoutineId];
+        localStorage.setItem('studylog_current_routine', currentRoutineId);
+        applyRoutine(activeRoutine, true);
+        toast('Switched to ' + activeRoutine.meta.routineName, 'info');
+      }
+    } else if (currentRoutineId === 'generic_sem' || !routines[currentRoutineId]) {
+      const realIds = Object.keys(routines).filter(id => id !== 'generic_sem');
+      if (realIds.length > 0) {
+        currentRoutineId = realIds[0];
+        activeRoutine = routines[currentRoutineId];
+        localStorage.setItem('studylog_current_routine', currentRoutineId);
+        applyRoutine(activeRoutine, true);
+      }
+    }
+
+    return data.mainData || null;
+  } catch (e) {
+    console.error('Firebase load failed:', e);
+    return null;
+  }
+}
+
+// ── Real-time listener (replaces polling) ──
+async function pollForChanges() {
+  // Not needed — onSnapshot handles real-time sync
+}
+
+function startBackgroundSync() {
+  if (!fbUser || fbUnsubMain) return;
+  fbUnsubMain = fbUserRef().onSnapshot(async (doc) => {
+    if (!doc.exists) return;
+    const data = doc.data();
+    if (data.mainData) {
+      const result = mergeCloudEntries(data.mainData);
+      if (result.changed) {
+        refreshDataViews();
+        toast('🔄 Synced from another device', 'info');
+      }
+    }
+    if (data.routines) {
+      let localRoutines = JSON.parse(localStorage.getItem('studylog_routines') || '{}');
+      Object.assign(localRoutines, data.routines);
+      localStorage.setItem('studylog_routines', JSON.stringify(localRoutines));
+      routines = localRoutines;
+      cleanUpRoutines();
+      buildSubjList();
+    }
+    if (data.goals?.goals) {
+      const cloudGoals = data.goals.goals;
+      const localMap = Object.fromEntries(goals.map(g => [g.id, g]));
+      const cloudMap = Object.fromEntries(cloudGoals.map(g => [g.id, g]));
+      const ids = new Set([...Object.keys(localMap), ...Object.keys(cloudMap)]);
+      const merged = [];
+      for (const id of ids) {
+        const l = localMap[id], c = cloudMap[id];
+        if (l && c) {
+          const base = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
+          const datesSet = new Set([...(l.completions||[]).map(x=>x.date)]);
+          const comps = [...(l.completions||[])];
+          (c.completions||[]).forEach(x => { if (!datesSet.has(x.date)) comps.push(x); });
+          merged.push({ ...base, completions: comps });
+        } else { merged.push(l || c); }
+      }
+      goals = merged.sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+      updateGoalBadge();
+      if (goalPanelOpen) renderGoalPanel();
+    }
+  }, (err) => { console.error('Firestore listener error:', err); });
+}
+
+function stopBackgroundSync() {
+  if (fbUnsubMain) { fbUnsubMain(); fbUnsubMain = null; }
+  if (fbUnsubGoals) { fbUnsubGoals(); fbUnsubGoals = null; }
+}
+
+// ── saveData ──
 async function saveData(opts = {}) {
   const { mergeFirst = true, quiet = false, syncRoutines = false } = opts;
   let data = {
@@ -9697,7 +9101,7 @@ async function saveData(opts = {}) {
   entries = data.entries;
   lsSave(data);
 
-  if (!ghToken) {
+  if (!fbUser) {
     if (!quiet) setSyncStatus('ok', 'Saved');
     return true;
   }
@@ -9707,16 +9111,10 @@ async function saveData(opts = {}) {
     if (mergeFirst) {
       await pullAndMergeFromGist();
       migrateEntriesToActiveRoutine();
-      data = {
-        version: 7,
-        entries: applyTombstones(entries),
-        settings: appSettings,
-        saved: new Date().toISOString()
-      };
+      data = { version: 7, entries: applyTombstones(entries), settings: appSettings, saved: new Date().toISOString() };
       entries = data.entries;
       lsSave(data);
     }
-
     const ok = await saveToGist(data, syncRoutines);
     if (!quiet) setSyncStatus(ok ? 'ok' : 'err', ok ? 'Synced' : 'Saved locally');
     return ok;
@@ -9724,34 +9122,26 @@ async function saveData(opts = {}) {
     console.error('Save failed:', err);
     if (!quiet) setSyncStatus('err', 'Saved locally');
     return false;
-  } finally {
-    updateSyncUI();
-  }
+  } finally { updateSyncUI(); }
 }
 
+// ── syncNow ──
 async function syncNow() {
-  if (!ghToken) {
-    toast('Connect GitHub first', 'err');
-    openGHConnectModal();
-    return false;
-  }
-
+  if (!fbUser) { toast('Sign in first', 'err'); openCloudModal(); return false; }
   setSyncStatus('syncing', 'Syncing...');
   try {
     const pull = await pullAndMergeFromGist();
     const migrated = migrateEntriesToActiveRoutine();
     entries = applyTombstones(entries);
     lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
-
     const pushOk = await saveData({ mergeFirst: false, quiet: true });
     refreshDataViews();
-
     if (pushOk) {
       setSyncStatus('ok', 'Synced');
       toast(pull.changed || migrated ? 'Synced changes across devices' : 'Already up to date', 'ok');
     } else {
       setSyncStatus('err', 'Sync failed');
-      toast('Sync failed - check GitHub token or connection', 'err');
+      toast('Sync failed', 'err');
     }
     return pushOk;
   } catch (err) {
@@ -9759,59 +9149,43 @@ async function syncNow() {
     setSyncStatus('err', 'Sync failed');
     toast('Sync failed - try again', 'err');
     return false;
-  } finally {
-    updateSyncUI();
-  }
+  } finally { updateSyncUI(); }
 }
 
-function _onVisChange() { if (document.visibilityState === 'visible' && ghToken) pollForChanges(); }
-function _onWindowFocus() { if (ghToken) pollForChanges(); }
-
-async function pollForChanges() {
-  if (!ghToken || isPolling || !gistId) return;
-  isPolling = true;
+// ── connectGitHub → now triggers Google sign-in ──
+async function connectGitHub() {
+  closeCloudModal(); // Instantly close modal so it doesn't get stuck on screen
+  setSyncStatus('syncing', 'Signing in...');
   try {
-    const gist = await ghFetch('GET', `/gists/${gistId}`);
-    if (!gist) return;
-    if (gist.updated_at === lastGistUpdatedAt) return;
-
-    const rawUrl = gist.files[GIST_FILENAME]?.raw_url;
-    if (!rawUrl) return;
-    const res = await fetch(rawUrl + '?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) return;
-    const gistData = await res.json();
-    lastGistUpdatedAt = gist.updated_at;
-
-    const { changed } = mergeCloudEntries(gistData);
-    if (changed) {
-      refreshDataViews();
-      toast('🔄 Synced from another device', 'info');
-    }
+    await fbAuth.signInWithPopup(googleProvider);
+    // onAuthStateChanged handles everything else
+    return true;
   } catch (e) {
-    console.debug('Background sync error', e);
-  } finally {
-    isPolling = false;
+    console.error('Google sign-in failed:', e);
+    setSyncStatus('err', 'Sign-in failed');
+    toast('Sign-in failed: ' + (e.message || 'Unknown error'), 'err');
+    return false;
   }
 }
 
-function startBackgroundSync() {
-  if (syncPollInterval) clearInterval(syncPollInterval);
-  syncPollInterval = setInterval(() => {
-    if (document.visibilityState === 'visible') pollForChanges();
-  }, 5000);
-  document.removeEventListener('visibilitychange', _onVisChange);
-  document.addEventListener('visibilitychange', _onVisChange);
-  window.removeEventListener('focus', _onWindowFocus);
-  window.addEventListener('focus', _onWindowFocus);
+// ── disconnectGitHub → now signs out of Firebase ──
+function disconnectGitHub() {
+  if (!confirm('Sign out and stop cloud sync?\n\nYour data stays in browser storage. You can sign in anytime.')) return;
+  stopBackgroundSync();
+  // Immediately clear local states so UI updates instantly
+  fbUser = null;
+  ghToken = '';
+  gistId = '';
+  localStorage.removeItem('slp_fb_uid');
+  localStorage.removeItem('slp_gh_user');
+  updateSyncUI();
+  toast('Disconnected. Data safe in browser storage.', 'info');
+  
+  // Trigger actual Firebase sign out
+  fbAuth.signOut().catch(e => console.error('Sign out error:', e));
 }
 
-function stopBackgroundSync() {
-  if (syncPollInterval) { clearInterval(syncPollInterval); syncPollInterval = null; }
-  document.removeEventListener('visibilitychange', _onVisChange);
-  window.removeEventListener('focus', _onWindowFocus);
-  lastGistUpdatedAt = null;
-}
-
+// ── loadData ──
 async function loadData() {
   let data = null;
   try {
@@ -9822,138 +9196,89 @@ async function loadData() {
     appSettings = data.settings;
     localStorage.setItem('slp_settings', JSON.stringify(appSettings));
   }
-
   entries = applyTombstones(data?.entries || []);
   lsSave({ version: 7, entries, settings: appSettings, saved: data?.saved || new Date().toISOString() });
 
-  if (!ghToken) return;
+  if (!fbUser) return;
 
   setSyncStatus('syncing', 'Syncing…');
-      try {
-        const pull = await pullAndMergeFromGist();
-        setSyncStatus(pull.ok ? 'ok' : 'err', pull.ok ? 'Synced ✓' : 'Saved locally');
-      } catch (err) {
-        console.error('Load sync failed:', err);
-        setSyncStatus('err', 'Saved locally');
-      } finally {
-        updateSyncUI();
-      }
-}
-
-async function connectGitHub(token) {
-  setSyncStatus('syncing', 'Verifying token...');
-  const user = await validateToken(token);
-  if (!user) {
-    setSyncStatus('err', 'Invalid token');
-    toast('Invalid token - check and try again', 'err');
-    return false;
-  }
-
-  ghToken = token;
-  localStorage.setItem('slp_gh_token', token);
-  localStorage.setItem('slp_gh_user', user.login);
-  setSyncStatus('syncing', 'Loading from GitHub...');
-
   try {
     const pull = await pullAndMergeFromGist();
-    migrateEntriesToActiveRoutine();
-    entries = applyTombstones(entries);
-    lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
-    await saveToGist({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() }, true);
-
-    setSyncStatus('ok', 'Synced');
-    updateSyncUI();
-    refreshDataViews();
-    toast(pull.ok ? 'Connected to GitHub - syncing across devices' : 'Connected - local data uploaded', 'ok');
-    startBackgroundSync();
-    return true;
+    if (pull.changed) refreshDataViews();
+    setSyncStatus(pull.ok ? 'ok' : 'err', pull.ok ? 'Synced ✓' : 'Saved locally');
   } catch (err) {
-    console.error('GitHub connect sync failed:', err);
-    setSyncStatus('err', 'Sync failed');
-    toast('Connected, but initial sync failed. Try Sync now.', 'err');
-    return false;
-  }
+    console.error('Load sync failed:', err);
+    setSyncStatus('err', 'Saved locally');
+  } finally { updateSyncUI(); }
 }
 
+// ── clearLocalCache (updated for Firebase keys) ──
 async function clearLocalCache() {
-  const ok = confirm(
-    'Clear local cache and UI history on this browser?\n\n' +
-    'This keeps synced entries, routines, goals, GitHub connection, and delete records.'
-  );
+  const ok = confirm('Clear local cache and UI history on this browser?\n\nThis keeps synced entries, routines, goals, and your sign-in.');
   if (!ok) return;
-
   const protectedKeys = new Set([
-    'studylog_v7', 'studylog_v6', 'studylog_v5',
-    'slp_deleted', 'slp_gh_token', 'slp_gist_id', 'slp_gh_user',
-    'studylog_routines', 'studylog_current_routine', 'slp_routine',
-    'slp_settings', 'slp_setup_done', 'slp_goals_v1'
+    'studylog_v7','studylog_v6','studylog_v5','slp_deleted',
+    'slp_fb_uid','slp_gh_user','studylog_routines','studylog_current_routine',
+    'slp_routine','slp_settings','slp_setup_done','slp_goals_v1'
   ]);
-  const exactKeys = [
-    'slp_view', 'slp_group', 'slp_sort', 'slp_hist',
-    'subjListCollapsed', 'slp_sidebar_collapsed',
-    'slp_entry_draft', 'slp_filters', 'slp_last_search',
-    'slp_cmd_recent', 'slp_notif_asked'
-  ];
-  const prefixes = ['slp_draft_', 'slp_tmp_', 'slp_cache_', 'slp_recent_', 'slp_last_', 'slp_gnotif_'];
-  const removed = new Set();
-
-  function removeKey(key) {
-    if (!key || protectedKeys.has(key)) return;
-    localStorage.removeItem(key);
-    removed.add(key);
-  }
-
+  const exactKeys = ['slp_view','slp_group','slp_sort','slp_hist','subjListCollapsed','slp_sidebar_collapsed','slp_notif_asked'];
+  const prefixes = ['slp_draft_','slp_tmp_','slp_cache_','slp_gnotif_'];
+  function removeKey(key) { if (!protectedKeys.has(key)) localStorage.removeItem(key); }
   exactKeys.forEach(removeKey);
   Object.keys(localStorage).forEach(key => {
-    if (!protectedKeys.has(key) && prefixes.some(prefix => key.startsWith(prefix))) {
-      removeKey(key);
-    }
+    if (!protectedKeys.has(key) && prefixes.some(p => key.startsWith(p))) removeKey(key);
   });
-
-  try {
-    Object.keys(sessionStorage).forEach(key => {
-      if (key.startsWith('slp_') || key.startsWith('studylog_')) sessionStorage.removeItem(key);
-    });
-  } catch (e) {}
-
-  if ('caches' in window) {
-    try {
-      const keys = await caches.keys();
-      await Promise.all(keys.filter(key => /studylog|slp/i.test(key)).map(key => caches.delete(key)));
-    } catch (e) {}
-  }
-
-  activeSubjs = [];
-  activeTagFilters = [];
-  activeNav = 'all';
-  groupMode = 'day';
+  activeSubjs = []; activeTagFilters = []; activeNav = 'all'; groupMode = 'day';
   if (selIds?.size) clearSel();
-  closeMobileSidebar();
-  document.querySelectorAll('#qInput, #toolbarSearchInput, input[type="search"]').forEach(input => { input.value = ''; });
-  history.replaceState({ slp: 'base' }, '');
   switchView('list');
   refreshDataViews();
   updateSyncUI();
-  toast(`Local cache cleared. Synced data kept.`, 'ok');
+  toast('Local cache cleared. Cloud data kept.', 'ok');
 }
 
-(function(){
-  function _wrapDisconnect(){
-    if (typeof window.disconnectGitHub === 'function'){
-      const _orig = window.disconnectGitHub;
-      window.disconnectGitHub = function(){
-        try { stopBackgroundSync(); } catch(e){}
-        return _orig.apply(this, arguments);
-      };
-    } else {
-      setTimeout(_wrapDisconnect, 200);
+// ── Firebase Auth State Observer ──
+fbAuth.onAuthStateChanged(async (user) => {
+  if (user) {
+    fbUser = user;
+    ghToken = user.uid;
+    gistId = user.uid;
+    localStorage.setItem('slp_fb_uid', user.uid);
+    localStorage.setItem('slp_gh_user', user.displayName || user.email || 'User');
+    localStorage.setItem('slp_setup_done', '1');
+    updateSyncUI();
+    setSyncStatus('syncing', 'Loading from cloud...');
+    try {
+      const pull = await pullAndMergeFromGist();
+      migrateEntriesToActiveRoutine();
+      entries = applyTombstones(entries);
+      lsSave({ version: 7, entries, settings: appSettings, saved: new Date().toISOString() });
+      refreshDataViews();
+      setSyncStatus('ok', 'Synced');
+      startBackgroundSync();
+      await loadGoalsFromGist();
+      updateGoalBadge();
+    } catch (e) {
+      console.error('Auth state sync failed:', e);
+      setSyncStatus('err', 'Sync failed');
     }
+    document.getElementById('setupOverlay')?.classList.add('hidden');
+  } else {
+    fbUser = null;
+    ghToken = '';
+    gistId = '';
+    localStorage.removeItem('slp_fb_uid');
+    stopBackgroundSync();
+    updateSyncUI();
   }
-  _wrapDisconnect();
+});
+
+// ── Wire up disconnect wrapper ──
+(function(){
+  const _orig = window.disconnectGitHub;
+  window.disconnectGitHub = function(){ try { stopBackgroundSync(); } catch(e){} return _orig.apply(this, arguments); };
 })();
 
 init();
-
 </script>
 </body>
 </html>
