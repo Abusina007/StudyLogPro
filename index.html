@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>StudyLog Pro</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Ccircle fill='%23061F31' cx='512' cy='512' r='509.979'/%3E%3Cpath fill='%2325A6F4' d='M563.132,342.368h116.296V705.51h197.317v105.36H563.132V342.368z'/%3E%3Cpath fill='%23FFFFFF' stroke='%23061F31' stroke-width='21' stroke-miterlimit='10' d='M341.503,608.479c4.569,25.165,12.569,44.889,24.012,59.174c18.867,20.582,50.879,30.873,96.05,30.873c27.442,0,49.31-4.851,65.605-14.579c16.294-9.715,24.441-23.155,24.441-40.307c0-14.86-5.722-25.58-17.152-32.16c-11.443-6.566-40.601-16.147-87.473-28.729c-52.608-12.569-94.053-25.151-124.35-37.734c-73.753-33.728-110.629-86.041-110.629-156.939c0-46.873,15.437-85.759,46.31-116.632c38.873-38.873,99.48-58.316,181.809-58.316c103.473,0,192.099,32.307,229.833,96.907c14.861,26.88,22.298,53.465,22.298,79.756v11.149H552.469c-2.291-24.012-9.728-42.022-22.297-54.028c-16.013-15.437-57.752-23.155-89.188-23.155c-27.443,0-48.883,5.012-64.319,15.008c-15.437,10.01-23.155,23.878-23.155,41.593c0,13.721,5.427,24.307,16.294,31.731c8.576,6.861,33.727,16.294,75.468,28.3c78.897,18.867,136.637,38.886,173.232,60.031c49.165,27.443,73.753,70.323,73.753,128.639c0,51.455-19.162,93.772-57.459,126.923c-43.456,36.595-106.636,54.886-189.526,54.886c-160.088,0-241.558-67.455-244.413-202.391H341.503z'/%3E%3C/svg%3E"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
@@ -76,7 +77,8 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 #setupOverlay{position:fixed;inset:0;background:var(--bg);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .25s}
 #setupOverlay.hidden{display:none}
 .su-card{padding:40px 28px;text-align:center;}
-.su-logo{width:60px;height:60px;background:linear-gradient(135deg,#001e36,#001e36);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;margin:0 auto 10px;}
+.su-logo{width:60px;height:60px;background:linear-gradient(135deg,#001e36,#001e36);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;margin:0 auto 10px;overflow:hidden}
+.su-logo svg{width:100%;height:100%;display:block}
 .su-progress{display:flex;gap:5px;justify-content:center;margin-bottom:22px}
 .su-dot{width:8px;height:8px;border-radius:50%;background:var(--panel4);transition:all .2s}
 .su-dot.on{background:var(--accent);width:22px;border-radius:4px}
@@ -120,7 +122,8 @@ input,textarea,select,button{font-family:var(--font);font-size:14px}
 .tb-hamburger:hover{background:var(--panel2);border-color:var(--border2)}
 .tb-hamburger span{display:block;width:100%;height:1.5px;background:var(--text2);border-radius:2px;transition:all .2s}
 .tb-brand{display:flex;align-items:center;gap:8px;padding-right:10px;border-right:1px solid var(--border);margin-right:8px;flex-shrink:0;padding-left: 5px;}
-.tb-logo{width:28px;height:28px;background:#001e36;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
+.tb-logo{width:28px;height:28px;background:#001e36;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden}
+.tb-logo svg{width:100%;height:100%;display:block}
 .tb-name{font-weight:600;font-size:13px;color:var(--text);letter-spacing:-.3px;line-height:1.2;white-space:nowrap}
 .tb-name small{display:block;font-size:9.5px;font-weight:400;color:var(--text3);letter-spacing:.1px}
 .tb-sep{width:1px;height:20px;background:var(--border);margin:0 7px;flex-shrink:0}
@@ -2468,10 +2471,19 @@ button, select, input[type="date"] {
 </head>
 <body>
 
+<!-- App logo sprite -->
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="app-logo" viewBox="0 0 1024 1024">
+    <circle fill="#061F31" cx="512" cy="512" r="509.979"/>
+    <path fill="#25A6F4" d="M563.132,342.368h116.296V705.51h197.317v105.36H563.132V342.368z"/>
+    <path fill="#FFFFFF" stroke="#061F31" stroke-width="21" stroke-miterlimit="10" d="M341.503,608.479c4.569,25.165,12.569,44.889,24.012,59.174c18.867,20.582,50.879,30.873,96.05,30.873c27.442,0,49.31-4.851,65.605-14.579c16.294-9.715,24.441-23.155,24.441-40.307c0-14.86-5.722-25.58-17.152-32.16c-11.443-6.566-40.601-16.147-87.473-28.729c-52.608-12.569-94.053-25.151-124.35-37.734c-73.753-33.728-110.629-86.041-110.629-156.939c0-46.873,15.437-85.759,46.31-116.632c38.873-38.873,99.48-58.316,181.809-58.316c103.473,0,192.099,32.307,229.833,96.907c14.861,26.88,22.298,53.465,22.298,79.756v11.149H552.469c-2.291-24.012-9.728-42.022-22.297-54.028c-16.013-15.437-57.752-23.155-89.188-23.155c-27.443,0-48.883,5.012-64.319,15.008c-15.437,10.01-23.155,23.878-23.155,41.593c0,13.721,5.427,24.307,16.294,31.731c8.576,6.861,33.727,16.294,75.468,28.3c78.897,18.867,136.637,38.886,173.232,60.031c49.165,27.443,73.753,70.323,73.753,128.639c0,51.455-19.162,93.772-57.459,126.923c-43.456,36.595-106.636,54.886-189.526,54.886c-160.088,0-241.558-67.455-244.413-202.391H341.503z"/>
+  </symbol>
+</svg>
+
 <!-- ▀▄▀▄ SETUP/LOGIN OVERLAY ▀▄▀▄ -->
 <div id="setupOverlay">
   <div class="su-card">
-    <div class="su-logo">SL</div>
+    <div class="su-logo"><svg viewBox="0 0 1024 1024"><use href="#app-logo"/></svg></div>
     <div class="tb-name" style="margin-bottom: 30px;">StudyLog Pro</div>
     <div id="suContent"></div>
   </div>
@@ -2494,7 +2506,7 @@ button, select, input[type="date"] {
 
   <!-- Brand -->
   <div class="tb-brand for-small tb-mobile-hide" style="padding-left:4px">
-    <div class="tb-logo" style="background:#001e36;border-radius:8px;font-size:14px">SL</div>
+    <div class="tb-logo"><svg viewBox="0 0 1024 1024"><use href="#app-logo"/></svg></div>
     <div class="tb-name focus-btn" id="tbName">StudyLog Pro<small id="tbSub">AIML · 1A</small></div>
   </div>
 
@@ -2577,7 +2589,7 @@ button, select, input[type="date"] {
     <div class="sb-top-head">
       <!-- Brand -->
       <div class="sb-mobile-brand" style="align-items:center;gap:8px">
-        <div style="width:28px;height:28px;background:#001e36;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">SL</div>
+        <div style="width:28px;height:28px;background:#001e36;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><svg viewBox="0 0 1024 1024" style="width:100%;height:100%"><use href="#app-logo"/></svg></div>
         <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.2px">StudyLog Pro</div>
       </div>
       <div class="sb-top-actions">
